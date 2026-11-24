@@ -1,0 +1,10 @@
+.DS_Store
+/.claude/*
+!/.claude/CLAUDE.md
+# pobrany zestaw testów W3C (pytanie 1) i wyniki porównań nie trafiają do repozytorium
+/testdata/w3c/xsdtests/
+/out/
+/ref/
+# skompilowane programy
+/tools/compare/compare
+/cmd/goxsdgo/goxsdgo

@@ -1,0 +1,25 @@
+# Plan
+
+Szacunki z 2026-11-24, w godzinach pracy z asystentem. Kryteria zakończenia całości: ADR 0001, kryteria K1–K9.
+
+| Etap | Zakres | Szacunek | Stan |
+|---|---|---|---|
+| 0 | infrastruktura testów: pobranie i przypięcie zestawu W3C (pytanie 1), czytnik metadanych zestawu (`*.testSet`, oczekiwane werdykty), raport zaliczeń według grup (Microsoft, Sun, NIST, Boeing, IBM), test pokrycia wymagań, szkielet fuzzingu, `tools/compare` z `goxsdval` (`-tags libxml2`), korpus MF z plikiem oczekiwań | 6–10 h | — |
+| 1 | czytnik XML: XML 1.0 Fifth Edition i przestrzenie nazw, strumieniowo, wiersz i kolumna, dobra forma, DOCTYPE bez rozwijania encji zewnętrznych, limity (pytanie 3) | 12–18 h | — |
+| 2 | typy proste: 44 typy wbudowane, przestrzeń wartości i leksykalna, normalizacja białych znaków, wszystkie aspekty (`length`, `pattern`, `enumeration`, `totalDigits`, `fractionDigits`, zakresy…), listy i unie, tłumacz wyrażeń regularnych XSD → RE2 | 20–30 h | — |
+| 3 | wczytanie schematu: komponenty z dokumentu schematu, `include`, `import`, `redefine`, rozwiązywanie nazw i przestrzeni, `fs.FS` bez sieci, katalog przestrzeń → plik, ograniczenia poprawności schematu (rozdział 3 części 1) z kodami błędów | 20–30 h | — |
+| 4 | typy złożone i modele zawartości: rozszerzenie i ograniczenie (z kontrolą poprawnego ograniczenia), `sequence`/`choice`/`all`, liczności jako liczniki, UPA, EDC, symbole wieloznaczne, grupy podstawienia, `abstract`, `block`, `final`, `mixed`, `nillable` | 20–30 h | — |
+| 5 | walidacja dokumentu: strumieniowa ocena elementów i atrybutów, `xsi:type`, `xsi:nil`, wartości domyślne i stałe, ograniczenia tożsamości z podzbiorem XPath, zbieranie błędów z limitem, ścieżka elementu | 15–20 h | — |
+| 6 | błędy dla ludzi i zgodność z odbiorcą: katalog kodów, parametry błędów, tabela `compat` do kodów libxml2, pierwszy błąd w tym samym miejscu co libxml2, `differences.md`, opcjonalna funkcja zwrotna z wartością typowaną (pytanie 6) | 8–12 h | — |
+| 7 | utwardzanie: przypadki patologiczne, fuzzing, pamięć przy pliku 1 GB, testy wydajności na dużych JPK | 8–12 h | — |
+| 8 | odbiór: pomiar K1–K9, pakiet dowodów, próba przepięcia u odbiorcy na jego testach | 4–6 h | — |
+| | **razem** | **115–170 h** | |
+
+Walidator odniesienia w `tools/compare`: `goxsdval` z libxml2 2.15.3 lub nowszą (wersja przypięta w pomiarach).
+
+Rozmiar docelowy: 10–14 tys. linii kodu bez testów (dla porównania: moduł schematów libxml2 w C ma ok. 29 tys. linii,
+same walidacje bez parsera XML).
+
+Kolejność jest zależnością: etap 3 potrzebuje czytnika z etapu 1 i typów z etapu 2; etap 5 potrzebuje 3 i 4. Etapy 1 i 2
+można prowadzić równolegle. Liczba zaliczonych przypadków W3C, w podziale na grupy, jest datowaną miarą postępu po każdym
+etapie; pierwsze liczby (typy proste z grupy NIST) pojawią się po etapie 2.

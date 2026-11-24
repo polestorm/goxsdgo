@@ -1,0 +1,32 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        go: ["1.22", "stable"]
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+      - name: gofmt
+        if: matrix.os == 'ubuntu-latest'
+        run: test -z "$(gofmt -l .)"
+      - name: no dependencies in the library module
+        if: matrix.os == 'ubuntu-latest'
+        run: "! grep -q '^require' go.mod"
+      - name: no cgo in the library
+        if: matrix.os == 'ubuntu-latest'
+        run: CGO_ENABLED=0 go build ./...
+      - run: go vet ./...
+      - run: go test ./...

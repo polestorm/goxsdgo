@@ -1,0 +1,8 @@
+goxsdgo
+Copyright 2026 Michał Głębowski
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Test data by other authors (the W3C XML Schema test suite, published schemas
+of public bodies) is not covered by the licence of goxsdgo. Sources, licences
+and checksums are in testdata/README.md.
