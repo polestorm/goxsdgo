@@ -78,14 +78,15 @@ All of them were run as programs through their public API, on the same cases and
 
 🥇 marks the best value in a row, when no more than two candidates share it. The full comparison (schema and
 instance tests, the MF corpus, safety probes, 20 MB and 1 GB documents, every footnote and how it was measured):
-[docs/comparison.md](docs/comparison.md).
+[docs/comparison.md](docs/comparison.md); the contested cases, each with its reason:
+[docs/contested-cases.md](docs/contested-cases.md).
 
 [^w3c]: The W3C XML Schema test suite, all 39,439 cases that apply to XSD 1.0 Second Edition, run by one harness
     with the same expected verdicts for every candidate.
 [^contested]: 133 cases chosen in advance by fixed criteria, the same for every candidate: queried or disputed in
     the suite's own metadata, dependent on the XML edition of name characters, or with opposite expectations in the
     suite for the same situation. In those cases goxsdgo follows the text of the recommendation; each one is listed
-    in [docs/contested-cases.md](docs/contested-cases.md).
+    in [docs/contested-cases.md](https://github.com/polestorm/goxsdgo/blob/main/docs/contested-cases.md).
 [^perf]: A synthetic JPK_V7M(3) file; schema compiled and file validated in a fresh process; wall time and
     process memory; one Apple M4 laptop shared with other work, so differences under about 10% are noise.
 [^tree]: Builds a tree of the whole document (11× and 22× the file size in memory), so not run on 200 MB.
