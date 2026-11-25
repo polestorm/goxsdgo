@@ -12,6 +12,7 @@ test `TestRequirementsCovered` sprawdza pokrycie w obie strony.
 | `CM` | `content.md` | typy złożone, modele zawartości, UPA, EDC, wyprowadzenia, grupy podstawienia |
 | `VAL` | `validation.md` | ocena dokumentu, `xsi:*`, wartości domyślne, ograniczenia tożsamości |
 | `ERR` | `errors.md` | kody, pozycje, ścieżki, parametry, tabela `compat`, kolejność |
+| `MSG` | `messages.md` | komunikaty dla ludzi w wielu językach (pakiet `messages`), warianty, parametry |
 | `SAFE` | `safety.md` | brak sieci i encji zewnętrznych, limity |
 | `DET` | `determinism.md` | powtarzalność, czas liniowy, pamięć przy strumieniu |
 

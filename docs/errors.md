@@ -7,7 +7,9 @@ i może się zmieniać, a do tłumaczenia służy kod i parametry.
 - **Rodzaj**: `schema` — błąd schematu (`SchemaError.Errors`); `document` — błąd dokumentu (wynik `Validate`);
   `limit` — limit biblioteki albo konstrukcja nieobsługiwana, kod tylko w treści błędu zwracanego drugim wynikiem
   (`ErrLimit`, `errors.ErrUnsupported`).
-- **Parametry**: pola `Error`, które błąd może ustawić poza `Code`, `Line`, `Column`, `Message`.
+- **Parametry**: pola `Error`, które błąd może ustawić poza `Code`, `Line`, `Column`, `Message`;
+  `Name` obejmuje też `Namespace`, `Reason` także `ExpectedNamespace`, `Type` także `TypeNamespace` i
+  `Builtin`, `Insert` pola `InsertLine` i `InsertColumn` (ADR 0010).
 - **libxml2**: odpowiednik z tabeli compat (kryterium K8); „observed n/m” — ustalony na tych samych danych przez
   `tools/compare`, „assigned” — przypisany, z podaną podstawą.
 - **Własny**: kod nadany przez goxsdgo, bo rekomendacja nie nazywa tej reguły.
@@ -24,15 +26,15 @@ Kodów: 234 (schema 143, document 80, limit 11); własnych 41; z odpowiednikiem 
 | `cvc-complex-type.2.1` | [XSD 1 3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-complex-type) | Path, Name | 1841 (observed 23/23) | An element with empty content has text or child elements. |
 | `cvc-complex-type.2.2` | [XSD 1 3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-complex-type) | Path, Name | 1842 (observed 2/2) | An element with simple content has child elements. |
 | `cvc-complex-type.2.3` | [XSD 1 3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-complex-type) | Path, Name, Value | 1843 (observed 23/23) | An element with element-only content has text other than white space. |
-| `cvc-complex-type.2.4` | [XSD 1 3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-complex-type) | Path, Name, Expected | 1871 (observed 794/805) | Child elements do not match the content model: an unexpected element or a missing one (Expected lists what is allowed). |
+| `cvc-complex-type.2.4` | [XSD 1 3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-complex-type) | Path, Name, Expected, Reason, Insert | 1871 (observed 794/805) | Child elements do not match the content model: an unexpected element or a missing one (Expected lists what is allowed). |
 | `cvc-complex-type.3.2.1` | [XSD 1 3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-complex-type) | Path, Name | 1866 (observed 76/78) | An attribute that is not declared and not allowed by an attribute wildcard. |
 | `cvc-complex-type.3.2.2` | [XSD 1 3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-complex-type) | Path, Name | 1867 (observed 76/76) | An attribute whose namespace the attribute wildcard does not allow. |
 | `cvc-complex-type.4` | [XSD 1 3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-complex-type) | Path, Name | 1868 (observed 17/17) | A required attribute is missing. |
 | `cvc-complex-type.5.1` | [XSD 1 3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-complex-type) | Path, Name | 1869 (assigned by meaning; libxml2 accepts the probe document) | More than one attribute of type ID through the attribute wildcard. |
 | `cvc-complex-type.5.2` | [XSD 1 3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-complex-type) | Path, Name | 1869 (assigned by meaning; libxml2 accepts the probe document) | An attribute of type ID through the wildcard on a type that already declares one. |
-| `cvc-datatype-valid.1.2.1` | [XSD 2 4.1.4](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-datatype-valid) | Path, Name, Value | 1824 (observed 731/731) | The value is not in the lexical space of the type. |
-| `cvc-datatype-valid.1.2.2` | [XSD 2 4.1.4](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-datatype-valid) | Path, Name, Value | 1824 (observed 4/4) | An item of a list value is not valid for the item type. |
-| `cvc-datatype-valid.1.2.3` | [XSD 2 4.1.4](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-datatype-valid) | Path, Name, Value | 1826 (observed 34/34) | The value matches no member type of the union. |
+| `cvc-datatype-valid.1.2.1` | [XSD 2 4.1.4](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-datatype-valid) | Path, Name, Value, Type | 1824 (observed 731/731) | The value is not in the lexical space of the type. |
+| `cvc-datatype-valid.1.2.2` | [XSD 2 4.1.4](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-datatype-valid) | Path, Name, Value, Type | 1824 (observed 4/4) | An item of a list value is not valid for the item type. |
+| `cvc-datatype-valid.1.2.3` | [XSD 2 4.1.4](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-datatype-valid) | Path, Name, Value, Type | 1826 (observed 34/34) | The value matches no member type of the union. |
 | `cvc-elt.1` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-elt) | Path, Name | 1845 (observed 42/44) | No element declaration where strict assessment requires one (validation root or strict wildcard). |
 | `cvc-elt.2` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-elt) | Path, Name | 1846 (observed 2/2) | The element declaration is abstract. |
 | `cvc-elt.3.1` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-elt) | Path, Name | 1847 (observed 12/12) | xsi:nil on an element whose declaration is not nillable. |
@@ -41,13 +43,13 @@ Kodów: 234 (schema 143, document 80, limit 11); własnych 41; z odpowiednikiem 
 | `cvc-elt.4.1` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-elt) | Path, Name, Value | 1824 (observed 2/2) | The xsi:type value is not a valid QName. |
 | `cvc-elt.4.2` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-elt) | Path, Name, Value | 1851 (observed 8/9) | The xsi:type value does not resolve to a type definition. |
 | `cvc-elt.4.3` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-elt) | Path, Name | 1852 (observed 355/355) | The xsi:type type is not validly derived from the declared type, or the derivation is blocked. |
-| `cvc-elt.5.1.1` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-elt) | Path, Name, Value, Facet | 1833 (observed 4/8) | The default value is not valid for the type given by xsi:type. |
+| `cvc-elt.5.1.1` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-elt) | Path, Name, Value, Facet, Type | 1833 (observed 4/8) | The default value is not valid for the type given by xsi:type. |
 | `cvc-elt.5.2.2.1` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-elt) | Path, Name | 1857 (observed 2/2) | An element with a fixed value has child elements. |
 | `cvc-elt.5.2.2.2.1` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-elt) | Path, Name, Value | 1857 (observed 8/8) | The content of a mixed element does not match its fixed value. |
 | `cvc-elt.5.2.2.2.2` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-elt) | Path, Name, Value | 1858 (observed 64/64) | The value of an element does not match its fixed value. |
 | `cvc-entity` | [XSD 2 3.3.11](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#ENTITY), własny | Path, Name, Value | 1824 (assigned by meaning (value not valid for its type)) | An ENTITY or ENTITIES value is not the name of an unparsed entity declared in the document. |
-| `cvc-enumeration-valid` | [XSD 2 4.3.5.4](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-enumeration-valid) | Path, Name, Value, Facet | 1840 (observed 2850/2852) | The value is not one of the enumerated values. |
-| `cvc-fractionDigits-valid` | [XSD 2 4.3.12.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-fractionDigits-valid) | Path, Name, Value, Facet | 1838 (observed 50/50) | The value has more fraction digits than fractionDigits. |
+| `cvc-enumeration-valid` | [XSD 2 4.3.5.4](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-enumeration-valid) | Path, Name, Value, Facet, Type | 1840 (observed 2850/2852) | The value is not one of the enumerated values. |
+| `cvc-fractionDigits-valid` | [XSD 2 4.3.12.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-fractionDigits-valid) | Path, Name, Value, Facet, Type | 1838 (observed 50/50) | The value has more fraction digits than fractionDigits. |
 | `cvc-id.1` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-id) | Path, Value | 1824 (assigned like cvc-id.2; libxml2 does not check IDREF values) | An IDREF value does not match any ID in the document. |
 | `cvc-id.2` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-id) | Path, Name, Value | 1824 (observed 5/5) | An ID value is not unique in the document. |
 | `cvc-identity-constraint.3` | [XSD 1 3.11.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-identity-constraint) | Path | 1877 (observed 24/24) | A field of an identity constraint selects more than one node or a node without a simple value. |
@@ -56,16 +58,16 @@ Kodów: 234 (schema 143, document 80, limit 11); własnych 41; z odpowiednikiem 
 | `cvc-identity-constraint.4.2.2` | [XSD 1 3.11.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-identity-constraint) | Path, Value | 1877 (observed 44/44) | Duplicate value for a key. |
 | `cvc-identity-constraint.4.2.3` | [XSD 1 3.11.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-identity-constraint) | Path | 1877 (observed 2/2) | A field of a key selects an element with xsi:nil="true". |
 | `cvc-identity-constraint.4.3` | [XSD 1 3.11.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-identity-constraint) | Path, Value | 1877 (observed 67/67) | A keyref value has no matching key or unique value. |
-| `cvc-length-valid` | [XSD 2 4.3.1.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-length-valid) | Path, Name, Value, Facet | 1830 (observed 2304/2304) | The value does not have the required length. |
-| `cvc-maxExclusive-valid` | [XSD 2 4.3.8.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-maxExclusive-valid) | Path, Name, Value, Facet | 1836 (observed 1094/1094) | The value is not less than maxExclusive. |
-| `cvc-maxInclusive-valid` | [XSD 2 4.3.7.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-maxInclusive-valid) | Path, Name, Value, Facet | 1834 (observed 1242/1275) | The value is greater than maxInclusive. |
-| `cvc-maxLength-valid` | [XSD 2 4.3.3.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-maxLength-valid) | Path, Name, Value, Facet | 1832 (observed 2288/2288) | The value is longer than maxLength. |
-| `cvc-minExclusive-valid` | [XSD 2 4.3.9.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-minExclusive-valid) | Path, Name, Value, Facet | 1835 (observed 1058/1058) | The value is not greater than minExclusive. |
-| `cvc-minInclusive-valid` | [XSD 2 4.3.10.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-minInclusive-valid) | Path, Name, Value, Facet | 1833 (observed 1192/1225) | The value is less than minInclusive. |
-| `cvc-minLength-valid` | [XSD 2 4.3.2.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-minLength-valid) | Path, Name, Value, Facet | 1831 (observed 2276/2284) | The value is shorter than minLength. |
+| `cvc-length-valid` | [XSD 2 4.3.1.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-length-valid) | Path, Name, Value, Facet, Type | 1830 (observed 2304/2304) | The value does not have the required length. |
+| `cvc-maxExclusive-valid` | [XSD 2 4.3.8.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-maxExclusive-valid) | Path, Name, Value, Facet, Type | 1836 (observed 1094/1094) | The value is not less than maxExclusive. |
+| `cvc-maxInclusive-valid` | [XSD 2 4.3.7.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-maxInclusive-valid) | Path, Name, Value, Facet, Type | 1834 (observed 1242/1275) | The value is greater than maxInclusive. |
+| `cvc-maxLength-valid` | [XSD 2 4.3.3.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-maxLength-valid) | Path, Name, Value, Facet, Type | 1832 (observed 2288/2288) | The value is longer than maxLength. |
+| `cvc-minExclusive-valid` | [XSD 2 4.3.9.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-minExclusive-valid) | Path, Name, Value, Facet, Type | 1835 (observed 1058/1058) | The value is not greater than minExclusive. |
+| `cvc-minInclusive-valid` | [XSD 2 4.3.10.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-minInclusive-valid) | Path, Name, Value, Facet, Type | 1833 (observed 1192/1225) | The value is less than minInclusive. |
+| `cvc-minLength-valid` | [XSD 2 4.3.2.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-minLength-valid) | Path, Name, Value, Facet, Type | 1831 (observed 2276/2284) | The value is shorter than minLength. |
 | `cvc-notation` | [XSD 2 3.2.19](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#NOTATION), własny | Path, Name, Value | 1824 (assigned by meaning (value not valid for its type)) | A NOTATION value is not the name of a notation in the schema. |
-| `cvc-pattern-valid` | [XSD 2 4.3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-pattern-valid) | Path, Name, Value, Facet | 1839 (observed 5396/5568) | The value does not match a pattern facet. |
-| `cvc-totalDigits-valid` | [XSD 2 4.3.11.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-totalDigits-valid) | Path, Name, Value, Facet | 1837 (observed 648/648) | The value has more digits than totalDigits. |
+| `cvc-pattern-valid` | [XSD 2 4.3.4.4](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-pattern-valid) | Path, Name, Value, Facet, Type | 1839 (observed 5396/5568) | The value does not match a pattern facet. |
+| `cvc-totalDigits-valid` | [XSD 2 4.3.11.3](https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#cvc-totalDigits-valid) | Path, Name, Value, Facet, Type | 1837 (observed 648/648) | The value has more digits than totalDigits. |
 | `cvc-type.2` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-type) | Path, Name | 1876 (observed 10/10) | The type definition is abstract. |
 | `cvc-type.3.1.1` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-type) | Path, Name | 1827 (observed 2/2) | An element of simple type has attributes other than xsi attributes. |
 | `cvc-type.3.1.2` | [XSD 1 3.3.4](https://www.w3.org/TR/2004/REC-xmlschema-1-20041028/#cvc-type) | Path, Name | 1828 (observed 6/6) | An element of simple type has child elements. |

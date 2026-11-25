@@ -39,8 +39,13 @@ func (o *codeObserver) add(kind string, errs []Error) {
 		}
 		c.count++
 		c.kinds[kind] = true
+		if e.Namespace != "" && e.Name == "" {
+			c.fields["Namespace without Name"] = true
+		}
 		for name, set := range map[string]bool{"Name": e.Name != "", "Value": e.Value != "", "Facet": e.Facet != "",
-			"Expected": len(e.Expected) > 0, "Path": e.Path != "", "Document": e.Document != ""} {
+			"Expected": len(e.Expected) > 0, "Path": e.Path != "", "Document": e.Document != "",
+			"Reason": e.Reason != "" || e.ExpectedNamespace != "", "Type": e.Type != "" || e.TypeNamespace != "" || e.Builtin != "",
+			"Insert": e.InsertLine != 0 || e.InsertColumn != 0} {
 			if set {
 				c.fields[name] = true
 			}

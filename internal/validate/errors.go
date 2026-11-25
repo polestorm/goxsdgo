@@ -78,7 +78,33 @@ type Error struct {
 	// symbol wieloznaczny jako "*" albo "{przestrzeń}*".
 	Expected []string
 	Message  string
+
+	// Namespace to przestrzeń nazw elementu albo atrybutu Name (pusta dla nazwy bez przestrzeni).
+	Namespace string
+	// Reason rozróżnia błędy cvc-complex-type.2.4 (ReasonMissing, ReasonUnexpected, ReasonWrongNamespace); dla
+	// innych kodów jest pusty. Kod reguły się nie zmienia (ADR 0010).
+	Reason string
+	// ExpectedNamespace to przestrzeń nazw, w której schemat oczekuje elementu o tej samej nazwie lokalnej
+	// (tylko ReasonWrongNamespace).
+	ExpectedNamespace string
+	// Type i TypeNamespace to typ ze schematu, któremu nie odpowiada wartość (błędy typów prostych); Type jest
+	// pusty dla typu anonimowego. Builtin to najbliższy typ wbudowany, z którego typ pochodzi (np. "date").
+	Type, TypeNamespace, Builtin string
+	// InsertLine i InsertColumn wskazują miejsce, w którym powinien zacząć się oczekiwany element (błędy
+	// cvc-complex-type.2.4): przed niedozwolonym elementem albo przed znacznikiem końcowym rodzica. Zero, gdy
+	// miejsca nie ma.
+	InsertLine, InsertColumn int
 }
+
+// Wartości Error.Reason dla cvc-complex-type.2.4.
+const (
+	// ReasonMissing: zawartość elementu się skończyła, a brakuje wymaganego dziecka (Expected).
+	ReasonMissing = "missing"
+	// ReasonUnexpected: dziecko Name nie jest dozwolone w tym miejscu.
+	ReasonUnexpected = "unexpected"
+	// ReasonWrongNamespace: dziecko ma nazwę lokalną oczekiwanego elementu, ale inną przestrzeń nazw.
+	ReasonWrongNamespace = "wrong-namespace"
+)
 
 func (e Error) Error() string {
 	return fmt.Sprintf("%d:%d: %s: %s", e.Line, e.Column, e.Code, e.Message)

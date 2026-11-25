@@ -10,7 +10,10 @@ import (
 	"testing"
 )
 
-var paramFields = map[string]bool{"Document": true, "Path": true, "Name": true, "Value": true, "Facet": true, "Expected": true}
+// paramFields to nazwy parametrów w katalogu. "Name" obejmuje też Namespace, "Reason" także ExpectedNamespace,
+// "Type" także TypeNamespace i Builtin, "Insert" pola InsertLine i InsertColumn (ADR 0010).
+var paramFields = map[string]bool{"Document": true, "Path": true, "Name": true, "Value": true, "Facet": true, "Expected": true,
+	"Reason": true, "Type": true, "Insert": true}
 
 // TestCatalogMatchesSource: katalog i kod źródłowy podają ten sam zbiór kodów błędów; każdy wpis jest kompletny.
 // REQ: ERR-001
@@ -199,7 +202,9 @@ i może się zmieniać, a do tłumaczenia służy kod i parametry.
 - **Rodzaj**: ` + "`schema`" + ` — błąd schematu (` + "`SchemaError.Errors`" + `); ` + "`document`" + ` — błąd dokumentu (wynik ` + "`Validate`" + `);
   ` + "`limit`" + ` — limit biblioteki albo konstrukcja nieobsługiwana, kod tylko w treści błędu zwracanego drugim wynikiem
   (` + "`ErrLimit`, `errors.ErrUnsupported`" + `).
-- **Parametry**: pola ` + "`Error`" + `, które błąd może ustawić poza ` + "`Code`, `Line`, `Column`, `Message`" + `.
+- **Parametry**: pola ` + "`Error`" + `, które błąd może ustawić poza ` + "`Code`, `Line`, `Column`, `Message`" + `;
+  ` + "`Name`" + ` obejmuje też ` + "`Namespace`" + `, ` + "`Reason`" + ` także ` + "`ExpectedNamespace`" + `, ` + "`Type`" + ` także ` + "`TypeNamespace`" + ` i
+  ` + "`Builtin`" + `, ` + "`Insert`" + ` pola ` + "`InsertLine`" + ` i ` + "`InsertColumn`" + ` (ADR 0010).
 - **libxml2**: odpowiednik z tabeli compat (kryterium K8); „observed n/m” — ustalony na tych samych danych przez
   ` + "`tools/compare`" + `, „assigned” — przypisany, z podaną podstawą.
 - **Własny**: kod nadany przez goxsdgo, bo rekomendacja nie nazywa tej reguły.

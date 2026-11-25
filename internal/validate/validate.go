@@ -122,6 +122,9 @@ type frame struct {
 	index int
 	line  int
 	col   int
+	// startLine i startCol to początek znacznika początkowego („<”); selfClosing: element zapisany jako <x/>.
+	startLine, startCol int
+	selfClosing         bool
 	// childCount liczy dzieci według nazwy, do ścieżek [n].
 	childCount map[schema.QName]int
 	nsMark     int
@@ -158,8 +161,10 @@ type nsBinding struct{ prefix, uri string }
 type validator struct {
 	sch  *schema.Schema
 	opts Options
-	rd   *xmlreader.Reader
-	errs []Error
+	// endLine i endCol to pozycja bieżącego znacznika końcowego (miejsce wstawienia brakującego dziecka).
+	endLine, endCol int
+	rd              *xmlreader.Reader
+	errs            []Error
 	// ctx rozwiązuje prefiksy wartości QName w bieżącym elemencie.
 	ctx   datatypes.Context
 	stack []*frame
@@ -319,7 +324,7 @@ func (v *validator) report(e Error) {
 
 func (v *validator) errorAt(fr *frame, code, format string, args ...any) {
 	v.report(Error{Code: code, Line: fr.line, Column: fr.col, Path: v.pathOf(fr), Name: fr.name.Local,
-		Message: fmt.Sprintf(format, args...)})
+		Namespace: fr.name.Space, Message: fmt.Sprintf(format, args...)})
 }
 
 func qnameOf(n xmlreader.Name) schema.QName { return schema.QName{Space: n.Space, Local: n.Local} }
@@ -334,6 +339,7 @@ func (v *validator) start(tok *xmlreader.Token) {
 	name := qnameOf(tok.Name)
 	fr := v.newFrame()
 	fr.name, fr.line, fr.col, fr.nsMark, fr.depth, fr.index = name, tok.EndLine, tok.EndColumn, len(v.ns), len(v.stack), 1
+	fr.startLine, fr.startCol, fr.selfClosing = tok.Line, tok.Column, tok.SelfClosing
 	v.nodes++
 	fr.node = v.nodes
 	if parent != nil {
@@ -438,7 +444,11 @@ func (v *validator) childDecl(parent *frame, fr *frame, name schema.QName) (*sch
 				parent.name, v.pathOf(parent), schema.MaxConfigurations)})
 		}
 		exp := expectedNames(parent.matcher.Expected())
-		e := Error{Code: CodeComplexContent, Line: fr.line, Column: fr.col, Path: v.pathOf(fr), Name: name.Local, Expected: exp}
+		e := Error{Code: CodeComplexContent, Line: fr.line, Column: fr.col, Path: v.pathOf(fr), Name: name.Local, Expected: exp,
+			Namespace: name.Space, Reason: ReasonUnexpected, InsertLine: fr.startLine, InsertColumn: fr.startCol}
+		if ns, ok := sameLocalOtherSpace(name, exp); ok {
+			e.Reason, e.ExpectedNamespace = ReasonWrongNamespace, ns
+		}
 		if len(exp) == 0 {
 			e.Message = fmt.Sprintf("unexpected element %s in %s; no more child elements are allowed here", name, parent.name)
 		} else {
@@ -546,7 +556,7 @@ func (v *validator) xsiAttrs(fr *frame, tok *xmlreader.Token) (schema.Type, bool
 		case "nil":
 			val, err := schema.BuiltinType("boolean").DT.Validate(a.Value, nil)
 			if err != nil {
-				v.report(dtError(err, a.Line, a.Column, v.pathOf(fr)+"/@nil", "nil"))
+				v.report(dtError(err, a.Line, a.Column, v.pathOf(fr)+"/@nil", "nil", schema.NamespaceXSI, schema.BuiltinType("boolean")))
 				continue
 			}
 			nilSet = true
@@ -663,7 +673,7 @@ func (v *validator) attributes(fr *frame, tok *xmlreader.Token) {
 				v.attribute(a, d, nil, path)
 			}
 		case fr.st != nil && fr.ct == nil:
-			v.report(Error{Code: CodeTypeSimpleAttrs, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local,
+			v.report(Error{Code: CodeTypeSimpleAttrs, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local, Namespace: q.Space,
 				Message: fmt.Sprintf("element %s has a simple type and cannot have attribute %s", fr.name, q)})
 		case schema.IsAnyType(fr.ct):
 			if d := v.sch.LookupAttribute(q); d != nil {
@@ -678,12 +688,12 @@ func (v *validator) attributes(fr *frame, tok *xmlreader.Token) {
 			}
 			w := fr.ct.AttributeWildcard
 			if w == nil {
-				v.report(Error{Code: CodeComplexAttr, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local,
+				v.report(Error{Code: CodeComplexAttr, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local, Namespace: q.Space,
 					Message: fmt.Sprintf("attribute %s is not allowed on element %s", q, fr.name)})
 				continue
 			}
 			if !w.Namespaces.Allows(q.Space) {
-				v.report(Error{Code: CodeComplexAttrWild, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local,
+				v.report(Error{Code: CodeComplexAttrWild, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local, Namespace: q.Space,
 					Message: fmt.Sprintf("attribute %s is not allowed on element %s: its namespace is not allowed by the attribute wildcard", q, fr.name)})
 				continue
 			}
@@ -693,7 +703,7 @@ func (v *validator) attributes(fr *frame, tok *xmlreader.Token) {
 			d := v.sch.LookupAttribute(q)
 			if d == nil {
 				if w.Process == schema.ProcessStrict {
-					v.report(Error{Code: CodeAttrDecl, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local,
+					v.report(Error{Code: CodeAttrDecl, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local, Namespace: q.Space,
 						Message: fmt.Sprintf("no global declaration for attribute %s, required by a strict wildcard", q)})
 				}
 				continue
@@ -701,11 +711,11 @@ func (v *validator) attributes(fr *frame, tok *xmlreader.Token) {
 			if schema.IsIDType(d.Type) {
 				wildIDs++
 				if wildIDs == 2 {
-					v.report(Error{Code: CodeComplexWildIDs, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local,
+					v.report(Error{Code: CodeComplexWildIDs, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local, Namespace: q.Space,
 						Message: fmt.Sprintf("element %s has more than one attribute of type ID through the attribute wildcard", fr.name)})
 				}
 				if hasIDUse(fr.ct) {
-					v.report(Error{Code: CodeComplexWildIDUse, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local,
+					v.report(Error{Code: CodeComplexWildIDUse, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local, Namespace: q.Space,
 						Message: fmt.Sprintf("attribute %s of type ID matches the wildcard of %s, which already declares an ID attribute", q, fr.name)})
 				}
 			}
@@ -763,17 +773,17 @@ func (v *validator) attribute(a *xmlreader.Attr, d *schema.AttributeDecl, u *sch
 	}
 	val, err := d.Type.DT.Validate(a.Value, &v.ctx)
 	if err != nil {
-		v.report(dtError(err, a.Line, a.Column, path.String(), q.Local))
+		v.report(dtError(err, a.Line, a.Column, path.String(), q.Local, q.Space, d.Type))
 		v.attrs = append(v.attrs, ta)
 		return
 	}
 	ta.value, ta.ok = val, true
 	v.attrs = append(v.attrs, ta)
 	if d.Value != nil && d.Value.Fixed && d.Value.Value != nil && !datatypes.Identical(val, d.Value.Value) {
-		v.report(Error{Code: CodeAttrFixed, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local, Value: a.Value,
+		v.report(Error{Code: CodeAttrFixed, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local, Namespace: q.Space, Value: a.Value,
 			Message: fmt.Sprintf("attribute %s must have the fixed value %q", q, d.Value.Lexical)})
 	} else if u != nil && u.Value != nil && u.Value.Fixed && u.Value.Value != nil && !datatypes.Identical(val, u.Value.Value) {
-		v.report(Error{Code: CodeAUFixed, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local, Value: a.Value,
+		v.report(Error{Code: CodeAUFixed, Line: a.Line, Column: a.Column, Path: path.String(), Name: q.Local, Namespace: q.Space, Value: a.Value,
 			Message: fmt.Sprintf("attribute %s must have the fixed value %q", q, u.Value.Lexical)})
 	}
 	v.specialValues(d.Type, val, a.Line, a.Column, path, q.Local)
@@ -797,9 +807,45 @@ func (p lazyPath) String() string {
 	return s
 }
 
+// typeNames zwraca nazwę i przestrzeń typu (puste dla typu anonimowego) oraz najbliższy typ wbudowany.
+func typeNames(st *schema.SimpleType) (name, space, builtin string) {
+	if st == nil {
+		return "", "", ""
+	}
+	name, space = st.Name.Local, st.Name.Space
+	for b := st; b != nil; {
+		if b.Builtin {
+			builtin = b.Name.Local
+			break
+		}
+		next, _ := b.Base.(*schema.SimpleType)
+		b = next
+	}
+	return name, space, builtin
+}
+
+// sameLocalOtherSpace szuka wśród oczekiwanych elementów ("nazwa" albo "{przestrzeń}nazwa") elementu o nazwie
+// lokalnej name w innej przestrzeni nazw; zwraca tę przestrzeń.
+func sameLocalOtherSpace(name schema.QName, expected []string) (string, bool) {
+	for _, e := range expected {
+		space, local := "", e
+		if strings.HasPrefix(e, "{") {
+			if i := strings.IndexByte(e, '}'); i > 0 {
+				space, local = e[1:i], e[i+1:]
+			}
+		}
+		if local == name.Local && space != name.Space {
+			return space, true
+		}
+	}
+	return "", false
+}
+
 // dtError zamienia błąd typu prostego na błąd dokumentu z kodem reguły części 2.
-func dtError(err error, line, col int, path, name string) Error {
-	e := Error{Code: datatypes.CodeDatatypeAtomic, Line: line, Column: col, Path: path, Name: name, Message: err.Error()}
+func dtError(err error, line, col int, path, name, space string, st *schema.SimpleType) Error {
+	e := Error{Code: datatypes.CodeDatatypeAtomic, Line: line, Column: col, Path: path, Name: name, Namespace: space,
+		Message: err.Error()}
+	e.Type, e.TypeNamespace, e.Builtin = typeNames(st)
 	var de *datatypes.Error
 	if errors.As(err, &de) {
 		// Najbardziej szczegółowa reguła: błąd składnika listy albo unii wskazuje przyczynę.
@@ -980,6 +1026,7 @@ func abbreviate(s string) string {
 
 func (v *validator) end(tok *xmlreader.Token) {
 	fr := v.stack[len(v.stack)-1]
+	v.endLine, v.endCol = tok.Line, tok.Column
 	if fr.mode != modeSkip {
 		v.finishElement(fr)
 	}
@@ -998,7 +1045,14 @@ func (v *validator) finishElement(fr *frame) {
 	}
 	if fr.matcher != nil && !fr.contentFailed && !fr.matcher.Accepting() {
 		exp := expectedNames(fr.matcher.Expected())
+		// Brakujące dziecko powinno stanąć przed znacznikiem końcowym; element <x/> trzeba najpierw rozwinąć,
+		// więc wskazujemy koniec jego znacznika.
+		insL, insC := v.endLine, v.endCol
+		if fr.selfClosing {
+			insL, insC = fr.line, fr.col
+		}
 		v.report(Error{Code: CodeComplexContent, Line: fr.line, Column: fr.col, Path: v.pathOf(fr), Name: fr.name.Local,
+			Namespace: fr.name.Space, Reason: ReasonMissing, InsertLine: insL, InsertColumn: insC,
 			Expected: exp, Message: fmt.Sprintf("element %s is incomplete; %s", fr.name, expectedPhrase(exp))})
 	}
 	decl := fr.decl
@@ -1016,7 +1070,7 @@ func (v *validator) finishElement(fr *frame) {
 			if useDefault && fr.typ != decl.Type {
 				code = CodeEltDefault
 			}
-			e := dtError(err, fr.line, fr.col, v.pathOf(fr), fr.name.Local)
+			e := dtError(err, fr.line, fr.col, v.pathOf(fr), fr.name.Local, fr.name.Space, fr.st)
 			if code != "" {
 				e.Code = code
 			}

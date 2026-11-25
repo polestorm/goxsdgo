@@ -173,7 +173,9 @@ func (s *Set) ValidateDocument(r io.Reader, name string) ([]Error, error) {
 		out = make([]Error, len(verrs))
 		for i, e := range verrs {
 			out[i] = Error{Code: e.Code, Line: e.Line, Column: e.Column, Path: e.Path, Name: e.Name, Value: e.Value,
-				Facet: e.Facet, Expected: e.Expected, Message: e.Message}
+				Facet: e.Facet, Expected: e.Expected, Message: e.Message, Namespace: e.Namespace, Reason: e.Reason,
+				ExpectedNamespace: e.ExpectedNamespace, Type: e.Type, TypeNamespace: e.TypeNamespace,
+				Builtin: e.Builtin, InsertLine: e.InsertLine, InsertColumn: e.InsertColumn}
 		}
 	}
 	if err != nil && !errors.Is(err, ErrTooManyErrors) {
@@ -268,9 +270,33 @@ type Error struct {
 	// Expected to elementy dozwolone w miejscu błędu cvc-complex-type.2.4: "nazwa" albo "{przestrzeń}nazwa",
 	// symbol wieloznaczny jako "*" albo "{przestrzeń}*".
 	Expected []string
-	// Message to komunikat po angielsku; do tłumaczenia służy Code (z parametrami z pól powyżej).
+	// Message to komunikat po angielsku; do tłumaczenia służy Code (z parametrami z pól powyżej i niżej).
 	Message string
+
+	// Namespace to przestrzeń nazw elementu albo atrybutu Name; pusta dla nazwy bez przestrzeni (ADR 0010).
+	Namespace string
+	// Reason rozróżnia błędy cvc-complex-type.2.4: ReasonMissing (brak wymaganego elementu), ReasonUnexpected
+	// (element niedozwolony w tym miejscu), ReasonWrongNamespace (nazwa lokalna oczekiwanego elementu w innej
+	// przestrzeni nazw). Dla innych kodów pusty; kod reguły jest zawsze ten sam.
+	Reason string
+	// ExpectedNamespace to przestrzeń nazw, w której schemat oczekuje elementu (tylko ReasonWrongNamespace).
+	ExpectedNamespace string
+	// Type i TypeNamespace to typ ze schematu, któremu nie odpowiada wartość (błędy typów prostych, np. "TData");
+	// Type jest pusty dla typu anonimowego. Builtin to najbliższy typ wbudowany, z którego typ pochodzi
+	// (np. "date", "decimal").
+	Type, TypeNamespace, Builtin string
+	// InsertLine i InsertColumn (cvc-complex-type.2.4) wskazują, gdzie powinien zacząć się oczekiwany element:
+	// przed niedozwolonym elementem (początek jego znacznika) albo przed znacznikiem końcowym rodzica; dla rodzica
+	// zapisanego jako <x/> koniec tego znacznika. Pozycja główna (Line, Column) się nie zmienia (ADR 0008).
+	InsertLine, InsertColumn int
 }
+
+// Wartości Error.Reason dla cvc-complex-type.2.4 (ADR 0010).
+const (
+	ReasonMissing        = validate.ReasonMissing
+	ReasonUnexpected     = validate.ReasonUnexpected
+	ReasonWrongNamespace = validate.ReasonWrongNamespace
+)
 
 func (e Error) Error() string {
 	if e.Document != "" {

@@ -50,7 +50,7 @@ func TestRequirementsCovered(t *testing.T) {
 	}
 
 	var sources []string
-	for _, pattern := range []string{"*_test.go", "../internal/*/*_test.go", "../testdata/corpus/*"} {
+	for _, pattern := range []string{"*_test.go", "../internal/*/*_test.go", "../messages/*_test.go", "../testdata/corpus/*"} {
 		m, _ := filepath.Glob(pattern)
 		sources = append(sources, m...)
 	}
