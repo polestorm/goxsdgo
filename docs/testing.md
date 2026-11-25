@@ -6,6 +6,7 @@
 |---|---|---|
 | zestaw W3C | `testdata/w3c/xsdtests/` (ADR 0003), `TestW3CSuite`, czytnik `internal/w3c` | werdykt dla każdego schematu i dokumentu z zestawu XSD 1.0 2e; raport w podziale na dostawców (NIST, Microsoft, Sun, Boeing, IBM, Saxonica, W3C); wyłączenia z powodem; zapadka `testdata/w3c/passing.txt` |
 | zgodność XML | `internal/xmlreader`, `TestXMLConformance` | czytnik XML na zestawie W3C XML Conformance (dobra forma, przestrzenie nazw, druga postać kanoniczna tam, gdzie zestaw ją podaje); zapadka `testdata/w3c/xmlconf-passing.txt`, `go test ./internal/xmlreader -update` |
+| typy proste (pośrednio) | `internal/datatypes`, `TestW3CDatatypes` | przypadki NIST i Microsoft (DataTypes, Regex) z zestawu W3C przez adapter w testach, który czyta schematy o prostym kształcie; nie jest to K1, bo bez etapu 3 brak prawdziwego wczytania schematu; zapadki `testdata/w3c/nist-datatypes-passing.txt`, `ms-datatypes-passing.txt` |
 | wymagania | `requirements/*.md`, `TestRequirementsCovered` | każde wymaganie ma test albo plik korpusu; każde odwołanie `REQ:` wskazuje istniejące wymaganie |
 | korpus schematów | `testdata/schemas/mf/`, `TestSchemaCorpus` | każdy ze 170 schematów MF (JPK, KSeF, e-Sprawozdania) kompiluje się bez błędów; importy rozwiązuje katalog adresów z manifestu, bez sieci; zapadka `testdata/passing-corpus.txt` |
 | korpus dokumentów | `testdata/instances/` + `expected.json`, `TestInstanceCorpus` | werdykt (później też kody i miejsca błędów) zgodny z oczekiwanym; zapadka jak wyżej |
@@ -56,6 +57,7 @@ Wyniki zapisujemy tutaj z datą, wersją i sposobem pomiaru.
 
 | Data | Commit | W3C (zaliczone / w zakresie) | Korpus MF | Zgodność z libxml2 | Uwagi |
 |---|---|---|---|---|---|
+| 2026-11-25 | `892eade` | 0 / 39 461 | — | — | etap 2, pomiar pośredni (adapter, nie K1): NIST 22 678 / 22 678 odczytanych z 23 170 w zakresie (nieodczytane: 492 przypadki ID z typem złożonym), MS-Regex 2 772 / 2 789 z 3 998, MS-DataTypes 29 / 29 z 3 430; 17 rozbieżności opisanych w `differences.md`; `go test ./internal/datatypes -run W3CDatatypes -v` |
 | 2026-11-25 | `b502002` | 0 / 39 461 | — | — | etap 1: XML Conformance 1725 / 1727 (xmltest 299/299, sun 101/101, oasis 323/323, ibm 526/527, eduni 476/477); `encoding/xml` na tym samym zestawie 1146 / 1727; werdykt dobrej formy jak w libxml2 dla 42 018 plików `.xml` i `.xsd` z zestawu W3C XSD i korpusu MF poza 3; `go test ./internal/xmlreader -run XMLConformance -v` |
 | 2026-11-25 | `bb585b7` | 0 / 39 461 | schematy 0 / 170, dokumenty 0 / 8 | — | etap 0: infrastruktura bez implementacji; `go test ./xsd -run 'W3C\|Corpus' -v` |
 
