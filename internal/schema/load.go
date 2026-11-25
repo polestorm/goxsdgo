@@ -102,6 +102,11 @@ type loader struct {
 	simpleTypes   []*SimpleType
 	attrDecls     []*AttributeDecl
 	attrUses      []*AttributeUse
+	// subst to grupy podstawienia, liczone na początku kontroli końcowych; rs sprawdza restrykcje cząstek.
+	subst map[*ElementDecl][]*ElementDecl
+	rs    *restrictor
+	// groupRedefs: redefinicje grup modeli (do src-redefine.6.2.2 po zbudowaniu grup podstawienia).
+	groupRedefs []*def
 }
 
 type notationType struct {
@@ -666,8 +671,7 @@ func (l *loader) checkRedefineShape(c *node, q QName) {
 				l.errorf(CodeRedefine+".6.1.2", r.pos(), "the self-reference in a redefined group must have maxOccurs 1")
 			}
 		}
-		// Punkt 6.2.2 (grupa bez odwołania do siebie musi być poprawną restrykcją oryginału) wymaga sprawdzenia
-		// restrykcji cząstek: etap 4 (cos-particle-restrict).
+		// Punkt 6.2.2 (grupa bez odwołania do siebie musi być poprawną restrykcją oryginału): checkGroupRedefine.
 	case "attributeGroup":
 		refs := selfRefs(c, "attributeGroup", q, l)
 		if len(refs) > 1 {

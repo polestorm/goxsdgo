@@ -108,7 +108,10 @@ type ComplexType struct {
 	SimpleContent *SimpleType
 	// Particle to cząstka treści, gdy Content to ContentElementOnly albo ContentMixed.
 	Particle *Particle
-	Pos      Position
+	// Model to skompilowany model zawartości (etap 4), gdy Content to ContentEmpty, ContentElementOnly albo
+	// ContentMixed; nil dla treści prostej i dla schematu z błędami.
+	Model *ContentModel
+	Pos   Position
 }
 
 func (t *ComplexType) TypeName() QName { return t.Name }

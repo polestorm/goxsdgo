@@ -59,6 +59,10 @@ const (
 	CodeSimpleRestricts     = "cos-st-restricts"
 	CodeSchemaProps         = "sch-props-correct"
 	CodeNotationProps       = "n-props-correct"
+	// Ograniczenia modeli zawartości (etap 4, ADR 0007).
+	CodeNonambig          = "cos-nonambig"
+	CodeElementConsistent = "cos-element-consistent"
+	CodeParticleRestrict  = "cos-particle-restrict"
 
 	// CodeLimit: przekroczony limit wczytywania (liczba dokumentów, głębokość włączeń); kod nasz (ADR 0006).
 	CodeLimit = "schema-limit"

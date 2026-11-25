@@ -6,12 +6,13 @@ import (
 	"github.com/polestorm/goxsdgo/internal/datatypes"
 )
 
-// finalChecks sprawdza ograniczenia komponentów, które wymagają zbudowanego schematu.
-//
-// Etap 4 dopisze tu kontrole modeli zawartości na Schema.ComplexTypes i grupach: Unique Particle Attribution
-// (cos-nonambig), Element Declarations Consistent (cos-element-consistent), Particle Valid (Restriction)
-// (cos-particle-restrict, w tym derivation-ok-restriction.5.4.2 i src-redefine.6.2.2) oraz cos-ct-extends.1.5.
+// finalChecks sprawdza ograniczenia komponentów, które wymagają zbudowanego schematu, w tym ograniczenia modeli
+// zawartości (etap 4, ADR 0007): Unique Particle Attribution (cos-nonambig), Element Declarations Consistent
+// (cos-element-consistent) i Particle Valid (Restriction) (cos-particle-restrict, w derivation-ok-restriction.5.4.2
+// i src-redefine.6.2.2).
 func (l *loader) finalChecks() {
+	l.subst = substitutionGroups(l.sch.ElementDecls)
+	l.rs = newRestrictor(l.subst)
 	for _, a := range l.attrDecls {
 		l.checkAttributeDecl(a)
 	}
@@ -20,6 +21,10 @@ func (l *loader) finalChecks() {
 	}
 	for _, ct := range l.sch.ComplexTypes {
 		l.checkComplexType(ct)
+		l.checkContentModel(ct)
+	}
+	for _, df := range l.groupRedefs {
+		l.checkGroupRedefine(df)
 	}
 	for _, nt := range l.notationTypes {
 		for _, lex := range nt.st.DT.Enumeration() {
@@ -237,7 +242,14 @@ func (l *loader) checkRestriction(ct, base *ComplexType) {
 		} else if ct.Content == ContentMixed && base.Content != ContentMixed {
 			l.errorf(CodeRestriction+".5.4.1.2", ct.Pos, "mixed content cannot restrict element-only content")
 		}
-		// 5.4.2: cząstka musi być poprawną restrykcją cząstki bazowej (cos-particle-restrict) — etap 4.
+		// 5.4.2: cząstka musi być poprawną restrykcją cząstki bazowej (cos-particle-restrict).
+		if ct.Particle != nil && base.Particle != nil {
+			l.rs.why = ""
+			if !l.rs.validRestriction(ct.Particle, base.Particle) {
+				l.errorf(CodeRestriction+".5.4.2", ct.Pos, "the content of %s is not a valid restriction of the content of %s: %s",
+					typeLabel(ct), typeLabel(base), l.rs.why)
+			}
+		}
 	}
 }
 

@@ -136,6 +136,9 @@ func (l *loader) buildGroupDef(df *def) {
 			if p != nil {
 				*gd.Group = *p.Term.(*ModelGroup)
 			}
+			if df.orig != nil {
+				l.groupRedefs = append(l.groupRedefs, df)
+			}
 			return
 		}
 	}
