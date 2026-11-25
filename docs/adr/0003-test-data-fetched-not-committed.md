@@ -20,7 +20,7 @@ daje niczego, czego nie da przypięcie wersji i sum kontrolnych.
    w Go. Jest **osobnym modułem** (`tools/fetch/go.mod` bez `require`), więc kod sieciowy nie należy do modułu
    biblioteki. Wersja w Pythonie (`tools/fetch/fetch.py`, Python 3.9+, tylko biblioteka standardowa) jest dla osób bez
    Go, m.in. na Windows. Obie czytają ten sam manifest i dają te same pliki. Testy obu wersji mają tę samą wartość
-   wzorcową sumy drzewa, a CI uruchamia testy Pythona na Linuksie i Windows. Basha nie używamy: nie ma go
+   wzorcową sumy drzewa, a CI uruchamia testy Pythona 3.10 i najnowszego na Linuksie i Windows (3.9 sprawdzony lokalnie, 3.9.6). Basha nie używamy: nie ma go
    w standardzie Windows, a narzędzia, których by potrzebował (`jq`, `sha256sum`), różnią się między systemami.
    Zmiana zachowania jednej wersji wymaga tej samej zmiany w drugiej.
 4. **Plik przyjmujemy tylko z sumą z manifestu.** Przy archiwach W3C sprawdzamy sumę drzewa plików, bo GitHub generuje

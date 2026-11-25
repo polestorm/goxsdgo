@@ -10,9 +10,14 @@ permissions:
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
         go: ["1.22", "stable"]
         os: [ubuntu-latest, macos-latest]
+        exclude:
+          # konsolidator Go 1.22 tworzy programy bez LC_UUID, których nowy macOS nie uruchamia
+          - go: "1.22"
+            os: macos-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -36,8 +41,10 @@ jobs:
   # wersja narzędzia w Pythonie (tools/fetch/fetch.py) dla osób bez Go, m.in. na Windows
   fetch-python:
     strategy:
+      fail-fast: false
       matrix:
-        python: ["3.9", "3.x"]
+        # Python 3.9 nie jest już dostępny w GitHub Actions; zgodność z 3.9 sprawdzana lokalnie (3.9.6)
+        python: ["3.10", "3.x"]
         os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
