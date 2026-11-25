@@ -46,9 +46,7 @@ func TestSchemaCorpus(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(schemasDir); err != nil {
-		t.Skip(testkit.FetchHint)
-	}
+	skipIfSchemasMissing(t, src)
 	cfg := Config{Locations: src.Locations(schemasSetName)}
 	fsys := os.DirFS(schemasDir)
 	passed := map[string]bool{}
@@ -100,6 +98,7 @@ func TestInstanceCorpus(t *testing.T) {
 	if _, err := os.Stat(instancesDir + "/mf"); err != nil {
 		t.Skip(testkit.FetchHint)
 	}
+	skipIfSchemasMissing(t, src)
 	cfg := Config{Locations: src.Locations(schemasSetName)}
 	fsys := os.DirFS(schemasDir)
 	passed := map[string]bool{}
@@ -133,6 +132,27 @@ func TestInstanceCorpus(t *testing.T) {
 	}
 	t.Logf("MF instances with the expected verdict: %d/%d", len(passed), checked)
 	ratchet(t, "instance:", passed)
+}
+
+// skipIfSchemasMissing pomija test, gdy brakuje któregoś schematu MF z manifestu (poza plikami local_only): bez
+// kompletu importów wynik byłby fałszywy. Dotyczy CI, z którego epuap.gov.pl nie odpowiada; lokalnie komplet
+// sprawdza `go -C tools/fetch run . -root ../.. -verify`.
+func skipIfSchemasMissing(t *testing.T, src *testkit.Sources) {
+	t.Helper()
+	missing := 0
+	for _, ds := range src.Sets {
+		if ds.Name != schemasSetName {
+			continue
+		}
+		for _, f := range ds.Files {
+			if _, err := os.Stat(path.Join(schemasDir, f.Path)); err != nil && !f.LocalOnly {
+				missing++
+			}
+		}
+	}
+	if missing > 0 {
+		t.Skipf("%d MF schema file(s) missing; %s", missing, testkit.FetchHint)
+	}
 }
 
 // ratchet porównuje zaliczenia z listą w testdata/passing-corpus.txt w obrębie prefiksu i z -update ją zapisuje.

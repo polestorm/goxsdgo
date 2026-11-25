@@ -35,7 +35,13 @@ jobs:
             testdata/instances/mf
           key: testdata-${{ hashFiles('testdata/sources.json') }}
       - name: fetch test data
-        run: go -C tools/fetch run . -root ../..
+        run: |
+          for set in w3c-xsdtests w3c-xmlconf w3c-schemas mf-instances; do
+            go -C tools/fetch run . -root ../.. -set $set
+          done
+          # epuap.gov.pl, na który crd.gov.pl przekierowuje część schematów MF, nie odpowiada z serwerów GitHuba;
+          # testy korpusu MF są wtedy pomijane z komunikatem (docs/testing.md)
+          go -C tools/fetch run . -root ../.. -set mf-schemas || echo "::warning::MF schemas incomplete; MF corpus tests skipped"
       - name: gofmt
         if: matrix.os == 'ubuntu-latest'
         run: test -z "$(gofmt -l .)"

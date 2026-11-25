@@ -18,6 +18,13 @@
 | patologiczne | `TestPathological` | wzorce z zagnieżdżonymi powtórzeniami, `maxOccurs` w setkach tysięcy, głębokie zagnieżdżenia, tysiące kluczy: czas rośnie liniowo |
 | wydajność | `BenchmarkCorpus` | porównanie z `goxsdval` (kryterium K7) |
 
+## CI i dane testowe
+
+CI pobiera dane według manifestu (ADR 0003) i trzyma je w pamięci podręcznej według sumy manifestu. Część schematów MF
+(22 pliki e-Sprawozdań i słowników, stan 2026-11-25) jest pod adresami crd.gov.pl, które przekierowują na
+epuap.gov.pl, a ten serwer nie odpowiada z maszyn GitHuba. Wtedy `TestSchemaCorpus` i `TestInstanceCorpus` są
+w CI pomijane z komunikatem, a kryterium K2 mierzymy lokalnie. Zestaw W3C i przykłady MF CI pobiera bez przeszkód.
+
 ## Zapadki
 
 Pliki `testdata/w3c/passing.txt` i `testdata/passing-corpus.txt` zawierają identyfikatory przypadków, które już
@@ -49,7 +56,7 @@ Wyniki zapisujemy tutaj z datą, wersją i sposobem pomiaru.
 
 | Data | Commit | W3C (zaliczone / w zakresie) | Korpus MF | Zgodność z libxml2 | Uwagi |
 |---|---|---|---|---|---|
-| 2026-11-25 | `88989c5` + etap 0 (przed commitem) | 0 / 39 461 | schematy 0 / 170, dokumenty 0 / 8 | — | etap 0: infrastruktura bez implementacji; `go test ./xsd -run 'W3C\|Corpus' -v` |
+| 2026-11-25 | `bb585b7` | 0 / 39 461 | schematy 0 / 170, dokumenty 0 / 8 | — | etap 0: infrastruktura bez implementacji; `go test ./xsd -run 'W3C\|Corpus' -v` |
 
 Pomiary walidatora odniesienia (libxml2 2.15.4 przez `goxsdval` `2f45df6`, `tools/compare`):
 
