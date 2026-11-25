@@ -47,120 +47,48 @@ smaller footprint. goxsdgo is new and has a single consumer so far.
 ## Contents
 
 - [Why goxsdgo](#why-goxsdgo) · [Comparison](#comparison) · [Status](#status) · [Documentation](#documentation) ·
-  [How the comparison was measured](#how-the-comparison-was-measured) · [Goals](#goals) · [License](#license)
+  [Goals](#goals) · [License](#license)
 
 ## Comparison
 
-libxml2[^ref] is what most tools use today (xmllint, lxml, PHP, Nokogiri); in Go it needs cgo. The other three
-are validators in pure Go, published in 2026.
+libxml2 2.15.4 is what most tools use today (xmllint, lxml, PHP, Nokogiri); in Go it needs cgo. The other three
+are validators in pure Go published in 2026: [knroy/go-xml](https://github.com/knroy/go-xml) 2.3.1,
+[jacoelho/xsd](https://github.com/jacoelho/xsd) 0.6.15 and [cB-Sigma/xsd](https://github.com/cB-Sigma/xsd) 1.0.0.
+All of them were run as programs through their public API, on the same cases and data.
 
-**Correctness**
-
-| | goxsdgo | libxml2[^ref] | knroy[^names] | jacoelho[^names] | cB-Sigma[^names] |
+| | goxsdgo | libxml2 | knroy | jacoelho | cB-Sigma |
 |---|:---:|:---:|:---:|:---:|:---:|
-| W3C XSD 1.0, all cases[^w3c] | 99.82%[^names5] | 98.03%[^libxml2run] | 99.87% 🥇 | 99.10% | 99.72% |
-| — schema tests | 99.92% | 96.81% | 99.98% 🥇 | 98.71% | 99.88% |
-| — instance tests | 99.77% | 99.57% | 99.80% 🥇 | 99.32% | 99.63% |
-| W3C, without 133 contested cases[^contested] | 99.97% 🥇 | 98.18% | 99.94% | 99.26% | 99.88% |
-| Same verdict as libxml2 (instances) | 99.69% | reference | — | — | — |
-| MF schemas compile[^mf] | all 170 🥇 | all 170 🥇 | all 170 🥇 | 168 | all 170 🥇 |
-| MF and synthetic documents | all 15 🥇 | all 15 🥇 | all 15 🥇 | all 15 🥇 | all 15 🥇 |
-
-**Size and speed**
-
-| | goxsdgo | libxml2[^ref] | knroy[^names] | jacoelho[^names] | cB-Sigma[^names] |
-|---|:---:|:---:|:---:|:---:|:---:|
-| Dependencies[^deps] | 0 🥇 | C, cgo | 1 | 0 🥇 | 0 🥇 |
+| W3C XSD 1.0 test suite[^w3c] | 99.82% | 98.03% | 99.87% 🥇 | 99.10% | 99.72% |
+| — without contested cases[^contested] | 99.97% 🥇 | 98.18% | 99.94% | 99.26% | 99.88% |
+| Dependencies | 0 | C, cgo | 1 | 0 | 0 |
 | Minimum Go | 1.22 🥇 | — | 1.25 | 1.27 | 1.24 |
-| Lines of Go code[^size] | 15,119 | (C) | 203,186 | 55,395 | 8,679 🥇 |
-| Added to a program | 1.7 MB | 1.0 MB[^dylib] | 6.4 MB | 3.2 MB | 1.6 MB 🥇 |
-| Time, 20 MB JPK[^perf] | 0.39 s 🥇 | 0.39 s 🥇 | 0.57 s | 0.39 s 🥇 | 3.62 s |
-| Time, 200 MB JPK | 3.96 s | 3.85 s | —[^tree] | 3.79 s 🥇[^jlimit] | —[^tree] |
-| Memory, 20 MB JPK | 24 MB | 5 MB 🥇 | 219 MB | 21 MB | 442 MB |
+| Lines of Go code | 15,119 | (C) | 203,186 | 55,395 | 8,679 🥇 |
+| Added to a program | 1.7 MB | 1.0 MB shared library | 6.4 MB | 3.2 MB | 1.6 MB 🥇 |
+| Time, 200 MB JPK[^perf] | 3.96 s | 3.85 s | —[^tree] | 3.79 s 🥇 | —[^tree] |
 | Memory, 200 MB JPK | 26 MB | 5 MB 🥇 | — | 22 MB | — |
-| Streaming | yes 🥇 | yes 🥇 | no, 11×[^tree] | yes 🥇 | no, 22×[^tree] |
-| 1 GB document | 6.3 MB[^gb] 🥇 | streams | — | limit[^jlimit] | — |
-
-**Safety, features, errors**
-
-| | goxsdgo | libxml2[^ref] | knroy[^names] | jacoelho[^names] | cB-Sigma[^names] |
-|---|:---:|:---:|:---:|:---:|:---:|
-| Network for `schemaLocation`[^safe] | never 🥇 | none seen | never 🥇 | never 🥇 | never 🥇 |
-| External entity `file:` | refused 🥇 | read[^xmllint] | refused 🥇 | refused 🥇 | refused 🥇 |
-| Billion laughs | limit 🥇 | limit 🥇 | refused 🥇 | refused 🥇 | refused 🥇 |
-| 100,000 nested elements | limit 🥇 | limit 🥇 | limit 🥇 | limit 🥇 | limit 🥇 |
-| `(a\|aa)*b`, 40,000 chars | 1.5 ms 🥇 | no verdict | 1.3 ms 🥇 | 0.6 ms 🥇 | 1.4 ms 🥇 |
-| `xs:redefine`[^feat] | yes 🥇 | yes 🥇 | yes 🥇 | no | yes 🥇 |
-| `key`, `xsi:type`, subst. groups | yes 🥇 | yes 🥇 | yes 🥇 | yes 🥇 | yes 🥇 |
+| `(a\|aa)*b`, 40,000 chars | 1.5 ms | no verdict | 1.3 ms | 0.6 ms | 1.4 ms |
+| `xs:redefine` | yes | yes | yes | no | yes |
 | `xsi:schemaLocation` hints | opt-in | yes | opt-in | no | opt-in |
 | XSD 1.1 | no | no | yes 🥇 | no | no |
-| Error code[^err] | W3C rule 🥇 | number | W3C rule 🥇 | own | category |
-| Line, column, path | all 🥇 | line, name | all 🥇 | all 🥇 | line, path |
-| Expected elements | a field 🥇 | in text | in text | in text | in text |
+| Error code | W3C rule 🥇 | number | W3C rule 🥇 | own | category |
+| Line, column, path of an error | all | line, name | all | all | line, path |
+| Expected elements at an error | a field 🥇 | in text | in text | in text | in text |
 | Message languages | EN, PL 🥇 | EN | EN | EN | EN |
 | License | Apache 2.0 | MIT | MIT | MIT | Apache 2.0 |
-| GitHub stars[^pop] | new | 771 (mirror) | 8 | 3 | 0 |
 
-[^names]: knroy is [knroy/go-xml](https://github.com/knroy/go-xml) 2.3.1, jacoelho is
-    [jacoelho/xsd](https://github.com/jacoelho/xsd) 0.6.15, cB-Sigma is [cB-Sigma/xsd](https://github.com/cB-Sigma/xsd)
-    1.0.0; libxml2 is 2.15.4.
-[^ref]: libxml2 is the reference validator throughout this project's tests (`tools/compare`, through
-    [goxsdval](https://github.com/polestorm/goxsdval), and `xmllint`). It and the other validators are only run
-    as programs, through their public API; goxsdgo is written from the recommendations, not from the source code of
-    other validators ([docs/provenance.md](docs/provenance.md)).
-[^w3c]: The W3C XML Schema test suite at commit `7bc3365c`, every schema and instance test that applies to
-    XSD 1.0 Second Edition: 39,439 cases, read by `internal/w3c` and run by the same harness for every candidate,
-    with the same expected verdicts and the same rules as `TestW3CSuite`. Passed cases, all / schema / instance:
-    goxsdgo 39,369 / 14,372 / 24,997; libxml2 38,662 / 13,851 of 14,307 / 24,797 of 24,903 comparable; knroy
-    39,386 / 14,381 / 25,005; jacoelho 39,083 / 14,198 / 24,885; cB-Sigma 39,329 / 14,367 / 24,962 (of 39,439 /
-    14,384 / 25,055). Without the contested cases (of 39,306): goxsdgo 39,295, libxml2 38,590, knroy 39,281,
-    jacoelho 39,015, cB-Sigma 39,257. A case without a verdict (a library
-    limit, an unsupported construct, a timeout of 30 s) counts as failed; so does an instance test whose valid
-    schema was rejected. `xml.xsd` and `xlink.xsd`, which some cases import from w3.org, are served from local
-    copies. Each candidate gets its own mechanism for `xsi:schemaLocation` hints where it has one; jacoelho/xsd has
-    none, so 55 cases that name their schema only in the document cannot run on it. Self-reported figures, not
-    measured here: knroy/go-xml 99.90% of instance and 99.98% of schema tests, cB-Sigma/xsd 99.6% of 39,369
-    tests (their READMEs).
-[^names5]: With `Config.NameRules: xsd.NamesXML10Edition5` (name characters of XML 1.0 Fifth Edition instead of
-    the Second Edition that XSD 1.0 2e refers to; ADR 0012) goxsdgo passes 39,385 of 39,439; the default stays the
-    Second Edition.
-[^contested]: Chosen in advance by fixed criteria, the same for every candidate, before looking at who passes them:
-    cases marked queried or disputed in the suite's own metadata (63), cases whose outcome depends on the XML edition
-    of name characters (53), and cases where the suite expects opposite verdicts for the same situation (17, both
-    sides); Unicode-version cases are all already marked queried. Every case, its reason and each candidate's result
-    are listed in [docs/contested-cases.md](docs/contested-cases.md). On the contested cases themselves goxsdgo passes
-    74 of 133 (90 with Fifth Edition names), knroy/go-xml 105, libxml2 72, cB-Sigma/xsd 72, jacoelho/xsd 68.
-[^libxml2run]: Counted by `tools/compare` through goxsdval, which compiles a schema from one file and does not
-    follow hints: 209 cases (154 with several schema documents, 55 with hints only) cannot run and count as failed.
-[^mf]: The 170 schemas of `testdata/sources.json` with their imports, resolved from a local catalogue; the 8
-    published MF samples and 7 synthetic documents of `testdata/instances/expected.json`. jacoelho/xsd stops at its
-    content-model state limit on the two KSeF invoice schemas, FA(2) and FA(3).
-[^deps]: Modules required by a program that validates a file. libxml2 is a C library reached through cgo.
-[^size]: Lines of the non-test Go files of the packages that a "compile a schema, validate a file" program pulls
-    in (`tools/bench/sizeprog`), without the program itself. "Added to a program" is the size of that program minus
-    the same program without a validator (`CGO_ENABLED=0`, `-ldflags="-s -w"`, macOS arm64); for libxml2 the size
-    of `libxml2.16.dylib`.
-[^perf]: A synthetic JPK_V7M(3) file: the published MF sample with its `SprzedazWiersz` row repeated to 20, 60
-    and 200 MB; compile the schema and validate the file in a fresh process, wall time and maximum resident set
-    size (`/usr/bin/time -l`); libxml2 as `xmllint --stream`. Validators that build a tree of the document were not
-    run on 200 MB; on 60 MB they used 613 MB (knroy/go-xml) and 1,324 MB (cB-Sigma/xsd). Measured on 2026-11-25 on
-    one Apple M4 laptop shared with other work (load average 2–3). 🥇 marks the best value in a row.
-[^tree]: knroy/go-xml and cB-Sigma/xsd build a tree of the whole document: process memory 11× and 22× the file
-    size, so they were not run on 200 MB or 1 GB.
-[^dylib]: Size of the shared library `libxml2.16.dylib`, plus the cgo binding.
-[^xmllint]: `xmllint` with default options reads it; a program using the library may set other options. The
-    other validators refuse the DOCTYPE, the DTD, or report the document as not well-formed.
-[^jlimit]: jacoelho/xsd stops at 64 MiB of input by default (`MaxInstanceBytes`); the time is with the limit
-    raised.
-[^gb]: `TestStreamingMemory` with `GOXSDGO_STREAM_MB=1024`, peak Go heap ([docs/testing.md](docs/testing.md)).
-[^safe]: Each library with its default settings on small inputs: a schema that imports from a local HTTP server
-    (requests counted), a document with an external entity on a local file, nine levels of nested entities, 100,000
-    nested elements, and the pattern `(a|aa)*b` against 20,000 and 40,000 `a`s (times grow linearly for the four Go
-    libraries). libxml2 is `xmllint` with default options; a program using the library may set other options.
-[^feat]: Small schemas and documents with a known verdict; "yes" means the verdict was right. For XSD 1.1, a
-    schema with `xs:assert`: knroy/go-xml supports XSD 1.1 through an option.
-[^err]: The same invalid document (a missing element and a wrong value) through each public API.
-[^pop]: Stars on 2026-11-25; libxml2 is developed on GNOME's GitLab, the count is of its GitHub mirror.
+🥇 marks the best value in a row, when no more than two candidates share it. The full comparison (schema and
+instance tests, the MF corpus, safety probes, 20 MB and 1 GB documents, every footnote and how it was measured):
+[docs/comparison.md](docs/comparison.md).
+
+[^w3c]: The W3C XML Schema test suite, all 39,439 cases that apply to XSD 1.0 Second Edition, run by one harness
+    with the same expected verdicts for every candidate.
+[^contested]: 133 cases chosen in advance by fixed criteria, the same for every candidate: queried or disputed in
+    the suite's own metadata, dependent on the XML edition of name characters, or with opposite expectations in the
+    suite for the same situation. In those cases goxsdgo follows the text of the recommendation; each one is listed
+    in [docs/contested-cases.md](docs/contested-cases.md).
+[^perf]: A synthetic JPK_V7M(3) file; schema compiled and file validated in a fresh process; wall time and
+    process memory; one Apple M4 laptop shared with other work, so differences under about 10% are noise.
+[^tree]: Builds a tree of the whole document (11× and 22× the file size in memory), so not run on 200 MB.
 
 ## Status
 
@@ -177,6 +105,7 @@ criteria of [ADR 0001](docs/adr/0001-scope-and-acceptance.md), from the evidence
 
 ## Documentation
 
+- [`docs/comparison.md`](docs/comparison.md): the full comparison with other validators.
 - [`docs/errors.md`](docs/errors.md): every error code, its rule and its fields.
 - [`docs/consumer-migration.md`](docs/consumer-migration.md): moving a libxml2-based consumer to goxsdgo.
 - In Polish: [`docs/provenance.md`](docs/provenance.md) (sources and clean-room rules),
@@ -185,41 +114,6 @@ criteria of [ADR 0001](docs/adr/0001-scope-and-acceptance.md), from the evidence
   (every case), [`docs/evidence.md`](docs/evidence.md) (evidence package), [`docs/fuzzing.md`](docs/fuzzing.md),
   [`requirements/`](requirements/) (numbered requirements), [`docs/adr/`](docs/adr/) (decisions),
   [`docs/roadmap.md`](docs/roadmap.md).
-
-Where the suite's expectation is contested (queried or disputed in its own metadata, dependent on the XML edition
-or the Unicode version, or contradictory within the suite), goxsdgo follows the text of the recommendation; each
-such case is listed with the rule in [docs/contested-cases.md](docs/contested-cases.md) and
-[docs/differences.md](docs/differences.md). The second W3C row compares all validators on the same uncontested
-set. On all in-scope cases knroy/go-xml passes 17 more than goxsdgo; on the uncontested set goxsdgo passes 14 more
-than knroy/go-xml. Of goxsdgo's 11 uncontested failures, 4 end with a library limit on counter-ambiguous content
-models, 5 are instance tests of groups whose schema test is contested (the instance tests themselves are not, so they stay in),
-and 2 (`attP031`, `anyURI_b006`) were considered and left in, because the suite deliberately splits their XSD 1.0
-and 1.1 outcomes.
-
-## How the comparison was measured
-
-All five validators run on the same inputs through their public API, by `tools/bench` (a separate module, so the
-library itself has no dependencies; libxml2 through `tools/compare` and `xmllint`):
-
-```sh
-go -C tools/fetch run . -root ../..                       # test data (W3C suite, MF schemas and samples)
-go -C tools/bench run . -root ../.. w3c                   # W3C suite, every candidate (and goxsdgo with 5e names)
-go -C tools/bench run . -root ../.. -docs contested       # contested cases, docs/contested-cases.md
-go -C tools/bench run . -root ../.. corpus                # MF corpus
-go -C tools/bench run . -root ../.. probe                 # safety, features, errors, patterns
-go -C tools/bench run . -root ../.. size                  # program size and lines of code
-go -C tools/bench build -o ../../out/bench/bench . && (cd tools/bench && ../../out/bench/bench -root ../.. perf 20 60 200)
-cd tools/compare && PKG_CONFIG_PATH=/opt/homebrew/opt/libxml2/lib/pkgconfig go run -tags libxml2 . w3c
-```
-
-The versions are the latest tags on 2026-11-25 (knroy/go-xml v2.3.1, jacoelho/xsd v0.6.15, cB-Sigma/xsd v1.0.0,
-libxml2 2.15.4 from Homebrew); `tools/bench` builds with Go 1.27 because jacoelho/xsd requires it.
-
-What the numbers do not say: the W3C rows count verdicts only, not error codes or positions. knroy/go-xml is also
-an XSD 1.1, XPath, XQuery and XSLT processor, which explains most of its size; it is configured here for XSD 1.0
-and allowed to read the DOCTYPE of suite documents (its default refuses it). A schema rejected by a candidate for a
-limit or an unsupported construct counts as a failure, as it does for goxsdgo. The timing rows are single runs on
-a shared machine; differences under 10% are within the noise.
 
 ## Goals
 
