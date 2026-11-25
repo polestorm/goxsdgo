@@ -38,7 +38,7 @@ Pliki `*.ratchet` (`testdata/w3c/xsdtests.ratchet`, `xmlconf.ratchet`, `nist-dat
 w zakresie już przechodzą. Plik zawiera krótszą z dwóch list: przypadki zaliczone (`# mode: passing`) albo
 niezaliczone (`# mode: failing`); nagłówek podaje, ile przypadków jest w zakresie i ile przechodzi
 (`internal/testkit.Ratchet`). Test kończy się błędem, gdy przypadek, który przechodził, przestaje przechodzić. Nowe
-zaliczenia zapisuje `go test ./xsd ./internal/... -update`, a zmiana pliku jest widoczna w przeglądzie. Przypadek
+zaliczenia zapisuje `go test ./xsd ./internal/datatypes ./internal/xmlreader -update` (flagę `-update` mają tylko pakiety z zapadkami), a zmiana pliku jest widoczna w przeglądzie. Przypadek
 przestaje przechodzić tylko z wyjaśnieniem w opisie commitu. Przypadek, którego `goxsdgo` jeszcze nie umie
 rozstrzygnąć (`errors.ErrUnsupported`), nie jest nigdy zaliczony, także gdy oczekiwany werdykt to „błędny”.
 
@@ -65,6 +65,7 @@ Wyniki zapisujemy tutaj z datą, wersją i sposobem pomiaru.
 
 | Data | Commit | W3C (zaliczone / w zakresie) | Korpus MF | Zgodność z libxml2 | Uwagi |
 |---|---|---|---|---|---|
+| 2026-11-25 | poprawka `length-minLength-maxLength` 1.2/2.2 | 39 369 / 39 439 (+2: MS IDREFS_length006, NMTOKENS_length006) | bez zmian | — | błąd goxsdgo znaleziony przy porównaniu z knroy/go-xml i klasyfikacji przypadków spornych; zrzut błędów: zmieniły się wyłącznie te 2 przypadki |
 | 2026-11-25 | `7ab2316` | 39 367 / 39 439 (domyślnie); z `NameRules: NamesXML10Edition5` 39 383 / 39 439 (+16: 15 XmlVersions i `reZ006i`, 0 utraconych) | bez zmian | bez zmian | ADR 0012; zrzut wszystkich błędów w ustawieniu domyślnym identyczny przed i po |
 | 2026-11-25 | `355ec91` (`tools/bench`) | W3C z 39 439: goxsdgo 39 367, knroy/go-xml 39 386, cB-Sigma/xsd 39 329, jacoelho/xsd 39 083, libxml2 38 662 | MF: 170 / 170 (jacoelho/xsd 168) | — | 200 MB JPK: goxsdgo 3,96 s, libxml2 3,85 s, jacoelho/xsd 3,79 s; knroy/go-xml i cB-Sigma/xsd budują drzewo (11× i 22× rozmiaru pliku w pamięci); pojedyncze przebiegi przy obciążeniu 2–3 |
 | 2026-11-25 | `50eaebc` + xml.pro `4c07f5b5` | bez zmian | bez zmian | xml.pro przez silnik goxsdgo: 172 pliki klientów (1,61 GB), ten sam status i werdykt 172 / 172, wiersz pierwszego błędu 50 / 51 | etap 8, K8: testy xml.pro 2029 pass / 1 fail (ta sama porażka niezwiązana z walidacją co na `origin/main`) w obu silnikach, `-tags libxml2` 1103 / 0; czas 1,03× (200 MB) i 1,09× (korpus) względem gomfxml |

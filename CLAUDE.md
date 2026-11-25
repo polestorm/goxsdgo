@@ -66,7 +66,7 @@ Zasady:
   `python tools/fetch/fetch.py` według `testdata/sources.json`; nie trafiają do repozytorium (ADR 0003). Obie wersje
   narzędzia zmieniamy razem;
 - zapadki `testdata/**/*.ratchet` (`docs/testing.md`): po zmianie, która dodaje zaliczenia,
-  `go test ./xsd ./internal/... -update`; walidator odniesienia: `tools/compare` (polecenia w `docs/testing.md`);
+  `go test ./xsd ./internal/datatypes ./internal/xmlreader -update` (flagę `-update` mają tylko pakiety z zapadkami); walidator odniesienia: `tools/compare` (polecenia w `docs/testing.md`);
 - **żadnych prawdziwych danych podatników ani klientów w korpusie**: tylko przykłady opublikowane przez MF i dokumenty
   syntetyczne (`testdata/README.md`);
 - nazwy plików, pakietów i identyfikatorów po angielsku; komentarze i dokumentacja po polsku; `README.md` po angielsku;

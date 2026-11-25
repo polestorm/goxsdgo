@@ -25,7 +25,7 @@ Compared with libxml2 and three other XML Schema validators in pure Go,
 [knroy/go-xml](https://github.com/knroy/go-xml), [jacoelho/xsd](https://github.com/jacoelho/xsd) and
 [cB-Sigma/xsd](https://github.com/cB-Sigma/xsd) (details in [Comparison](#comparison)):
 
-- **Follows the recommendation, measured**: 39,367 of the 39,439 W3C test-suite cases for XSD 1.0 pass; every one
+- **Follows the recommendation, measured**: 39,369 of the 39,439 W3C test-suite cases for XSD 1.0 pass; every one
   of the other 72 is explained in [docs/differences.md](docs/differences.md). All 170 published schemas of the
   Polish Ministry of Finance (JPK, KSeF, e-Sprawozdania) compile, offline.
 - **A drop-in for libxml2 where it matters**: on the W3C instance tests it gives libxml2's verdict in 99.69% of
@@ -39,7 +39,7 @@ Compared with libxml2 and three other XML Schema validators in pure Go,
 - **Safe by default, linear time**: no network, no external entities, limits on depth, size and entity
   expansion; `pattern` facets and content models with large counters run in linear time; fuzzed.
 
-Where it is weaker: knroy/go-xml passes 19 more W3C cases (goxsdgo follows the text of the recommendation where it
+Where it is weaker: knroy/go-xml passes 17 more W3C cases (goxsdgo follows the text of the recommendation where it
 reads it differently from the suite, see [docs/differences.md](docs/differences.md)) and also implements XSD 1.1;
 libxml2 needs less memory (5 MB of process memory against 25 MB); jacoelho/xsd is equally fast with a slightly
 smaller footprint. goxsdgo is new and has a single consumer so far.
@@ -56,10 +56,10 @@ are validators in pure Go, published in 2026.
 
 | | goxsdgo | libxml2 2.15.4[^ref] | knroy/go-xml 2.3.1 | jacoelho/xsd 0.6.15 | cB-Sigma/xsd 1.0.0 |
 |---|:---:|:---:|:---:|:---:|:---:|
-| W3C XSD 1.0 test suite, all in-scope cases[^w3c] | 39,367 of 39,439[^names5] | 38,662 of 39,439[^libxml2run] | 39,386 of 39,439 🥇 | 39,083 of 39,439 | 39,329 of 39,439 |
-| — schema tests | 14,370 of 14,384 | 13,851 of 14,307 comparable | 14,381 of 14,384 🥇 | 14,198 of 14,384 | 14,367 of 14,384 |
+| W3C XSD 1.0 test suite, all in-scope cases[^w3c] | 39,369 of 39,439[^names5] | 38,662 of 39,439[^libxml2run] | 39,386 of 39,439 🥇 | 39,083 of 39,439 | 39,329 of 39,439 |
+| — schema tests | 14,372 of 14,384 | 13,851 of 14,307 comparable | 14,381 of 14,384 🥇 | 14,198 of 14,384 | 14,367 of 14,384 |
 | — instance tests | 24,997 of 25,055 | 24,797 of 24,903 comparable | 25,005 of 25,055 🥇 | 24,885 of 25,055 | 24,962 of 25,055 |
-| W3C XSD 1.0, excluding 133 contested cases[^contested] | 39,293 of 39,306 🥇 | 38,590 of 39,306 | 39,281 of 39,306 | 39,015 of 39,306 | 39,257 of 39,306 |
+| W3C XSD 1.0, excluding 133 contested cases[^contested] | 39,295 of 39,306 🥇 | 38,590 of 39,306 | 39,281 of 39,306 | 39,015 of 39,306 | 39,257 of 39,306 |
 | Same verdict as libxml2, instance tests | 99.69% | reference | not measured | not measured | not measured |
 | MF schemas compile (JPK, KSeF, e-SF)[^mf] | 170 of 170 🥇 | 170 of 170 🥇 | 170 of 170 🥇 | 168 of 170 | 170 of 170 🥇 |
 | MF and synthetic documents, expected verdict | 15 of 15 🥇 | 15 of 15 🥇 | 15 of 15 🥇 | 15 of 15 🥇 | 15 of 15 🥇 |
@@ -103,7 +103,7 @@ are validators in pure Go, published in 2026.
     measured here: knroy/go-xml 99.90% of instance and 99.98% of schema tests, cB-Sigma/xsd 99.6% of 39,369
     tests (their READMEs).
 [^names5]: With `Config.NameRules: xsd.NamesXML10Edition5` (name characters of XML 1.0 Fifth Edition instead of
-    the Second Edition that XSD 1.0 2e refers to; ADR 0012) goxsdgo passes 39,383 of 39,439; the default stays the
+    the Second Edition that XSD 1.0 2e refers to; ADR 0012) goxsdgo passes 39,385 of 39,439; the default stays the
     Second Edition.
 [^contested]: Chosen in advance by fixed criteria, the same for every candidate, before looking at who passes them:
     cases marked queried or disputed in the suite's own metadata (63), cases whose outcome depends on the XML edition
@@ -144,7 +144,7 @@ Feature complete for XSD 1.0; the API may still change before 1.0. Requires Go 1
 criteria of [ADR 0001](docs/adr/0001-scope-and-acceptance.md), from the evidence package of 2026-11-25
 ([docs/evidence.md](docs/evidence.md)):
 
-- K1 W3C test suite: 39,367 of 39,439; the 72 others explained. K2 MF corpus: 170 of 170 schemas, 15 of 15
+- K1 W3C test suite: 39,369 of 39,439; the 70 others explained. K2 MF corpus: 170 of 170 schemas, 15 of 15
   documents. K3 agreement with libxml2: 99.69% verdicts, 99.7% first-error lines, every difference described.
   K4 requirements: 136, all tested. K6 memory: 1 GB in 6.3 MB. K7 speed: 1.05× libxml2 on 200 MB, 1.19× on a
   private corpus of 1.6 GB. K8 consumer: xml.pro passes its tests with goxsdgo as its validator (branch, not yet
@@ -166,10 +166,9 @@ Where the suite's expectation is contested (queried or disputed in its own metad
 or the Unicode version, or contradictory within the suite), goxsdgo follows the text of the recommendation; each
 such case is listed with the rule in [docs/contested-cases.md](docs/contested-cases.md) and
 [docs/differences.md](docs/differences.md). The second W3C row compares all validators on the same uncontested
-set. On all in-scope cases knroy/go-xml passes 19 more than goxsdgo; on the uncontested set goxsdgo passes 12 more
-than knroy/go-xml. Of goxsdgo's 13 uncontested failures, 4 end with a library limit on counter-ambiguous content
-models, 2 (`IDREFS_length006`, `NMTOKENS_length006`) are goxsdgo errors found while drawing up this list, 5 are
-instance tests of groups whose schema test is contested (the instance tests themselves are not, so they stay in),
+set. On all in-scope cases knroy/go-xml passes 17 more than goxsdgo; on the uncontested set goxsdgo passes 14 more
+than knroy/go-xml. Of goxsdgo's 11 uncontested failures, 4 end with a library limit on counter-ambiguous content
+models, 5 are instance tests of groups whose schema test is contested (the instance tests themselves are not, so they stay in),
 and 2 (`attP031`, `anyURI_b006`) were considered and left in, because the suite deliberately splits their XSD 1.0
 and 1.1 outcomes.
 

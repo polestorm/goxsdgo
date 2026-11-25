@@ -397,12 +397,16 @@ func (f *facets) setCount(base *Type, k FacetKind, n uint64, lexical string) *Er
 func (t *Type) checkLengths(base *Type, step facetSet) *Error {
 	f := &t.f
 	if f.present.has(FacetLength) {
-		// minLength (maxLength) może współistnieć z length tylko wtedy, gdy nie przeczy mu (1.1, 2.1) i pochodzi
-		// z typu-przodka, w którym nie było length (1.2, 2.2).
-		if f.present.has(FacetMinLength) && !(f.minLength <= f.length && f.minLengthAlone && !step.has(FacetMinLength)) {
+		// minLength (maxLength) może współistnieć z length tylko wtedy, gdy nie przeczy mu (1.1, 2.1) i istnieje
+		// typ-przodek, w którym minLength (maxLength) ma tę samą wartość, a length nie było (1.2, 2.2). Wartość może
+		// być powtórzona w bieżącym kroku: tekst 1.2 wymaga tylko takiego przodka (np. restrykcja xsd:IDREFS, który
+		// ma minLength 1, z length 5 i minLength 1 w jednym kroku jest poprawna: MS IDREFS_length006).
+		if f.present.has(FacetMinLength) && !(f.minLength <= f.length && base != nil &&
+			base.f.present.has(FacetMinLength) && base.f.minLength == f.minLength && base.f.minLengthAlone) {
 			return errorf(CodeLengthMinMax, fmt.Sprint(f.length), "length", "minLength %d", f.minLength)
 		}
-		if f.present.has(FacetMaxLength) && !(f.length <= f.maxLength && f.maxLengthAlone && !step.has(FacetMaxLength)) {
+		if f.present.has(FacetMaxLength) && !(f.length <= f.maxLength && base != nil &&
+			base.f.present.has(FacetMaxLength) && base.f.maxLength == f.maxLength && base.f.maxLengthAlone) {
 			return errorf(CodeLengthMinMax, fmt.Sprint(f.length), "length", "maxLength %d", f.maxLength)
 		}
 	}

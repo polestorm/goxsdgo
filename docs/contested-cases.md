@@ -25,8 +25,8 @@ Kategoria e jest pusta: żaden rozważony przypadek nie miał jednoznacznego cyt
 
 | Kandydat | Wszystkie w zakresie | Bez spornych | Sporne zaliczone | a | b | c | d | e |
 |---|---|---|---|---|---|---|---|---|
-| goxsdgo | 39367 / 39439 | 39293 / 39306 | 74 / 133 | 37 | 34 | 0 | 3 | 0 |
-| goxsdgo (XML 1.0 5e names) | 39383 / 39439 | 39293 / 39306 | 90 / 133 | 37 | 50 | 0 | 3 | 0 |
+| goxsdgo | 39369 / 39439 | 39295 / 39306 | 74 / 133 | 37 | 34 | 0 | 3 | 0 |
+| goxsdgo (XML 1.0 5e names) | 39385 / 39439 | 39295 / 39306 | 90 / 133 | 37 | 50 | 0 | 3 | 0 |
 | libxml2 2.15.4 | 38662 / 39439 | 38590 / 39306 | 72 / 133 | 27 | 40 | 0 | 5 | 0 |
 | knroy/go-xml | 39386 / 39439 | 39281 / 39306 | 105 / 133 | 37 | 53 | 0 | 15 | 0 |
 | jacoelho/xsd | 39083 / 39439 | 39015 / 39306 | 68 / 133 | 32 | 22 | 0 | 14 | 0 |

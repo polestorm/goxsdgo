@@ -563,6 +563,9 @@ func TestRestrictionConstraints(t *testing.T) {
 	}{
 		{"string", [][]FacetSpec{{fs(FacetMinLength, "5"), fs(FacetMaxLength, "3")}}, CodeMinLengthMaxLength},
 		{"string", [][]FacetSpec{{fs(FacetLength, "5"), fs(FacetMinLength, "3")}}, CodeLengthMinMax},
+		// 1.2: przodek z minLength 1 bez length, ale w kroku minLength inny niż u przodka.
+		{"IDREFS", [][]FacetSpec{{fs(FacetLength, "5"), fs(FacetMinLength, "2")}}, CodeLengthMinMax},
+		{"string", [][]FacetSpec{{fs(FacetLength, "5"), fs(FacetMaxLength, "7")}}, CodeLengthMinMax},
 		{"string", [][]FacetSpec{{fs(FacetLength, "5")}, {fs(FacetLength, "6")}}, CodeLengthRestriction},
 		{"string", [][]FacetSpec{{fs(FacetMinLength, "5")}, {fs(FacetMinLength, "4")}}, CodeMinLengthRestriction},
 		{"string", [][]FacetSpec{{fs(FacetMaxLength, "5")}, {fs(FacetMaxLength, "6")}}, CodeMaxLengthRestriction},
@@ -611,11 +614,17 @@ func TestRestrictionConstraints(t *testing.T) {
 		{{fs(FacetMaxInclusive, "10")}, {fs(FacetMaxExclusive, "10")}},
 		{{fs(FacetMinInclusive, "1"), fs(FacetMaxInclusive, "1")}},
 		{{{Kind: FacetMaxLength, Value: "5", Fixed: true}}, {fs(FacetMaxLength, "5")}},
+		// 1.2 i 2.2: wartość przodka powtórzona w kroku z length (MS IDREFS_length006, NMTOKENS_length006).
+		{{fs(FacetLength, "5"), fs(FacetMinLength, "1")}},
+		{{fs(FacetMaxLength, "9")}, {fs(FacetLength, "5"), fs(FacetMaxLength, "9")}},
 	}
 	for i, steps := range ok {
 		base := "integer"
-		if i == 1 || i == 4 {
+		switch i {
+		case 1, 4, 6:
 			base = "string"
+		case 5:
+			base = "IDREFS"
 		}
 		ty := bt(t, base)
 		for _, step := range steps {

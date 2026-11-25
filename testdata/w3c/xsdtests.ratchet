@@ -1,10 +1,8 @@
 # W3C XML Schema test suite, XSD 1.0 2e (TestW3CSuite, go test ./xsd -update).
 # A case stops passing only with an explanation in the commit message.
-# in scope 39439, passing 39367
+# in scope 39439, passing 39369
 # mode: failing
 MS-Attribute2006-07-15/attP031/attP031.i
-MS-DataTypes2006-07-15/IDREFS_length006_395/IDREFS_length006_395
-MS-DataTypes2006-07-15/NMTOKENS_length006_438/NMTOKENS_length006_438
 MS-DataTypes2006-07-15/anyURI_a004_1339/anyURI_a004_1339.i
 MS-DataTypes2006-07-15/anyURI_b006_1356/anyURI_b006_1356
 MS-DataTypes2006-07-15/gMonth002_2061/gMonth002_2061.v
