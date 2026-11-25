@@ -15,6 +15,11 @@ zebrane w jednym miejscu i pomiary względem libxml2, także na prywatnym korpus
    każdego przebiegu do `docs/fuzzing.md` (data, commit, czas, wykonania, wynik). Do K5 liczy się czas przebiegów
    zakończonych wynikiem „ok” na commicie kandydata albo na późniejszych commitach bez zmian kodu biblioteki poza
    testami; przebieg z błędem zeruje licznik dla kodu, którego dotyczy (reguła w `docs/fuzzing.md`).
+   Decyzja właściciela z 2026-11-25: fuzzing nie działa lokalnie w dzień (blokuje inne sesje i przekłamuje ich
+   czasy). `tools/fuzz -pack` buduje paczkę dla serwera bez Go (Synology): binarki testów z `go test -c` dla
+   linux/amd64 i linux/arm64, wejścia regresji i dane wejść startowych w układzie repozytorium, skrypt `run.sh` w czystym
+   sh (BusyBox) z dziennikiem `journal.tsv`; `tools/fuzz -import` dopisuje dziennik serwera do `docs/fuzzing.md`.
+   Pierwsza kampania lokalna na `2e813e9` została przerwana po 15 min (`FuzzDecimal`, 107,8 mln wykonań, bez błędów).
 2. **Wejścia startowe z pobranych danych.** Fuzzery dostają próbkę schematów i przykładów MF, przypadków W3C,
    dokumentów XML Conformance i wzorców ze schematów MF (`testkit.SampleFiles`), czytaną w czasie testu. Danych nie
    commitujemy (ADR 0003), a bez nich fuzzery startują z wejść wpisanych w kod. Danych prywatnych nie używamy.
@@ -78,13 +83,13 @@ zebrane w jednym miejscu i pomiary względem libxml2, także na prywatnym korpus
 
 - Bez `unsafe`, asemblera i współbieżności wewnątrz walidacji jednego dokumentu: zapas do K7 (≤ 3×) jest duży.
 - Bez przybliżonego łączenia wartości liczników (przedziały zamiast zbiorów): mogłoby przyjąć dokument błędny.
-- Kampania fuzzingu nie działa w CI (CI jest wstrzymane do następnego okresu rozliczeniowego); prowadzi ją lokalnie
-  właściciel jednym poleceniem z `docs/fuzzing.md`.
+- Kampania fuzzingu nie działa w CI (CI jest wstrzymane do następnego okresu rozliczeniowego) ani lokalnie w dzień;
+  działa na serwerze Synology z paczki `tools/fuzz -pack` (polecenia w `docs/fuzzing.md`).
 
 ## Konsekwencje
 
 + K6 i K7 spełnione z zapasem także na prawdziwych dużych plikach; K3 na korpusie prywatnym 100% werdyktów;
 + limity opisane w jednym miejscu i dostępne przez API;
 + każda optymalizacja ma dowód, że nie zmienia wyników;
-− do K5 brakuje godzin kampanii na kandydacie do wydania (stan w `docs/fuzzing.md`);
+− do K5 brakuje 23 h 45 min kampanii na kandydacie `2e813e9` (stan w `docs/fuzzing.md`);
 − indeks scalony zwiększa pamięć używanego modelu o rozmiar sumy indeksów krawędzi (najwyżej 256 dzieci na krawędź).

@@ -8,6 +8,8 @@
 //	go -C tools/fuzz run . -root ../.. -duration 21h -rounds 3 # trzy rundy po 7 h
 //	go -C tools/fuzz run . -root ../.. -only Validate -duration 30m
 //	go -C tools/fuzz run . -root ../.. -list                  # tylko lista fuzzerów
+//	go -C tools/fuzz run . -root ../.. -pack ../../out/fuzzpack # paczka dla serwera bez Go (pack.go)
+//	go -C tools/fuzz run . -root ../.. -import journal.tsv      # wiersze z dziennika serwera do docs/fuzzing.md
 //
 // Pełne wyjście każdego przebiegu trafia do <root>/out/fuzz/. Znalezione wejście, które łamie niezmiennik, Go zapisuje
 // w testdata/fuzz/<Fuzzer>/ pakietu; trzeba je przejrzeć, naprawić błąd i zostawić plik jako test regresji.
@@ -44,6 +46,7 @@ type result struct {
 	logPath  string
 	commit   string
 	modified bool
+	host     string // gdzie przebieg działał, gdy nie lokalnie (np. "Synology")
 }
 
 var (
@@ -60,6 +63,11 @@ func main() {
 	parallel := flag.Int("parallel", max(1, runtime.NumCPU()-2), "fuzzing workers per fuzzer (-parallel of go test)")
 	journal := flag.String("journal", "docs/fuzzing.md", "journal file, relative to -root")
 	list := flag.Bool("list", false, "only list the fuzzers")
+	packDir := flag.String("pack", "", "build a self-contained package for a server without Go into this directory")
+	targets := flag.String("targets", "linux/amd64,linux/arm64", "-pack: GOOS/GOARCH list")
+	withData := flag.Bool("data", true, "-pack: include the fetched test data the fuzzers read as seed inputs")
+	importPath := flag.String("import", "", "append the rows of a server journal (journal.tsv) to the journal")
+	host := flag.String("host", "Synology", "-import: where the runs happened")
 	flag.Parse()
 
 	fuzzers, err := discover(*root)
@@ -88,6 +96,18 @@ func main() {
 		}
 		return
 	}
+	if *packDir != "" {
+		if err := pack(*root, *packDir, fuzzers, strings.Split(*targets, ","), *withData); err != nil {
+			fail(err)
+		}
+		return
+	}
+	if *importPath != "" {
+		if err := importJournal(*importPath, journalPath(*root, *journal), *host); err != nil {
+			fail(err)
+		}
+		return
+	}
 	slot := (*duration / time.Duration(len(fuzzers)**rounds)).Round(time.Second)
 	if slot < 10*time.Second {
 		fail(fmt.Errorf("%v per fuzzer is too short", slot))
@@ -112,7 +132,7 @@ func main() {
 				failed++
 			}
 			fmt.Printf("%-22s %-20s %8v %12d execs  %s\n", f.pkg, f.name, res.elapsed.Round(time.Second), res.execs, status)
-			if err := appendJournal(filepath.Join(*root, *journal), []result{res}); err != nil {
+			if err := appendJournal(journalPath(*root, *journal), []result{res}); err != nil {
 				fail(err)
 			}
 		}
@@ -132,6 +152,14 @@ func main() {
 func fail(err error) {
 	fmt.Fprintln(os.Stderr, "fuzz:", err)
 	os.Exit(1)
+}
+
+// journalPath zwraca ścieżkę dziennika: bezwzględną bez zmian, względną względem root.
+func journalPath(root, journal string) string {
+	if filepath.IsAbs(journal) {
+		return journal
+	}
+	return filepath.Join(root, journal)
 }
 
 func dirtyMark(m bool) string {
@@ -257,6 +285,9 @@ func appendJournal(path string, rs []result) error {
 		status := "ok"
 		if !r.ok {
 			status = "**błąd**: " + r.detail
+		}
+		if r.host != "" {
+			status += " (" + r.host + ")"
 		}
 		fmt.Fprintf(f, "| %s | `%s`%s | %s | `%s` | %s | %d | %s |\n", r.start.Format("2006-01-02 15:04"), r.commit,
 			map[bool]string{true: " (zmiany)", false: ""}[r.modified], r.pkg, r.name,
