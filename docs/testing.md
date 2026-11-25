@@ -64,6 +64,7 @@ Wyniki zapisujemy tutaj z datą, wersją i sposobem pomiaru.
 
 | Data | Commit | W3C (zaliczone / w zakresie) | Korpus MF | Zgodność z libxml2 | Uwagi |
 |---|---|---|---|---|---|
+| 2026-11-25 | `50eaebc` + xml.pro `4c07f5b5` | bez zmian | bez zmian | xml.pro przez silnik goxsdgo: 172 pliki klientów (1,61 GB), ten sam status i werdykt 172 / 172, wiersz pierwszego błędu 50 / 51 | etap 8, K8: testy xml.pro 2029 pass / 1 fail (ta sama porażka niezwiązana z walidacją co na `origin/main`) w obu silnikach, `-tags libxml2` 1103 / 0; czas 1,03× (200 MB) i 1,09× (korpus) względem gomfxml |
 | 2026-11-25 | `2e813e9` | 39 367 / 39 439 (bez zmian) | 170 / 170, 15 / 15 | korpus prywatny (151 plików z schematem, 1,59 GB): werdykt 151 / 151, wiersz pierwszego błędu 50 / 51 | etap 7; K6: 1 GB, szczyt 6,3 MB; K7: 200 MB 1,05×, korpus prywatny 1,19× (największy plik 227 MB: 1,33×); `BenchmarkValidateJPK` 47–48 MB/s (było 41); K5: 15 min / 24 h (`docs/fuzzing.md`) |
 | 2026-11-25 | `12a5436` | bez zmian | bez zmian | bez zmian | etap 6b; 184 kombinacje kod/wariant zaobserwowane na W3C i korpusie MF opisane w EN i PL; `BenchmarkValidateJPK` ok. 41 MB/s, bez zmian |
 | 2026-11-25 | `a497d5b` | 39 367 / 39 439 (bez zmian) | 170 / 170, 15 / 15 | bez zmian; 528 rozbieżności werdyktu z libxml2 opisanych w `differences-libxml2.md` (rację ma goxsdgo w 519, libxml2 w 9) | etap 6: compat 223 / 223 kodów; 52 ze 117 kodów odbiorcy są odpowiednikiem kodu dokumentu; `BenchmarkValidateJPK` bez `OnValue` 41 MB/s (bez zmian), z `OnValue` 33 MB/s |

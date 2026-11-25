@@ -43,12 +43,12 @@
     "limit_ratio": 3
   },
   "k8": {
-    "status": "pending",
+    "status": "met",
     "consumer": "xml.pro",
-    "branch": "",
-    "commit": "",
-    "date": "",
-    "result": "",
-    "note": "Gałąź z przepięciem xml.pro na goxsdgo w przygotowaniu (etap 8). Po przebiegu testów odbiorcy wpisz gałąź, commit, datę, wynik (np. \"go test ./... : 1234 testów, 0 błędów\") i status \"met\" albo \"not_met\"."
+    "branch": "feat/goxsdgo-engine",
+    "commit": "4c07f5b5",
+    "date": "2026-11-25",
+    "result": "go test ./...: 2029 pass, 38 skip, 1 fail w obu silnikach (ta sama porażka niezwiązana z walidacją jest na origin/main); -tags libxml2 (importing, server, web): 1103 pass, 0 fail w obu; 16 dokumentów publicznych i 172 pliki klientów: ten sam status i werdykt we wszystkich",
+    "note": "Silnik goxsdgo za XMLPRO_VALIDATION_ENGINE=goxsdgo, domyślny bez zmian. Spełnione na gałęzi; zmiana domyślnego silnika po próbie na dev (docs/techniczne/goxsdgo-migracja.md w xml.pro)."
   }
 }
