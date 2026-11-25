@@ -1,0 +1,8 @@
+github.com/cB-Sigma/xsd v1.0.0 h1:+C0390Lfe4BPR0JAEn/M5GZSa63rx1toj4nUqD1X4GY=
+github.com/cB-Sigma/xsd v1.0.0/go.mod h1:SjPBhCFxsTx2jI2PLpuzZoaw25qTVd1M+O2Idp4oYDM=
+github.com/jacoelho/xsd v0.6.15 h1:qFN1/JhGsMnAZxya8t/oVSkVGFcZg0PDKLauylrytjM=
+github.com/jacoelho/xsd v0.6.15/go.mod h1:XHmCbS7FfRMApI6IcXQIEAJdhpDhY9lRkRUsg64L2uA=
+github.com/knroy/go-xml/v2 v2.3.1 h1:ogU5WL+S0mhsY+uXAwYAtxiLgKxIJIoNlRKfnCP/JQY=
+github.com/knroy/go-xml/v2 v2.3.1/go.mod h1:q3hL666HVFOGRuv+qwUQCyql/QteEB1qCk6EUdNk7pw=
+golang.org/x/text v0.41.0 h1:vz/seA0lnX87Othu2f/0L24RcgrXD9/YFTSuGjj3rH8=
+golang.org/x/text v0.41.0/go.mod h1:jvf1O8ajNzZqhSrQBPbutR/EB83Cc0CFrezNQIwbb5M=
