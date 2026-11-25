@@ -5,7 +5,7 @@
 | Warstwa | Gdzie | Co sprawdza |
 |---|---|---|
 | zestaw W3C | `testdata/w3c/xsdtests/` (ADR 0003), `TestW3CSuite`, czytnik `internal/w3c` | werdykt dla każdego schematu i dokumentu z zestawu XSD 1.0 2e; raport w podziale na dostawców (NIST, Microsoft, Sun, Boeing, IBM, Saxonica, W3C); wyłączenia z powodem; zapadka `testdata/w3c/passing.txt` |
-| zgodność XML | `TestXMLConformance` | czytnik XML na zestawie W3C XML Conformance (dobra forma, przestrzenie nazw) |
+| zgodność XML | `internal/xmlreader`, `TestXMLConformance` | czytnik XML na zestawie W3C XML Conformance (dobra forma, przestrzenie nazw, druga postać kanoniczna tam, gdzie zestaw ją podaje); zapadka `testdata/w3c/xmlconf-passing.txt`, `go test ./internal/xmlreader -update` |
 | wymagania | `requirements/*.md`, `TestRequirementsCovered` | każde wymaganie ma test albo plik korpusu; każde odwołanie `REQ:` wskazuje istniejące wymaganie |
 | korpus schematów | `testdata/schemas/mf/`, `TestSchemaCorpus` | każdy ze 170 schematów MF (JPK, KSeF, e-Sprawozdania) kompiluje się bez błędów; importy rozwiązuje katalog adresów z manifestu, bez sieci; zapadka `testdata/passing-corpus.txt` |
 | korpus dokumentów | `testdata/instances/` + `expected.json`, `TestInstanceCorpus` | werdykt (później też kody i miejsca błędów) zgodny z oczekiwanym; zapadka jak wyżej |
@@ -56,6 +56,7 @@ Wyniki zapisujemy tutaj z datą, wersją i sposobem pomiaru.
 
 | Data | Commit | W3C (zaliczone / w zakresie) | Korpus MF | Zgodność z libxml2 | Uwagi |
 |---|---|---|---|---|---|
+| 2026-11-25 | `b502002` | 0 / 39 461 | — | — | etap 1: XML Conformance 1725 / 1727 (xmltest 299/299, sun 101/101, oasis 323/323, ibm 526/527, eduni 476/477); `encoding/xml` na tym samym zestawie 1146 / 1727; werdykt dobrej formy jak w libxml2 dla 42 018 plików `.xml` i `.xsd` z zestawu W3C XSD i korpusu MF poza 3; `go test ./internal/xmlreader -run XMLConformance -v` |
 | 2026-11-25 | `bb585b7` | 0 / 39 461 | schematy 0 / 170, dokumenty 0 / 8 | — | etap 0: infrastruktura bez implementacji; `go test ./xsd -run 'W3C\|Corpus' -v` |
 
 Pomiary walidatora odniesienia (libxml2 2.15.4 przez `goxsdval` `2f45df6`, `tools/compare`):

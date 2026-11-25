@@ -4,7 +4,9 @@
    `tools/fetch`, przypięty commit i suma drzewa w `testdata/sources.json`, poza repozytorium.
 2. ~~**Schematy i przykłady MF w repozytorium.**~~ Rozstrzygnięte w ADR 0003 (2026-11-25): pobierane tak samo, poza
    repozytorium, z sumą każdego pliku w manifeście.
-3. **Własny czytnik XML czy `encoding/xml`.** `encoding/xml` nie zgłasza części błędów dobrej formy, nie daje kolumny,
+3. ~~**Własny czytnik XML czy `encoding/xml`.**~~ Rozstrzygnięte w ADR 0004 (2026-11-25): własny czytnik
+   (`internal/xmlreader`); `encoding/xml` daje na zestawie XML Conformance 1146 / 1727, własny 1725 / 1727.
+   Pierwotny opis: `encoding/xml` nie zgłasza części błędów dobrej formy, nie daje kolumny,
    inaczej traktuje przestrzenie nazw i DOCTYPE. Rekomendacja: własny czytnik strumieniowy XML 1.0 + przestrzenie nazw
    (ok. 1,5–2 tys. linii), z testami z zestawu W3C XML Conformance (pobierany jak w pytaniu 1). Do rozstrzygnięcia
    w etapie 1.
