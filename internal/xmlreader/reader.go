@@ -52,6 +52,9 @@ type Token struct {
 	// SelfClosing: znacznik pustego elementu; następny token to jego KindEndElement.
 	SelfClosing  bool
 	Line, Column int
+	// EndLine i EndColumn (KindStartElement): pozycja tuż za końcem znacznika początkowego („>” albo „/>”).
+	// Walidacja XSD wskazuje nią element w błędach, tak jak libxml2 (ADR 0008).
+	EndLine, EndColumn int
 }
 
 // Limits to limity czytnika. Zero oznacza wartość domyślną (DefaultLimits), wartość ujemna brak limitu.
@@ -1048,7 +1051,9 @@ func (r *Reader) startTag(l, c int) (Token, error) {
 	r.depth++
 	r.seenRoot = true
 	r.pendingEnd = selfClosing
-	return Token{Kind: KindStartElement, Name: el.name, Attrs: r.out, SelfClosing: selfClosing, Line: l, Column: c}, nil
+	endL, endC := r.position()
+	return Token{Kind: KindStartElement, Name: el.name, Attrs: r.out, SelfClosing: selfClosing, Line: l, Column: c,
+		EndLine: endL, EndColumn: endC}, nil
 }
 
 // duplicateAttr mówi, czy nazwa an już wystąpiła w bieżącym znaczniku.

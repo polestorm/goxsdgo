@@ -5,16 +5,25 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"path"
+	"sort"
 	"strings"
+	"sync"
 
 	"github.com/polestorm/goxsdgo/internal/schema"
+	"github.com/polestorm/goxsdgo/internal/validate"
 )
 
-// errNotImplemented oznacza część rekomendacji, której biblioteka jeszcze nie obsługuje. Testy zgodności liczą
-// taki wynik jako porażkę, nigdy jako poprawny werdykt „schemat błędny” albo „dokument błędny”.
-var errNotImplemented = fmt.Errorf("xsd: %w", errors.ErrUnsupported)
+// ErrLimit oznacza przekroczenie limitu biblioteki podczas walidacji (głębokość, rozmiar tekstu, liczba wpisów
+// ID i ograniczeń tożsamości, złożoność dopasowania modelu zawartości). To nie jest werdykt o dokumencie.
+var ErrLimit = validate.ErrLimit
 
-// Config ustawia kompilację schematu. Wartość zerowa to ustawienia domyślne: bez sieci, schematy tylko z fsys.
+// ErrTooManyErrors oznacza, że walidację przerwano po Config.MaxErrors błędach. Validate zwraca go razem
+// z zebranymi błędami; dokument jest wtedy na pewno błędny.
+var ErrTooManyErrors = validate.ErrTooManyErrors
+
+// Config ustawia kompilację schematu i walidację. Wartość zerowa to ustawienia domyślne: bez sieci, schematy tylko
+// z fsys, wskazówki xsi:schemaLocation wyłączone.
 //
 // Kształt API jest wstępny (pytanie 5 w docs/adr/open-questions.md); ustalą go testy kolejnych etapów.
 type Config struct {
@@ -29,6 +38,16 @@ type Config struct {
 	// MaxDocuments i MaxDepth ograniczają liczbę wczytanych dokumentów schematu (domyślnie 1000) i zagnieżdżenie
 	// include, import i redefine (domyślnie 64). Zero oznacza wartość domyślną.
 	MaxDocuments, MaxDepth int
+
+	// SchemaLocationHints włącza wskazówki xsi:schemaLocation i xsi:noNamespaceSchemaLocation w dokumentach
+	// (4.3.2). Wskazane dokumenty schematu są czytane wyłącznie z fsys: przez Locations albo jako ścieżka
+	// względna wobec nazwy dokumentu podanej w ValidateDocument. Domyślnie wyłączone (ADR 0001, ADR 0008).
+	SchemaLocationHints bool
+	// MaxErrors przerywa walidację dokumentu po tylu błędach (ErrTooManyErrors). 0: 1000; ujemna: bez limitu.
+	MaxErrors int
+	// MaxIdentityEntries ogranicza łączną liczbę wartości ID, IDREF i wpisów tabel ograniczeń tożsamości
+	// przechowywanych podczas walidacji jednego dokumentu. 0: 4 194 304.
+	MaxIdentityEntries int
 }
 
 // Compile kompiluje schemat złożony z dokumentów names z fsys, z ustawieniami domyślnymi.
@@ -38,23 +57,38 @@ func Compile(fsys fs.FS, names ...string) (*Set, error) {
 
 // Compile kompiluje schemat złożony z dokumentów names z fsys. Gdy schemat nie jest poprawny (rozdziały 3 i 4
 // części 1 rekomendacji), zwraca *SchemaError z listą błędów. Błąd opakowujący errors.ErrUnsupported oznacza
-// konstrukcję, której biblioteka jeszcze nie obsługuje; nie mówi nic o poprawności schematu.
+// konstrukcję, której biblioteka jeszcze nie obsługuje; nie mówi nic o poprawności schematu. Z włączonymi
+// wskazówkami (SchemaLocationHints) names może być puste: schemat wskażą dopiero dokumenty.
 func (c Config) Compile(fsys fs.FS, names ...string) (*Set, error) {
-	sch, err := schema.Load(fsys, schema.Config{Locations: c.Locations, Namespaces: c.Namespaces,
-		MaxDocuments: c.MaxDocuments, MaxDepth: c.MaxDepth}, names...)
-	if err != nil {
-		var list schema.ErrorList
-		if errors.As(err, &list) {
-			se := &SchemaError{}
-			for _, e := range list {
-				se.Errors = append(se.Errors, Error{Code: e.Code, Document: e.Pos.Document, Line: e.Pos.Line,
-					Column: e.Pos.Column, Message: e.Message})
-			}
-			return nil, se
-		}
-		return nil, err
+	s := &Set{cfg: c, fsys: fsys, names: append([]string(nil), names...)}
+	if len(names) == 0 && c.SchemaLocationHints {
+		s.schema = schema.Empty()
+		return s, nil
 	}
-	return &Set{schema: sch}, nil
+	sch, err := schema.Load(fsys, c.schemaConfig(), names...)
+	if err != nil {
+		return nil, schemaError(err)
+	}
+	s.schema = sch
+	return s, nil
+}
+
+func (c Config) schemaConfig() schema.Config {
+	return schema.Config{Locations: c.Locations, Namespaces: c.Namespaces, MaxDocuments: c.MaxDocuments,
+		MaxDepth: c.MaxDepth}
+}
+
+func schemaError(err error) error {
+	var list schema.ErrorList
+	if !errors.As(err, &list) {
+		return err
+	}
+	se := &SchemaError{}
+	for _, e := range list {
+		se.Errors = append(se.Errors, Error{Code: e.Code, Document: e.Pos.Document, Line: e.Pos.Line,
+			Column: e.Pos.Column, Message: e.Message})
+	}
+	return se
 }
 
 // SchemaError to błąd kompilacji: schemat nie jest poprawny. Errors są w powtarzalnej kolejności.
@@ -78,12 +112,114 @@ func (e *SchemaError) Error() string {
 // Set to skompilowany schemat, gotowy do walidacji wielu dokumentów, także równocześnie.
 type Set struct {
 	schema *schema.Schema
+	cfg    Config
+	fsys   fs.FS
+	names  []string
+
+	// hinted: schematy poszerzone o dokumenty ze wskazówek, według posortowanej listy ścieżek.
+	mu     sync.Mutex
+	hinted map[string]hintedSchema
+}
+
+type hintedSchema struct {
+	sch *schema.Schema
+	err error
 }
 
 // Validate waliduje dokument z r strumieniowo. Pusta lista błędów oznacza dokument poprawny. Błąd zwracany jako
-// drugi wynik dotyczy wejścia albo ograniczeń biblioteki, nie treści dokumentu.
+// drugi wynik dotyczy wejścia albo ograniczeń biblioteki (ErrLimit, errors.ErrUnsupported), nie treści dokumentu;
+// wyjątkiem jest ErrTooManyErrors, zwracany razem z błędami dokumentu.
 func (s *Set) Validate(r io.Reader) ([]Error, error) {
-	return nil, errNotImplemented
+	return s.ValidateDocument(r, "")
+}
+
+// ValidateDocument działa jak Validate; name to ścieżka dokumentu w fsys schematu, względem której są
+// rozwiązywane względne wskazówki xsi:schemaLocation (gdy Config.SchemaLocationHints). Bez wskazówek name służy
+// tylko komunikatom i może być puste.
+func (s *Set) ValidateDocument(r io.Reader, name string) ([]Error, error) {
+	opts := validate.Options{MaxErrors: s.cfg.MaxErrors, MaxIdentityEntries: s.cfg.MaxIdentityEntries}
+	if s.cfg.SchemaLocationHints {
+		opts.Hints = &hintLoader{set: s, dir: path.Dir(name), loaded: append([]string(nil), s.names...)}
+	}
+	verrs, err := validate.Validate(s.schema, r, opts)
+	var out []Error
+	if len(verrs) > 0 {
+		out = make([]Error, len(verrs))
+		for i, e := range verrs {
+			out[i] = Error{Code: e.Code, Line: e.Line, Column: e.Column, Path: e.Path, Name: e.Name, Value: e.Value,
+				Facet: e.Facet, Expected: e.Expected, Message: e.Message}
+		}
+	}
+	if err != nil && !errors.Is(err, ErrTooManyErrors) {
+		err = fmt.Errorf("xsd: %w", err)
+	}
+	return out, err
+}
+
+// hintLoader wczytuje dokumenty ze wskazówek jednego dokumentu; schematy są wspólne dla Set (pamięć podręczna).
+type hintLoader struct {
+	set    *Set
+	dir    string
+	loaded []string
+}
+
+func (h *hintLoader) LoadHints(hints []validate.Hint) (*schema.Schema, error) {
+	added := false
+	for _, hint := range hints {
+		p, ok := h.resolve(hint.Location)
+		if !ok {
+			continue // wskazówka bez dokumentu w fsys: procesor może ją pominąć (4.3.2)
+		}
+		dup := false
+		for _, q := range h.loaded {
+			if q == p {
+				dup = true
+				break
+			}
+		}
+		if !dup {
+			h.loaded = append(h.loaded, p)
+			added = true
+		}
+	}
+	if !added {
+		return nil, nil
+	}
+	return h.set.schemaFor(h.loaded)
+}
+
+func (h *hintLoader) resolve(loc string) (string, bool) {
+	if p, ok := h.set.cfg.Locations[loc]; ok {
+		return p, true
+	}
+	if strings.Contains(loc, ":") || strings.HasPrefix(loc, "/") {
+		return "", false
+	}
+	p := path.Clean(path.Join(h.dir, loc))
+	if !fs.ValidPath(p) {
+		return "", false
+	}
+	if _, err := fs.Stat(h.set.fsys, p); err != nil {
+		return "", false
+	}
+	return p, true
+}
+
+func (s *Set) schemaFor(names []string) (*schema.Schema, error) {
+	key := append([]string(nil), names...)
+	sort.Strings(key)
+	k := strings.Join(key, "\x00")
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if h, ok := s.hinted[k]; ok {
+		return h.sch, h.err
+	}
+	sch, err := schema.Load(s.fsys, s.cfg.schemaConfig(), names...)
+	if s.hinted == nil {
+		s.hinted = map[string]hintedSchema{}
+	}
+	s.hinted[k] = hintedSchema{sch, err}
+	return sch, err
 }
 
 // Error to jeden błąd walidacji dokumentu albo schematu.
@@ -92,11 +228,21 @@ type Error struct {
 	Code string
 	// Document to ścieżka dokumentu schematu w fsys dla błędów schematu; pusta dla błędów dokumentu.
 	Document string
-	// Line i Column to pozycja w dokumencie, liczone od 1.
+	// Line i Column to pozycja w dokumencie, liczone od 1; kolumna w znakach.
 	Line, Column int
-	// Path to ścieżka elementu, np. "/JPK/Ewidencja/SprzedazWiersz[3]".
+	// Path to ścieżka elementu, np. "/JPK/Ewidencja/SprzedazWiersz[3]": nazwy lokalne bez prefiksów, [n] od
+	// drugiego wystąpienia nazwy wśród rodzeństwa, "/@nazwa" dla atrybutu (ADR 0008).
 	Path string
-	// Message to komunikat po angielsku; do tłumaczenia służy Code.
+	// Name to nazwa lokalna elementu albo atrybutu, którego dotyczy błąd.
+	Name string
+	// Value to wartość, której dotyczy błąd (np. tekst niezgodny z typem, zdublowany klucz).
+	Value string
+	// Facet to naruszony aspekt i jego wartość, np. "maxLength 5"; puste, gdy błąd nie dotyczy aspektu.
+	Facet string
+	// Expected to elementy dozwolone w miejscu błędu cvc-complex-type.2.4: "nazwa" albo "{przestrzeń}nazwa",
+	// symbol wieloznaczny jako "*" albo "{przestrzeń}*".
+	Expected []string
+	// Message to komunikat po angielsku; do tłumaczenia służy Code (z parametrami z pól powyżej).
 	Message string
 }
 

@@ -25,6 +25,7 @@ const (
 // TestW3CSuite mierzy kryterium K1 na zestawie W3C XML Schema: każdy przypadek objęty zakresem XSD 1.0 2e
 // (internal/w3c) ma dać oczekiwany werdykt. Zapadka testdata/w3c/xsdtests.ratchet mówi, które przypadki
 // już przechodzą; test kończy się błędem, gdy któryś z nich przestaje przechodzić. Nowe zaliczenia zapisuje `go test ./xsd -update`.
+// REQ: VAL-021
 func TestW3CSuite(t *testing.T) {
 	if _, err := os.Stat(w3cRoot + "/suite.xml"); err != nil {
 		t.Skip(testkit.FetchHint)
@@ -52,12 +53,16 @@ func TestW3CSuite(t *testing.T) {
 			schemaExpected[c.Set+"/"+c.Group] = c.Expected
 		}
 	}
+	failures := os.Getenv("GOXSDGO_W3C_FAILURES") != ""
 	for _, c := range cases {
 		if !c.InScope() {
 			continue
 		}
-		if got := runW3CCase(cfg, fsys, c, schemas, schemaExpected); got != "" && c.Matches(got) {
+		got := runW3CCase(cfg, fsys, c, schemas, schemaExpected)
+		if got != "" && c.Matches(got) {
 			passed[c.ID] = true
+		} else if failures && c.Kind == w3c.InstanceTest {
+			t.Logf("fail %s: got %q, want %s (%s)", c.ID, got, c.Expected, c.Instance)
 		}
 	}
 	report := w3cReport(cases, passed)
@@ -81,10 +86,9 @@ type compiled struct {
 // runW3CCase zwraca werdykt goxsdgo dla przypadku, albo "" gdy goxsdgo nie umie jeszcze go wydać (np. część
 // rekomendacji bez implementacji): taki przypadek nigdy nie jest zaliczony.
 func runW3CCase(cfg Config, fsys fs.FS, c *w3c.Case, schemas map[string]compiled, schemaExpected map[string]w3c.Validity) w3c.Validity {
-	if len(c.SchemaDocs) == 0 {
-		// Dokument wskazuje schemat przez xsi:schemaLocation; obsługa wskazówek przyjdzie w etapie 5.
-		return ""
-	}
+	// Dokumenty zestawu wskazują schematy (także dodatkowe przestrzenie) przez xsi:schemaLocation, a grupy bez
+	// schematu w metadanych tylko tak (ADR 0008). W teście zestawu wskazówki są więc włączone; domyślnie nie są.
+	cfg.SchemaLocationHints = true
 	key := strings.Join(c.SchemaDocs, "\x00")
 	s, ok := schemas[key]
 	if !ok {
@@ -113,8 +117,10 @@ func runW3CCase(cfg Config, fsys fs.FS, c *w3c.Case, schemas map[string]compiled
 		return ""
 	}
 	defer f.Close()
-	errs, err := s.set.Validate(f)
+	errs, err := s.set.ValidateDocument(f, c.Instance)
 	switch {
+	case errors.Is(err, ErrTooManyErrors):
+		return w3c.Invalid
 	case err != nil:
 		return ""
 	case len(errs) > 0:
@@ -166,6 +172,27 @@ func w3cReport(cases []*w3c.Case, passed map[string]bool) string {
 		line(n, *rows[n])
 	}
 	line("all", total)
+	byExp := map[string][2]int{}
+	for _, c := range cases {
+		if !c.InScope() {
+			continue
+		}
+		k := string(c.Kind) + " expected " + string(c.Expected)
+		x := byExp[k]
+		x[1]++
+		if passed[c.ID] {
+			x[0]++
+		}
+		byExp[k] = x
+	}
+	keys := make([]string, 0, len(byExp))
+	for k := range byExp {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		fmt.Fprintf(&b, "%-28s %5d/%-5d\n", k, byExp[k][0], byExp[k][1])
+	}
 	reasons := make([]string, 0, len(excluded))
 	for r := range excluded {
 		reasons = append(reasons, r)

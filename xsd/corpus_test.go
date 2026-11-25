@@ -86,6 +86,7 @@ func TestSchemaCorpus(t *testing.T) {
 
 // TestInstanceCorpus mierzy drugą część kryterium K2: każdy dokument z testdata/instances/expected.json daje
 // werdykt z tego pliku.
+// REQ: VAL-021
 func TestInstanceCorpus(t *testing.T) {
 	src, err := testkit.LoadSources(repoRoot)
 	if err != nil {
@@ -130,13 +131,25 @@ func TestInstanceCorpus(t *testing.T) {
 		if err != nil {
 			continue
 		}
-		if (len(errs) == 0) == e.Valid {
-			passed["instance:"+e.Path] = true
-		} else {
+		if (len(errs) == 0) != e.Valid {
 			t.Logf("instance %s: valid=%v, want %v; first error: %v", e.Path, len(errs) == 0, e.Valid, errs[:min(1, len(errs))])
+			continue
+		}
+		// Oczekiwane błędy (kod, wiersz, ścieżka) to początek listy błędów walidacji, w tej samej kolejności.
+		ok := len(errs) >= len(e.Errors)
+		for i := 0; ok && i < len(e.Errors); i++ {
+			w, g := e.Errors[i], errs[i]
+			if g.Code != w.Code || g.Line != w.Line || (w.Path != "" && g.Path != w.Path) {
+				t.Errorf("instance %s: error %d is %s at line %d, %s; want %s at line %d, %s", e.Path, i+1, g.Code, g.Line,
+					g.Path, w.Code, w.Line, w.Path)
+				ok = false
+			}
+		}
+		if ok {
+			passed["instance:"+e.Path] = true
 		}
 	}
-	t.Logf("MF instances with the expected verdict: %d/%d", len(passed), checked)
+	t.Logf("MF and synthetic documents with the expected verdict and errors: %d/%d", len(passed), checked)
 	testkit.Ratchet(t, instancesRatchet, "MF documents with the expected verdict (TestInstanceCorpus, go test ./xsd -update).",
 		inScope, passed, *update)
 }

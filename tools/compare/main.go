@@ -91,6 +91,8 @@ func runW3C(root, out string) error {
 	}
 	defer closeSchema()
 	results := map[string]verdict{}
+	// firstLine: wiersz pierwszego błędu libxml2 w dokumentach odrzuconych (K3: miejsce pierwszego błędu).
+	firstLine := map[string]int{}
 	for _, c := range cases {
 		if !c.InScope() {
 			continue
@@ -130,6 +132,7 @@ func runW3C(root, out string) error {
 			results[c.ID] = verdict("not comparable: " + err.Error())
 		case hasErrors(errs):
 			results[c.ID] = invalid
+			firstLine[c.ID] = firstError(errs).Line
 		default:
 			results[c.ID] = valid
 		}
@@ -180,7 +183,111 @@ func runW3C(root, out string) error {
 		fmt.Printf("%-10s %6d / %6d / %6d  (%.1f%% of comparable)\n", n, r.agree, r.comparable, r.in,
 			100*float64(r.agree)/float64(max(r.comparable, 1)))
 	}
-	return compareSchemaTests(root, out, cases, results)
+	if err := compareSchemaTests(root, out, cases, results); err != nil {
+		return err
+	}
+	return compareInstanceTests(root, out, cases, results, firstLine)
+}
+
+// compareInstanceTests porównuje testy dokumentów W3C: werdykt goxsdgo i libxml2 oraz, gdy oba odrzucają
+// dokument, wiersz pierwszego błędu (kryterium K3, od etapu 5). goxsdgo działa jak w TestW3CSuite: z włączonymi
+// wskazówkami xsi:schemaLocation, bo przypadki zestawu z nich korzystają.
+func compareInstanceTests(root, out string, cases []*w3c.Case, libxml2 map[string]verdict, libLine map[string]int) error {
+	src, err := testkit.LoadSources(root)
+	if err != nil {
+		return err
+	}
+	const extra = "_w3c-schemas"
+	suite := filepath.Join(root, "testdata", "w3c", "xsdtests")
+	fsys := testkit.Overlay(os.DirFS(suite), extra, os.DirFS(filepath.Join(root, "testdata", "w3c", "schemas")))
+	cfg := xsd.Config{Locations: testkit.PrefixLocations(src.Locations("w3c-schemas"), extra), SchemaLocationHints: true}
+	type row struct{ n, goOK, libOK, same, bothInvalid, sameLine int }
+	rows := map[string]*row{}
+	sets := map[string]*xsd.Set{}
+	var diffs []string
+	for _, c := range cases {
+		lv := libxml2[c.ID]
+		if c.Kind != w3c.InstanceTest || !comparable(lv) {
+			continue
+		}
+		key := strings.Join(c.SchemaDocs, "\x00")
+		set, ok := sets[key]
+		if !ok {
+			set, _ = cfg.Compile(fsys, c.SchemaDocs...)
+			sets[key] = set
+		}
+		if set == nil {
+			continue // schemat odrzucony przez goxsdgo: porównanie testów schematów wyżej
+		}
+		f, err := fsys.Open(c.Instance)
+		if err != nil {
+			return err
+		}
+		errs, err := set.ValidateDocument(f, c.Instance)
+		f.Close()
+		gv := valid
+		switch {
+		case errors.Is(err, xsd.ErrTooManyErrors):
+			gv = invalid
+		case err != nil:
+			continue
+		case len(errs) > 0:
+			gv = invalid
+		}
+		r := rows[c.Contributor]
+		if r == nil {
+			r = &row{}
+			rows[c.Contributor] = r
+		}
+		r.n++
+		if c.Matches(w3c.Validity(gv)) {
+			r.goOK++
+		}
+		if c.Matches(w3c.Validity(lv)) {
+			r.libOK++
+		}
+		goLine, code := 0, ""
+		if len(errs) > 0 {
+			goLine, code = errs[0].Line, errs[0].Code
+		}
+		switch {
+		case gv != lv:
+			diffs = append(diffs, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d", c.ID, c.Expected, c.Status, gv, lv, code, goLine, libLine[c.ID]))
+		case gv == invalid:
+			r.same++
+			r.bothInvalid++
+			if goLine == libLine[c.ID] {
+				r.sameLine++
+			} else {
+				diffs = append(diffs, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%d\t%d", c.ID, c.Expected, c.Status, gv, lv, code, goLine, libLine[c.ID]))
+			}
+		default:
+			r.same++
+		}
+	}
+	if err := writeLines(filepath.Join(out, "instances-goxsdgo-libxml2.tsv"),
+		"id\texpected\tstatus\tgoxsdgo\tlibxml2\tgoxsdgo-code\tgoxsdgo-line\tlibxml2-line", diffs); err != nil {
+		return err
+	}
+	fmt.Println("\nW3C instance tests, comparable: goxsdgo correct / libxml2 correct / same verdict / cases; same first-error line / both invalid")
+	names := make([]string, 0, len(rows))
+	for n := range rows {
+		names = append(names, n)
+	}
+	sort.Strings(names)
+	total := row{}
+	for _, n := range append(names, "all") {
+		r := total
+		if n != "all" {
+			r = *rows[n]
+			total.n, total.goOK, total.libOK, total.same = total.n+r.n, total.goOK+r.goOK, total.libOK+r.libOK, total.same+r.same
+			total.bothInvalid, total.sameLine = total.bothInvalid+r.bothInvalid, total.sameLine+r.sameLine
+		}
+		fmt.Printf("%-10s %6d / %6d / %6d / %6d  (same verdict %.2f%%); line %6d / %6d (%.1f%%)\n", n, r.goOK, r.libOK,
+			r.same, r.n, 100*float64(r.same)/float64(max(r.n, 1)), r.sameLine, r.bothInvalid,
+			100*float64(r.sameLine)/float64(max(r.bothInvalid, 1)))
+	}
+	return nil
 }
 
 // compareSchemaTests porównuje werdykty testów schematów: goxsdgo (xsd.Compile) i libxml2 z oczekiwanymi i ze
@@ -304,6 +411,20 @@ func runCorpus(root, out string) error {
 		return err
 	}
 	agree, checked := 0, 0
+	sameVerdict, bothInvalid, sameLine := 0, 0, 0
+	gcfg := xsd.Config{Locations: src.Locations("mf-schemas")}
+	gsets := map[string]*xsd.Set{}
+	gset := func(name string) *xsd.Set {
+		if s, ok := gsets[name]; ok {
+			return s
+		}
+		s, err := gcfg.Compile(os.DirFS(schemas), name)
+		if err != nil {
+			fmt.Printf("goxsdgo: schema %s: %v\n", name, err)
+		}
+		gsets[name] = s
+		return s
+	}
 	for _, e := range expected {
 		if e.Schema == "" {
 			continue
@@ -326,8 +447,10 @@ func runCorpus(root, out string) error {
 		}
 		got := !hasErrors(errs)
 		detail := ""
+		libLine := 0
 		if !got {
 			first := firstError(errs)
+			libLine = first.Line
 			detail = fmt.Sprintf("line %d: %d %s", first.Line, first.Code, oneLine(first.Message))
 		}
 		if got == e.Valid {
@@ -335,10 +458,45 @@ func runCorpus(root, out string) error {
 		} else {
 			fmt.Printf("instance %s: libxml2 valid=%v, expected %v; %s\n", e.Path, got, e.Valid, detail)
 		}
-		lines = append(lines, fmt.Sprintf("instance:%s\t%v\t%s", e.Path, got, detail))
+		gValid, gLine, gerr := goxsdgoVerdict(gset(e.Schema), filepath.Join(root, "testdata", "instances", filepath.FromSlash(e.Path)))
+		if gerr != nil {
+			return gerr
+		}
+		if gValid == got {
+			sameVerdict++
+			if !got {
+				bothInvalid++
+				if gLine == libLine {
+					sameLine++
+				}
+			}
+		}
+		lines = append(lines, fmt.Sprintf("instance:%s\t%v\t%s\tgoxsdgo valid=%v line %d", e.Path, got, detail, gValid, gLine))
 	}
 	fmt.Printf("MF instances where libxml2 gives the expected verdict: %d/%d\n", agree, checked)
+	fmt.Printf("MF instances, goxsdgo vs libxml2: same verdict %d/%d; same first-error line %d/%d\n", sameVerdict, checked,
+		sameLine, bothInvalid)
 	return writeLines(filepath.Join(out, "libxml2-corpus.tsv"), "id\tlibxml2\tdetail", lines)
+}
+
+// goxsdgoVerdict waliduje plik przez goxsdgo; zwraca werdykt i wiersz pierwszego błędu.
+func goxsdgoVerdict(set *xsd.Set, file string) (bool, int, error) {
+	if set == nil {
+		return false, 0, nil
+	}
+	f, err := os.Open(file)
+	if err != nil {
+		return false, 0, err
+	}
+	defer f.Close()
+	errs, err := set.Validate(f)
+	if err != nil && !errors.Is(err, xsd.ErrTooManyErrors) {
+		return false, 0, err
+	}
+	if len(errs) == 0 {
+		return true, 0, nil
+	}
+	return false, errs[0].Line, nil
 }
 
 // loadCatalog rejestruje w libxml2 katalog XML dla zestawu set z manifestu, którego pliki leżą w dir. libxml2

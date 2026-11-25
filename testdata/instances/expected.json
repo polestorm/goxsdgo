@@ -82,5 +82,89 @@
     "schema": "",
     "valid": false,
     "note": "InitUpload (przestrzeń http://e-dokumenty.mf.gov.pl): schematu metadanych przesyłki nie ma w korpusie."
+  },
+  {
+    "path": "synthetic/jpk_v7m_3_valid.xml",
+    "schema": "jpk_v7m_3.xsd",
+    "valid": true,
+    "note": "Dokument syntetyczny. Przykład MF z wymyślonym NIP 1111111111 (poprawna cyfra kontrolna)."
+  },
+  {
+    "path": "synthetic/jpk_v7m_3_nip_pattern.xml",
+    "schema": "jpk_v7m_3.xsd",
+    "valid": false,
+    "note": "Dokument syntetyczny. NIP z literą: wzorzec TNrNIP.",
+    "errors": [
+      {
+        "code": "cvc-pattern-valid",
+        "line": 16,
+        "path": "/JPK/Podmiot1/OsobaNiefizyczna/NIP"
+      }
+    ]
+  },
+  {
+    "path": "synthetic/jpk_v7m_3_missing_rok.xml",
+    "schema": "jpk_v7m_3.xsd",
+    "valid": false,
+    "note": "Dokument syntetyczny. Brak elementu Rok: Miesiac w miejscu, w którym model oczekuje Rok.",
+    "errors": [
+      {
+        "code": "cvc-complex-type.2.4",
+        "line": 11,
+        "path": "/JPK/Naglowek/Miesiac"
+      }
+    ]
+  },
+  {
+    "path": "synthetic/jpk_v7m_3_month_range.xml",
+    "schema": "jpk_v7m_3.xsd",
+    "valid": false,
+    "note": "Dokument syntetyczny. Miesiac 13: maxInclusive 12.",
+    "errors": [
+      {
+        "code": "cvc-maxInclusive-valid",
+        "line": 12,
+        "path": "/JPK/Naglowek/Miesiac"
+      }
+    ]
+  },
+  {
+    "path": "synthetic/jpk_v7m_3_bad_datetime.xml",
+    "schema": "jpk_v7m_3.xsd",
+    "valid": false,
+    "note": "Dokument syntetyczny. 30 lutego: spoza przestrzeni leksykalnej dateTime (część 2, 3.2.7).",
+    "errors": [
+      {
+        "code": "cvc-datatype-valid.1.2.1",
+        "line": 7,
+        "path": "/JPK/Naglowek/DataWytworzeniaJPK"
+      }
+    ]
+  },
+  {
+    "path": "synthetic/jpk_v7m_3_unknown_attribute.xml",
+    "schema": "jpk_v7m_3.xsd",
+    "valid": false,
+    "note": "Dokument syntetyczny. Atrybut niezadeklarowany, typ bez symbolu wieloznacznego atrybutów.",
+    "errors": [
+      {
+        "code": "cvc-complex-type.3.2.1",
+        "line": 4,
+        "path": "/JPK/Naglowek/@wersja"
+      }
+    ]
+  },
+  {
+    "path": "synthetic/jpk_v7m_3_text_in_element.xml",
+    "schema": "jpk_v7m_3.xsd",
+    "valid": false,
+    "note": "Dokument syntetyczny. Tekst w elemencie o treści wyłącznie elementowej.",
+    "errors": [
+      {
+        "code": "cvc-complex-type.2.3",
+        "line": 14,
+        "path": "/JPK/Podmiot1"
+      }
+    ]
   }
 ]
