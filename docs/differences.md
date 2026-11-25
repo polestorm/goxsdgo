@@ -18,6 +18,8 @@ wpis: przypadek, oba wyniki, co mówi rekomendacja (rozdział i reguła), kto ma
 | Saxonica Missing: missing001, missing002, missing003, missing006 | błąd `src-resolve` | poprawny | 43 przypadki Sun i Microsoft oczekują błędu dla nierozwiązanego odwołania; ADR 0006 | zostawić jako różnicę |
 | Saxonica XmlVersions: xv001, xv004 | błąd | poprawny | „Dĳkstra” (U+0133) nie jest NCName według znaków nazw XML 1.0 2e, z których korzysta XSD 1.0 2e | zostawić jako różnicę |
 | MS IDREFS_length006, NMTOKENS_length006 (stable), errF001 (queried) | błąd `length-minLength-maxLength` | poprawny | `length` i `minLength` w jednym kroku restrykcji są błędem według 4.3.1.4, punkty 1.2 i 2.2 | zostawić jako różnicę |
+| MS particlesZ001 | błąd `cos-particle-restrict` | poprawny | RecurseAsIfGroup stosowany dosłownie (3.9.6), czego wymagają particlesHa161 i particlesK006; ADR 0007 | zostawić jako różnicę |
+| MS elemZ026, elemZ027_c, particlesV020 (queried) | poprawny | błędny | restrykcja z grupami podstawienia według normalizacji 2.1 w 3.9.6; choice z grupy podstawienia nie wymaga zachowania kolejności członków (rekomendacja jej nie określa); ADR 0007 | zostawić jako różnicę |
 | MS ste110 (queried) | błąd `src-simple-type.4` | poprawny | unia z cyklem w definicji | zostawić jako różnicę |
 | MS schU1 (disputed-test) | według rekomendacji | sporny | status sporny w zestawie | zostawić jako różnicę |
 | MS anyURI_b006 (stable) | poprawny | błędny | ukośnik wsteczny przyjmujemy: część 2, 3.2.17 każe przed sprawdzeniem z RFC 2396 zamienić znaki według XLink §5.4, a ukośnik wsteczny staje się wtedy `%5C`, czyli poprawnym URI | do sprawdzenia w etapie 6 |

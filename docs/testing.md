@@ -15,8 +15,8 @@
 | bezpieczeństwo | `TestSafeByDefault` | brak sieci i encji zewnętrznych, limity głębokości i rozmiaru, schemat spoza `fs.FS` odrzucony |
 | pamięć | `TestStreamingMemory` | syntetyczny JPK 1 GB (generator w teście, nie plik): szczyt pamięci < 64 MB |
 | powtarzalność | `TestDeterministic` | wielokrotna walidacja daje te same błędy w tej samej kolejności |
-| odporność | `FuzzCompile`, `FuzzValidate` | dowolny schemat i dokument: bez paniki, czas ograniczony |
-| patologiczne | `TestPathological` | wzorce z zagnieżdżonymi powtórzeniami, `maxOccurs` w setkach tysięcy, głębokie zagnieżdżenia, tysiące kluczy: czas rośnie liniowo |
+| odporność | `FuzzCompile`, `FuzzValidate`, `FuzzContentModel` (automat porównywany z niezależnym, prostym dopasowaniem), `FuzzReader`, `FuzzRegexTranslate`, `FuzzLexical` | dowolny schemat i dokument: bez paniki, czas ograniczony |
+| patologiczne | `TestPathological` (`internal/schema`: modele zawartości; etap 7: wzorce, klucze, zagnieżdżenia dokumentu) | wzorce z zagnieżdżonymi powtórzeniami, `maxOccurs` w setkach tysięcy, głębokie zagnieżdżenia, tysiące kluczy: czas rośnie liniowo |
 | wydajność | `BenchmarkCorpus` | porównanie z `goxsdval` (kryterium K7) |
 
 ## CI i dane testowe
@@ -60,6 +60,7 @@ Wyniki zapisujemy tutaj z datą, wersją i sposobem pomiaru.
 
 | Data | Commit | W3C (zaliczone / w zakresie) | Korpus MF | Zgodność z libxml2 | Uwagi |
 |---|---|---|---|---|---|
+| 2026-11-25 | `0a44da1` | 14 370 / 39 439 (testy schematów 14 370 / 14 384: poprawne 11 036 / 11 044, błędne 3 334 / 3 340; testy dokumentów 0 / 25 055) | schematy 170 / 170, dokumenty 0 / 8 | testy schematów: ten sam werdykt co libxml2 w 96,8% z 14 307 porównywalnych; z 452 rozbieżności rację ma goxsdgo w 447, libxml2 w 5 | etap 4; `particlesZ001` przestaje przechodzić (ADR 0007, `differences.md`) |
 | 2026-11-25 | wyłączenie 9 grup XSD 1.1 bez żetonu | 14 048 / 39 439 (testy schematów 14 048 / 14 384) | bez zmian | bez zmian | 22 przypadki wyłączone z powodem (`internal/w3c.ExcludedGroups`, `differences.md`) |
 | 2026-11-25 | `0546663` | 14 048 / 39 461 (testy schematów 14 048 / 14 393: poprawne 11 024 / 11 044, błędne 3 024 / 3 349; testy dokumentów 0 / 25 068, etap 5) | schematy 170 / 170, dokumenty 0 / 8 | testy schematów: ten sam werdykt co libxml2 w 98,6% z 14 316 porównywalnych; z 196 rozbieżności rację ma goxsdgo w 158, libxml2 w 38 | etap 3; 324 z 325 niezaliczonych „błędnych” czeka na kontrole z etapu 4 (265 MS-Particles, 24 MS-ModelGroups, reszta UPA, EDC, redefinicje grup) |
 | 2026-11-25 | `892eade` | 0 / 39 461 | — | — | etap 2, pomiar pośredni (adapter, nie K1): NIST 22 678 / 22 678 odczytanych z 23 170 w zakresie (nieodczytane: 492 przypadki ID z typem złożonym), MS-Regex 2 772 / 2 789 z 3 998, MS-DataTypes 29 / 29 z 3 430; 17 rozbieżności opisanych w `differences.md`; `go test ./internal/datatypes -run W3CDatatypes -v` |
