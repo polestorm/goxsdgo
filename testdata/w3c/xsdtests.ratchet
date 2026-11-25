@@ -1,0 +1,4 @@
+# W3C XML Schema test suite, XSD 1.0 2e (TestW3CSuite, go test ./xsd -update).
+# A case stops passing only with an explanation in the commit message.
+# in scope 39461, passing 0
+# mode: passing

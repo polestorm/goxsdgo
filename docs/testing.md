@@ -4,11 +4,11 @@
 
 | Warstwa | Gdzie | Co sprawdza |
 |---|---|---|
-| zestaw W3C | `testdata/w3c/xsdtests/` (ADR 0003), `TestW3CSuite`, czytnik `internal/w3c` | werdykt dla każdego schematu i dokumentu z zestawu XSD 1.0 2e; raport w podziale na dostawców (NIST, Microsoft, Sun, Boeing, IBM, Saxonica, W3C); wyłączenia z powodem; zapadka `testdata/w3c/passing.txt` |
-| zgodność XML | `internal/xmlreader`, `TestXMLConformance` | czytnik XML na zestawie W3C XML Conformance (dobra forma, przestrzenie nazw, druga postać kanoniczna tam, gdzie zestaw ją podaje); zapadka `testdata/w3c/xmlconf-passing.txt`, `go test ./internal/xmlreader -update` |
-| typy proste (pośrednio) | `internal/datatypes`, `TestW3CDatatypes` | przypadki NIST i Microsoft (DataTypes, Regex) z zestawu W3C przez adapter w testach, który czyta schematy o prostym kształcie; nie jest to K1, bo bez etapu 3 brak prawdziwego wczytania schematu; zapadki `testdata/w3c/nist-datatypes-passing.txt`, `ms-datatypes-passing.txt` |
+| zestaw W3C | `testdata/w3c/xsdtests/` (ADR 0003), `TestW3CSuite`, czytnik `internal/w3c` | werdykt dla każdego schematu i dokumentu z zestawu XSD 1.0 2e; raport w podziale na dostawców (NIST, Microsoft, Sun, Boeing, IBM, Saxonica, W3C); wyłączenia z powodem; zapadka `testdata/w3c/xsdtests.ratchet` |
+| zgodność XML | `internal/xmlreader`, `TestXMLConformance` | czytnik XML na zestawie W3C XML Conformance (dobra forma, przestrzenie nazw, druga postać kanoniczna tam, gdzie zestaw ją podaje); zapadka `testdata/w3c/xmlconf.ratchet`, `go test ./internal/xmlreader -update` |
+| typy proste (pośrednio) | `internal/datatypes`, `TestW3CDatatypes` | przypadki NIST i Microsoft (DataTypes, Regex) z zestawu W3C przez adapter w testach, który czyta schematy o prostym kształcie; nie jest to K1, bo bez etapu 3 brak prawdziwego wczytania schematu; zapadki `testdata/w3c/nist-datatypes.ratchet`, `ms-datatypes.ratchet` |
 | wymagania | `requirements/*.md`, `TestRequirementsCovered` | każde wymaganie ma test albo plik korpusu; każde odwołanie `REQ:` wskazuje istniejące wymaganie |
-| korpus schematów | `testdata/schemas/mf/`, `TestSchemaCorpus` | każdy ze 170 schematów MF (JPK, KSeF, e-Sprawozdania) kompiluje się bez błędów; importy rozwiązuje katalog adresów z manifestu, bez sieci; zapadka `testdata/passing-corpus.txt` |
+| korpus schematów | `testdata/schemas/mf/`, `TestSchemaCorpus` | każdy ze 170 schematów MF (JPK, KSeF, e-Sprawozdania) kompiluje się bez błędów; importy rozwiązuje katalog adresów z manifestu, bez sieci; zapadki `testdata/mf-schemas.ratchet`, `testdata/mf-instances.ratchet` |
 | korpus dokumentów | `testdata/instances/` + `expected.json`, `TestInstanceCorpus` | werdykt (później też kody i miejsca błędów) zgodny z oczekiwanym; zapadka jak wyżej |
 | korpus własny | `testdata/corpus/` | małe schematy i dokumenty dla każdego wymagania, w tym polskie znaki, duże liczności, typy z ograniczeniami |
 | różnicowe | `tools/compare` (osobny moduł, cgo) | ten sam zestaw W3C i korpus MF przez libxml2 (`goxsdval`); werdykty dla każdego przypadku w `out/compare/*.tsv`; od etapu 3 raport różnic względem `goxsdgo` i miejsca pierwszego błędu; każda różnica werdyktu w `differences.md` |
@@ -28,11 +28,14 @@ w CI pomijane z komunikatem, a kryterium K2 mierzymy lokalnie. Zestaw W3C i przy
 
 ## Zapadki
 
-Pliki `testdata/w3c/passing.txt` i `testdata/passing-corpus.txt` zawierają identyfikatory przypadków, które już
-przechodzą. Test kończy się błędem, gdy któryś z nich przestaje przechodzić. Nowe zaliczenia zapisuje
-`go test ./xsd -update`, a zmiana pliku jest widoczna w przeglądzie. Przypadek usuwamy z listy tylko z wyjaśnieniem
-w opisie commitu. Przypadek, którego `goxsdgo` jeszcze nie umie rozstrzygnąć (`errors.ErrUnsupported`), nie jest nigdy
-zaliczony, także gdy oczekiwany werdykt to „błędny”.
+Pliki `*.ratchet` (`testdata/w3c/xsdtests.ratchet`, `xmlconf.ratchet`, `nist-datatypes.ratchet`,
+`ms-datatypes.ratchet`, `testdata/mf-schemas.ratchet`, `testdata/mf-instances.ratchet`) mówią, które przypadki
+w zakresie już przechodzą. Plik zawiera krótszą z dwóch list: przypadki zaliczone (`# mode: passing`) albo
+niezaliczone (`# mode: failing`); nagłówek podaje, ile przypadków jest w zakresie i ile przechodzi
+(`internal/testkit.Ratchet`). Test kończy się błędem, gdy przypadek, który przechodził, przestaje przechodzić. Nowe
+zaliczenia zapisuje `go test ./xsd ./internal/... -update`, a zmiana pliku jest widoczna w przeglądzie. Przypadek
+przestaje przechodzić tylko z wyjaśnieniem w opisie commitu. Przypadek, którego `goxsdgo` jeszcze nie umie
+rozstrzygnąć (`errors.ErrUnsupported`), nie jest nigdy zaliczony, także gdy oczekiwany werdykt to „błędny”.
 
 ## Walidator odniesienia
 

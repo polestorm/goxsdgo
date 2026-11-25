@@ -18,13 +18,13 @@ var update = flag.Bool("update", false, "rewrite ratchet files (lists of passing
 
 const (
 	w3cRoot    = "../testdata/w3c/xsdtests"
-	w3cPassing = "../testdata/w3c/passing.txt"
+	w3cRatchet = "../testdata/w3c/xsdtests.ratchet"
 	w3cSchemas = "../testdata/w3c/schemas"
 )
 
 // TestW3CSuite mierzy kryterium K1 na zestawie W3C XML Schema: każdy przypadek objęty zakresem XSD 1.0 2e
-// (internal/w3c) ma dać oczekiwany werdykt. Przypadki zaliczone są zapisane w testdata/w3c/passing.txt; test
-// kończy się błędem, gdy któryś z nich przestaje przechodzić. Nowe zaliczenia zapisuje `go test ./xsd -update`.
+// (internal/w3c) ma dać oczekiwany werdykt. Zapadka testdata/w3c/xsdtests.ratchet mówi, które przypadki
+// już przechodzą; test kończy się błędem, gdy któryś z nich przestaje przechodzić. Nowe zaliczenia zapisuje `go test ./xsd -update`.
 func TestW3CSuite(t *testing.T) {
 	if _, err := os.Stat(w3cRoot + "/suite.xml"); err != nil {
 		t.Skip(testkit.FetchHint)
@@ -55,23 +55,14 @@ func TestW3CSuite(t *testing.T) {
 	report := w3cReport(cases, passed)
 	t.Log("\n" + report)
 
-	list, err := testkit.ReadList(w3cPassing)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if regressed := testkit.Regressions(list, passed); len(regressed) > 0 {
-		t.Errorf("%d W3C case(s) from passing.txt no longer pass, first: %s", len(regressed),
-			strings.Join(regressed[:min(len(regressed), 20)], ", "))
-	}
-	if *update {
-		header := "W3C XML Schema test suite: cases goxsdgo passes (TestW3CSuite, go test ./xsd -update).\n" +
-			"A case leaves this list only with an explanation in the commit message."
-		if err := testkit.WriteList(w3cPassing, header, passed); err != nil {
-			t.Fatal(err)
+	inScope := map[string]bool{}
+	for _, c := range cases {
+		if c.InScope() {
+			inScope[c.ID] = true
 		}
-	} else if n := len(passed) - len(list); n > 0 {
-		t.Logf("%d newly passing case(s); record them with: go test ./xsd -run TestW3CSuite -update", n)
 	}
+	testkit.Ratchet(t, w3cRatchet, "W3C XML Schema test suite, XSD 1.0 2e (TestW3CSuite, go test ./xsd -update).\n"+
+		"A case stops passing only with an explanation in the commit message.", inScope, passed, *update)
 }
 
 type compiled struct {

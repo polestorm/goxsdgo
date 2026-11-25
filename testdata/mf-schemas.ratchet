@@ -1,0 +1,3 @@
+# MF schemas that compile (TestSchemaCorpus, go test ./xsd -update).
+# in scope 170, passing 0
+# mode: passing

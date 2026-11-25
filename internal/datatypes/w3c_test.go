@@ -26,8 +26,8 @@ import (
 const (
 	suiteRoot   = "../../testdata/w3c/xsdtests"
 	xsdNS       = "http://www.w3.org/2001/XMLSchema"
-	ratchetNIST = "../../testdata/w3c/nist-datatypes-passing.txt"
-	ratchetMS   = "../../testdata/w3c/ms-datatypes-passing.txt"
+	ratchetNIST = "../../testdata/w3c/nist-datatypes.ratchet"
+	ratchetMS   = "../../testdata/w3c/ms-datatypes.ratchet"
 )
 
 var update = flag.Bool("update", false, "rewrite ratchet files")
@@ -585,6 +585,7 @@ func TestW3CDatatypes(t *testing.T) {
 	type stat struct{ inScope, read, passed int }
 	byGroup := map[string]map[string]*stat{"NIST": {}, "Microsoft": {}}
 	passed := map[string]map[string]bool{"NIST": {}, "Microsoft": {}}
+	inScope := map[string]map[string]bool{"NIST": {}, "Microsoft": {}}
 	var failures []string
 	for _, c := range cases {
 		groups, ok := byGroup[c.Contributor]
@@ -608,6 +609,7 @@ func TestW3CDatatypes(t *testing.T) {
 			groups[key] = st
 		}
 		st.inScope++
+		inScope[c.Contributor][c.ID] = true
 		got, why := verdict(fsys, c)
 		if got == "" {
 			continue
@@ -639,19 +641,8 @@ func TestW3CDatatypes(t *testing.T) {
 		t.Log("fail: " + f)
 	}
 	for who, path := range map[string]string{"NIST": ratchetNIST, "Microsoft": ratchetMS} {
-		list, err := testkit.ReadList(path)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if reg := testkit.Regressions(list, passed[who]); len(reg) > 0 {
-			t.Errorf("%s: %d case(s) no longer pass, first: %s", who, len(reg), strings.Join(reg[:min(len(reg), 10)], ", "))
-		}
-		if *update {
-			header := who + " datatype cases passing through the stage 2 adapter (internal/datatypes, TestW3CDatatypes, -update).\n" +
-				"Intermediate measure, not criterion K1."
-			if err := testkit.WriteList(path, header, passed[who]); err != nil {
-				t.Fatal(err)
-			}
-		}
+		header := who + " datatype cases passing through the stage 2 adapter (internal/datatypes, TestW3CDatatypes, -update).\n" +
+			"Intermediate measure, not criterion K1."
+		testkit.Ratchet(t, path, header, inScope[who], passed[who], *update)
 	}
 }

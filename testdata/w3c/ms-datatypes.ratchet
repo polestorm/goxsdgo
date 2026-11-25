@@ -1,5 +1,7 @@
 # Microsoft datatype cases passing through the stage 2 adapter (internal/datatypes, TestW3CDatatypes, -update).
 # Intermediate measure, not criterion K1.
+# in scope 7428, passing 2801
+# mode: passing
 MS-DataTypes2006-07-15/NMTOKENS_pattern001_1475/NMTOKENS_pattern001_1475
 MS-DataTypes2006-07-15/NMTOKENS_pattern001_1475/NMTOKENS_pattern001_1475.v
 MS-DataTypes2006-07-15/NMTOKENS_pattern002_1476/NMTOKENS_pattern002_1476

@@ -16,11 +16,11 @@ import (
 	"github.com/polestorm/goxsdgo/internal/testkit"
 )
 
-var update = flag.Bool("update", false, "rewrite the ratchet file testdata/w3c/xmlconf-passing.txt")
+var update = flag.Bool("update", false, "rewrite the ratchet file testdata/w3c/xmlconf.ratchet")
 
 const (
 	xmlconfRoot    = "../../testdata/w3c/xmlconf"
-	xmlconfPassing = "../../testdata/w3c/xmlconf-passing.txt"
+	xmlconfRatchet = "../../testdata/w3c/xmlconf.ratchet"
 )
 
 // confTest to jeden przypadek zestawu W3C XML Conformance (element TEST, testcases.dtd).
@@ -176,6 +176,7 @@ func TestXMLConformance(t *testing.T) {
 	}
 	tests := loadConformance(t)
 	passed := map[string]bool{}
+	inScope := map[string]bool{}
 	type row struct{ in, ok int }
 	rows := map[string]*row{}
 	excluded := map[string]int{}
@@ -191,6 +192,7 @@ func TestXMLConformance(t *testing.T) {
 			rows[ct.Group] = rw
 		}
 		rw.in++
+		inScope[ct.Group+"/"+ct.ID] = true
 		ok, why := runConformance(ct)
 		if ok {
 			rw.ok++
@@ -228,21 +230,8 @@ func TestXMLConformance(t *testing.T) {
 		}
 	}
 
-	list, err := testkit.ReadList(xmlconfPassing)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if regressed := testkit.Regressions(list, passed); len(regressed) > 0 {
-		t.Errorf("%d case(s) from xmlconf-passing.txt no longer pass: %s", len(regressed), strings.Join(regressed[:min(20, len(regressed))], ", "))
-	}
-	if *update {
-		header := "W3C XML Conformance: cases internal/xmlreader passes (TestXMLConformance, go test ./internal/xmlreader -update)."
-		if err := testkit.WriteList(xmlconfPassing, header, passed); err != nil {
-			t.Fatal(err)
-		}
-	} else if n := len(passed) - len(list); n > 0 {
-		t.Logf("%d newly passing case(s); record them with: go test ./internal/xmlreader -run TestXMLConformance -update", n)
-	}
+	testkit.Ratchet(t, xmlconfRatchet, "W3C XML Conformance (TestXMLConformance, go test ./internal/xmlreader -update).",
+		inScope, passed, *update)
 }
 
 func runConformance(ct *confTest) (bool, string) {

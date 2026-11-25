@@ -1,7 +1,7 @@
 // Package testkit to wspólne narzędzia testów zgodności: zapadka zaliczonych przypadków i manifest danych testowych.
 //
-// Zapadka (ratchet) to plik z listą identyfikatorów przypadków, które już przechodzą. Test zgodności kończy się
-// błędem, gdy któryś z nich przestaje przechodzić, a z flagą -update zapisuje nową listę. Liczba zaliczonych
+// Zapadka (ratchet) to plik, z którego wynika, które przypadki już przechodzą. Test zgodności kończy się błędem, gdy
+// któryś z nich przestaje przechodzić, a z flagą -update zapisuje plik od nowa. Liczba zaliczonych
 // przypadków nie spada więc między commitami bez widocznej zmiany tego pliku (CLAUDE.md, „Jak pracujemy”).
 //
 // Pakiet służy tylko testom; biblioteka go nie importuje.
@@ -16,61 +16,109 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+	"testing"
 )
 
-// ReadList czyta plik zapadki: jeden identyfikator w wierszu, wiersze od „#” to komentarze. Brak pliku oznacza
-// pustą listę.
-func ReadList(path string) (map[string]bool, error) {
+// Plik zapadki ma nagłówek z komentarzy („#”) i jeden identyfikator w wierszu. Wiersz „# mode: failing” oznacza, że
+// lista zawiera przypadki w zakresie, które jeszcze nie przechodzą; „# mode: passing” (albo brak wiersza trybu), że
+// zawiera przypadki, które już przechodzą. Ratchet zapisuje krótszą z dwóch list, więc plik zostaje mały i przy niskiej,
+// i przy wysokiej zgodności.
+const (
+	modePassing = "passing"
+	modeFailing = "failing"
+)
+
+// Ratchet porównuje wynik testu z plikiem zapadki path. inScope to identyfikatory przypadków objętych zakresem, passed
+// to te, które przeszły. Przypadek uznany wcześniej za zaliczony, który teraz nie przechodzi, jest błędem testu.
+// Z update=true plik jest zapisywany od nowa; inaczej test podaje, ile przypadków przechodzi po raz pierwszy.
+func Ratchet(t testing.TB, path, header string, inScope, passed map[string]bool, update bool) {
+	t.Helper()
+	mode, ids, err := readRatchet(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var regressed []string
+	improved := 0
+	for id := range inScope {
+		wasPassing := ids[id] == (mode == modePassing)
+		switch {
+		case wasPassing && !passed[id]:
+			regressed = append(regressed, id)
+		case !wasPassing && passed[id]:
+			improved++
+		}
+	}
+	sort.Strings(regressed)
+	if len(regressed) > 0 {
+		t.Errorf("%s: %d case(s) that passed before no longer pass, first: %s", filepath.Base(path), len(regressed),
+			strings.Join(regressed[:min(len(regressed), 20)], ", "))
+	}
+	if update {
+		if err := writeRatchet(path, header, inScope, passed); err != nil {
+			t.Fatal(err)
+		}
+		return
+	}
+	if improved > 0 {
+		t.Logf("%s: %d newly passing case(s); record them with -update", filepath.Base(path), improved)
+	}
+}
+
+func readRatchet(path string) (string, map[string]bool, error) {
 	f, err := os.Open(path)
 	if os.IsNotExist(err) {
-		return map[string]bool{}, nil
+		return modePassing, map[string]bool{}, nil
 	}
 	if err != nil {
-		return nil, err
+		return "", nil, err
 	}
 	defer f.Close()
+	mode := modePassing
 	ids := map[string]bool{}
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		line := strings.TrimSpace(sc.Text())
+		if m, ok := strings.CutPrefix(line, "# mode: "); ok {
+			if m != modePassing && m != modeFailing {
+				return "", nil, fmt.Errorf("%s: unknown mode %q", path, m)
+			}
+			mode = m
+			continue
+		}
 		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
 		ids[line] = true
 	}
-	return ids, sc.Err()
+	return mode, ids, sc.Err()
 }
 
-// WriteList zapisuje plik zapadki: nagłówek jako komentarze i posortowane identyfikatory.
-func WriteList(path, header string, ids map[string]bool) error {
+func writeRatchet(path, header string, inScope, passed map[string]bool) error {
+	var pass, fail []string
+	for id := range inScope {
+		if passed[id] {
+			pass = append(pass, id)
+		} else {
+			fail = append(fail, id)
+		}
+	}
+	mode, list := modePassing, pass
+	if len(fail) < len(pass) {
+		mode, list = modeFailing, fail
+	}
+	sort.Strings(list)
 	var b strings.Builder
 	for _, line := range strings.Split(strings.TrimSpace(header), "\n") {
 		b.WriteString("# " + line + "\n")
 	}
-	sorted := make([]string, 0, len(ids))
-	for id := range ids {
-		sorted = append(sorted, id)
-	}
-	sort.Strings(sorted)
-	for _, id := range sorted {
+	fmt.Fprintf(&b, "# in scope %d, passing %d\n# mode: %s\n", len(inScope), len(pass), mode)
+	for _, id := range list {
 		b.WriteString(id + "\n")
 	}
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return err
 	}
 	return os.WriteFile(path, []byte(b.String()), 0o644)
-}
-
-// Regressions zwraca posortowane identyfikatory z listy zapadki, które teraz nie przechodzą.
-func Regressions(list, passed map[string]bool) []string {
-	var out []string
-	for id := range list {
-		if !passed[id] {
-			out = append(out, id)
-		}
-	}
-	sort.Strings(out)
-	return out
 }
 
 // Sources to manifest testdata/sources.json (ADR 0003), w części potrzebnej testom.

@@ -6,19 +6,19 @@ import (
 	"os"
 	"path"
 	"sort"
-	"strings"
 	"testing"
 
 	"github.com/polestorm/goxsdgo/internal/testkit"
 )
 
 const (
-	repoRoot       = ".."
-	corpusPassing  = "../testdata/passing-corpus.txt"
-	expectedPath   = "../testdata/instances/expected.json"
-	schemasDir     = "../testdata/schemas/mf"
-	instancesDir   = "../testdata/instances"
-	schemasSetName = "mf-schemas"
+	repoRoot         = ".."
+	schemasRatchet   = "../testdata/mf-schemas.ratchet"
+	instancesRatchet = "../testdata/mf-instances.ratchet"
+	expectedPath     = "../testdata/instances/expected.json"
+	schemasDir       = "../testdata/schemas/mf"
+	instancesDir     = "../testdata/instances"
+	schemasSetName   = "mf-schemas"
 )
 
 // expectedInstance to wpis w testdata/instances/expected.json: oczekiwany werdykt dokumentu korpusu.
@@ -77,7 +77,11 @@ func TestSchemaCorpus(t *testing.T) {
 		}
 	}
 	t.Logf("MF schemas compiled: %d/%d (not yet supported: %d)", len(passed), len(paths), unsupported)
-	ratchet(t, "schema:", passed)
+	inScope := map[string]bool{}
+	for _, p := range paths {
+		inScope["schema:"+p] = true
+	}
+	testkit.Ratchet(t, schemasRatchet, "MF schemas that compile (TestSchemaCorpus, go test ./xsd -update).", inScope, passed, *update)
 }
 
 // TestInstanceCorpus mierzy drugą część kryterium K2: każdy dokument z testdata/instances/expected.json daje
@@ -102,12 +106,14 @@ func TestInstanceCorpus(t *testing.T) {
 	cfg := Config{Locations: src.Locations(schemasSetName)}
 	fsys := os.DirFS(schemasDir)
 	passed := map[string]bool{}
+	inScope := map[string]bool{}
 	checked := 0
 	for _, e := range expected {
 		if e.Schema == "" {
 			continue
 		}
 		checked++
+		inScope["instance:"+e.Path] = true
 		set, err := cfg.Compile(fsys, e.Schema)
 		if err != nil {
 			if !errors.Is(err, errors.ErrUnsupported) {
@@ -131,7 +137,8 @@ func TestInstanceCorpus(t *testing.T) {
 		}
 	}
 	t.Logf("MF instances with the expected verdict: %d/%d", len(passed), checked)
-	ratchet(t, "instance:", passed)
+	testkit.Ratchet(t, instancesRatchet, "MF documents with the expected verdict (TestInstanceCorpus, go test ./xsd -update).",
+		inScope, passed, *update)
 }
 
 // skipIfSchemasMissing pomija test, gdy brakuje któregoś schematu MF z manifestu (poza plikami local_only): bez
@@ -152,37 +159,5 @@ func skipIfSchemasMissing(t *testing.T, src *testkit.Sources) {
 	}
 	if missing > 0 {
 		t.Skipf("%d MF schema file(s) missing; %s", missing, testkit.FetchHint)
-	}
-}
-
-// ratchet porównuje zaliczenia z listą w testdata/passing-corpus.txt w obrębie prefiksu i z -update ją zapisuje.
-func ratchet(t *testing.T, prefix string, passed map[string]bool) {
-	t.Helper()
-	list, err := testkit.ReadList(corpusPassing)
-	if err != nil {
-		t.Fatal(err)
-	}
-	mine := map[string]bool{}
-	for id := range list {
-		if strings.HasPrefix(id, prefix) {
-			mine[id] = true
-		}
-	}
-	if regressed := testkit.Regressions(mine, passed); len(regressed) > 0 {
-		t.Errorf("%d corpus case(s) from passing-corpus.txt no longer pass: %s", len(regressed), strings.Join(regressed, ", "))
-	}
-	if !*update {
-		return
-	}
-	for id := range mine {
-		delete(list, id)
-	}
-	for id := range passed {
-		list[id] = true
-	}
-	header := "MF corpus: schemas that compile and documents with the expected verdict\n" +
-		"(TestSchemaCorpus, TestInstanceCorpus; go test ./xsd -update)."
-	if err := testkit.WriteList(corpusPassing, header, list); err != nil {
-		t.Fatal(err)
 	}
 }

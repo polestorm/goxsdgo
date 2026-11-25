@@ -1,6 +1,6 @@
 # 0005 Typy proste i wyrażenia regularne
 
-Status: proponowana (etap 2) · 2026-11-25
+Status: przyjęta · 2026-11-25 (decyzja właściciela; rozstrzyga pytanie 7)
 
 ## Kontekst
 

@@ -1,0 +1,5 @@
+# W3C XML Conformance (TestXMLConformance, go test ./internal/xmlreader -update).
+# in scope 1727, passing 1725
+# mode: failing
+eduni/rmt-e3e-13
+ibm/ibm-valid-P29-ibm29v01.xml
