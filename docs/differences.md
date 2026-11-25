@@ -8,7 +8,7 @@ wpis: przypadek, oba wyniki, co mówi rekomendacja (rozdział i reguła), kto ma
 | `msData/additional/ns.xml`, `msData/datatypes/Facets/anyURI/anyURI_a002.xml` i `.xsd` (dobra forma) | przyjmuje | odrzuca nazwę przestrzeni nazw jako „nie URI” | Namespaces in XML 1.0, §2.2: niezgodność z RFC 3986 nie jest błędem dobrej formy | plik dotąd odrzucany zostanie przyjęty przez czytnik |
 | dokumenty z odwołaniem do encji zewnętrznej, z deklaracjami potrzebnymi z podzbioru zewnętrznego albo z sekcjami warunkowymi w encjach parametrycznych | odrzuca (`unsupported-*`, ADR 0004) | czyta encje zewnętrzne, jeśli są dostępne | rekomendacja pozwala procesorowi bez walidacji DTD nie czytać encji zewnętrznych (XML 1.0, §5.1), ale wtedy treść jest niepełna | plik dotąd przyjmowany zostanie odrzucony; w korpusie MF takich nie ma |
 
-| MS-Regex: reJ11, reJ13, reJ19, reJ21, reJ23, reJ25, reJ29, reJ31, reJ33, reJ35, reJ61, reJ69, reJ75, reJ77, reS42, reT63 | kategorie znaków spoza BMP według Unicode 15 (np. U+1D7A8 to `Lu`, U+1D7FF to `Nd`) | — (porównanie w etapie 3) | zestaw zakłada Unicode 3.0, w którym znaki spoza BMP nie mają kategorii; ADR 0005, pytanie 7 | wzorce z `\p{Lu}`, `\d` itd. przyjmą znaki spoza BMP; w korpusie MF bez znaczenia |
+| MS-Regex: reJ11, reJ13, reJ19, reJ21, reJ23, reJ25, reJ29, reJ31, reJ33, reJ35, reJ61, reJ69, reJ75, reJ77, reS21, reS42, reT63, reT84 | kategorie znaków spoza BMP według Unicode 15 (np. U+1D7A8 to `Lu`, U+1D7FF to `Nd`) | — (porównanie w etapie 3) | zestaw zakłada Unicode 3.0, w którym znaki spoza BMP nie mają kategorii; ADR 0005, pytanie 7 | wzorce z `\p{Lu}`, `\d` itd. przyjmą znaki spoza BMP; w korpusie MF bez znaczenia |
 | MS-Regex: reZ006i | U+0346 poza `\c` | — | produkcja CombiningChar z XML 1.0 2e kończy pierwszy przedział na U+0345; zestaw oczekuje U+0346 w `\c` | bez znaczenia dla korpusu MF |
 
 ## Różnice względem oczekiwań zestawu W3C (testy schematów, etap 3)
@@ -23,6 +23,20 @@ wpis: przypadek, oba wyniki, co mówi rekomendacja (rozdział i reguła), kto ma
 | MS ste110 (queried) | błąd `src-simple-type.4` | poprawny | unia z cyklem w definicji | zostawić jako różnicę |
 | MS schU1 (disputed-test) | według rekomendacji | sporny | status sporny w zestawie | zostawić jako różnicę |
 | MS anyURI_b006 (stable) | poprawny | błędny | ukośnik wsteczny przyjmujemy: część 2, 3.2.17 każe przed sprawdzeniem z RFC 2396 zamienić znaki według XLink §5.4, a ukośnik wsteczny staje się wtedy `%5C`, czyli poprawnym URI | do sprawdzenia w etapie 6 |
+
+## Różnice względem oczekiwań zestawu W3C (testy dokumentów, etap 5)
+
+| Przypadek | `goxsdgo` | Oczekiwane | Uzasadnienie | Skutek dla odbiorcy |
+|---|---|---|---|---|
+| Saxonica XmlVersions xv002–xv100 | według znaków nazw XML 1.0 2e | według XML 1.0 5e albo XML 1.1 | typy nazw (`Name`, `NCName`, `NMTOKEN`) w XSD 1.0 2e opierają się na XML 1.0 2e | nazwy z nowszymi znakami odrzucane; w korpusie MF bez znaczenia |
+| MS gMonth002, gMonth004 | „--MM” | „--MM--” | wydanie drugie (część 2, 3.2.14, z erratą) podaje postać „--MM”; zestaw zakłada pierwsze wydanie | wartości „--MM--” odrzucane |
+| MS anyURI_a004 | według etapu 2 | inaczej | literał `anyURI`, jak `anyURI_b006` wyżej | do sprawdzenia w etapie 6 |
+| MS stZ073b | poprawny | błędny | restrykcja unii przyjmuje `xsi:type` wskazujący typ członka (ADR 0008, punkt 11) | do sprawdzenia w etapie 6 |
+| MS attP031 | błędny | poprawny | atrybut zabroniony (`use="prohibited"`) jest niedozwolony w dokumencie (ADR 0008, punkt 11) | do sprawdzenia w etapie 6 |
+| korzeń bez deklaracji globalnej | błąd `cvc-elt.1` | według zestawu | ocena korzenia jest ścisła; luźna ocena dotyczy tylko symboli wieloznacznych z `processContents="lax"` (ADR 0008) | dokument z nieznanym korzeniem jest odrzucany, jak w libxml2 |
+
+Pozostałe niezaliczone testy dokumentów (Missing, errF001, ste110, schU3–schU5, particlesZ001 i pokrewne) wynikają ze
+schematów odrzuconych z powodów opisanych wyżej.
 
 ## Wyłączenia z zestawu W3C
 
