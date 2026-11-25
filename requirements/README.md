@@ -15,6 +15,7 @@ test `TestRequirementsCovered` sprawdza pokrycie w obie strony.
 | `MSG` | `messages.md` | komunikaty dla ludzi w wielu językach (pakiet `messages`), warianty, parametry |
 | `SAFE` | `safety.md` | brak sieci i encji zewnętrznych, limity |
 | `DET` | `determinism.md` | powtarzalność, czas liniowy, pamięć przy strumieniu |
+| `EVD` | `evidence.md` | pakiet dowodów (K9): przebiegi testów, macierz śledzenia, tabela K1–K9, powtarzalność (`tools/evidence`) |
 
 Wymaganie dla rekomendacji wskazuje rozdział i regułę (np. „cvc-complex-type.2.4”, „src-resolve”), a nie pojedynczy
 przypadek testowy; przypadki W3C są testami tego wymagania. Nazwy reguł z rekomendacji są też podstawą kodów błędów.

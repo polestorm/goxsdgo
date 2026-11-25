@@ -421,6 +421,11 @@ func writeFile(target string, b []byte) error {
 // treeSum liczy sumę drzewa: SHA-256 z posortowanych wierszy „<sha256 pliku>  <ścieżka>\n”, jak w wyniku
 // sha256sum. Nie zależy od sposobu spakowania archiwum.
 func treeSum(dir string) (string, int, error) {
+	// Katalog bywa dowiązaniem (np. dane z głównej kopii w git worktree); os.walk w fetch.py za nim podąża, więc
+	// i tu liczymy sumę drzewa, na które wskazuje.
+	if real, err := filepath.EvalSymlinks(dir); err == nil {
+		dir = real
+	}
 	var lines []string
 	err := filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
 		if err != nil {

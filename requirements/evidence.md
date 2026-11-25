@@ -1,0 +1,11 @@
+# Wymagania: pakiet dowodów
+
+Kryterium K9 (ADR 0001): pakiet dowodów do walidacji u odbiorcy. Narzędzie: `tools/evidence`, opis: `docs/evidence.md`.
+
+| Id | Wymaganie |
+|---|---|
+| EVD-001 | Pakiet zawiera wynik ostatniego przebiegu `go test -count=1 -json ./...` modułu głównego, `tools/fetch` i `tools/evidence`, wynik testów `tools/fetch` w Pythonie i wynik `tools/fetch -verify`, z commitem (i oznaczeniem zmian w drzewie roboczym), wersją Go, systemem, wersją Pythona i datą; do tego nagłówki wszystkich plików `*.ratchet`, sumy z `testdata/sources.json`, listę ADR i sekcje `docs/differences.md`. |
+| EVD-002 | Pakiet zawiera macierz śledzenia: każde wymaganie z `requirements/*.md` (prefiksy z tabeli w `requirements/README.md`) z testami, które się na nie powołują przez `REQ:` w komentarzu, i z wynikiem tych testów w przebiegu. Komentarz wewnątrz funkcji należy do niej, komentarz poza funkcją do najbliższej funkcji poniżej. Funkcja pomocnicza testów jest dowodem wspierającym (nie wystarcza sama); benchmark i test pomijany bez zmiennej `GOXSDGO_*` są dowodem „na żądanie”. Wymaganie bez dowodu, wymaganie z samymi funkcjami pomocniczymi i test, który nie przeszedł, są wypisane jako niezgodność; narzędzie kończy się kodem 1, gdy K4 albo K9 nie są spełnione. |
+| EVD-003 | Pakiet zawiera tabelę K1–K9: wartość, cel, stan (spełnione, niespełnione, oczekuje) i źródło. Wartości z przebiegów testów liczy z ich wyjścia; pomiary spoza `go test` (K3, K6 dla 1 GB, K7, K8) bierze z `docs/measurements.json` z datą i commitem pomiaru; K5 liczy z dziennika `docs/fuzzing.md`: tylko przebiegi „ok” bez „(zmiany)” na kandydacie albo na commitach bez zmian kodu biblioteki; K1 zestawia niezaliczone przypadki z `testdata/w3c/xsdtests.ratchet` z ich wzmianką w `docs/differences.md`. |
+| EVD-004 | Dla tego samego commitu i tych samych danych `report.md` i `evidence.json` różnią się tylko datą wygenerowania; czasy przebiegów są tylko w surowych plikach wyników. |
+| EVD-005 | Narzędzie nie sięga do sieci, nie uruchamia fuzzingu ani libxml2 i nie czyta korpusu prywatnego: przebiegi testów dostają środowisko bez `GOXSDGO_PRIVATE_CORPUS`, `GOXSDGO_DUMP_ERRORS` i (poza `-stream-mb`) `GOXSDGO_STREAM_MB`. |

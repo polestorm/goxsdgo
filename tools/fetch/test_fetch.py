@@ -37,6 +37,16 @@ class FetchTest(unittest.TestCase):
             fetch.extract_tar_gz(tar_gz([("top/a.xsd", b"a"), ("top/sub/b.xml", b"b")]), d, 1)
             self.assertEqual(fetch.tree_sum(d)[0], GO_TREE_SUM)
 
+    def test_tree_sum_follows_symlinked_dir(self):
+        with tempfile.TemporaryDirectory() as d, tempfile.TemporaryDirectory() as d2:
+            fetch.extract_tar_gz(tar_gz([("top/a.xsd", b"a"), ("top/sub/b.xml", b"b")]), d, 1)
+            link = os.path.join(d2, "link")
+            try:
+                os.symlink(d, link, target_is_directory=True)
+            except (OSError, NotImplementedError) as e:
+                self.skipTest("symlinks not available: %s" % e)
+            self.assertEqual(fetch.tree_sum(link), fetch.tree_sum(d))
+
     def test_extract_rejects_escaping_paths(self):
         for name in ("top/../../evil", "/abs/evil", "c:/evil"):
             with tempfile.TemporaryDirectory() as d:

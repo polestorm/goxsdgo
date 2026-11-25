@@ -50,6 +50,23 @@ func TestExtractStripsAndHashes(t *testing.T) {
 	}
 }
 
+// Suma drzewa przez dowiązanie do katalogu jest taka sama jak bez niego (zgodnie z fetch.py).
+func TestTreeSumFollowsSymlinkedDir(t *testing.T) {
+	dir := t.TempDir()
+	if err := extractTarGz(bytes.NewReader(tarGz(t, map[string]string{"top/a.xsd": "a", "top/sub/b.xml": "b"})), dir, 1); err != nil {
+		t.Fatal(err)
+	}
+	link := filepath.Join(t.TempDir(), "link")
+	if err := os.Symlink(dir, link); err != nil {
+		t.Skip("symlinks not available:", err)
+	}
+	a, _, err1 := treeSum(dir)
+	b, _, err2 := treeSum(link)
+	if err1 != nil || err2 != nil || a != b {
+		t.Fatalf("treeSum via symlink: %s %v vs %s %v", b, err2, a, err1)
+	}
+}
+
 func TestExtractRejectsEscapingPaths(t *testing.T) {
 	for _, name := range []string{"top/../../evil", "/abs/evil", "c:/evil"} {
 		dir := t.TempDir()
