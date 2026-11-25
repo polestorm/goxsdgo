@@ -103,6 +103,15 @@ func TestLoadSuite(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	groups := map[string]bool{}
+	for _, c := range cases {
+		groups[c.Set+"/"+c.Group] = true
+	}
+	for g := range ExcludedGroups {
+		if !groups[g] {
+			t.Errorf("ExcludedGroups: no group %s in the suite", g)
+		}
+	}
 	inScope := map[Kind]int{}
 	excluded := map[string]int{}
 	for _, c := range cases {

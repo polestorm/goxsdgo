@@ -24,6 +24,22 @@ import (
 // wypadają jako wyłączone z powodem.
 var Tokens1_0 = []string{"1.0", "1.0-2e"}
 
+// ExcludedGroups to grupy wyłączone ręcznie, z powodem (docs/differences.md). Klucz to "<testSet>/<testGroup>";
+// wyłączenie obejmuje test schematu i testy dokumentów grupy. Decyzja właściciela z 2026-11-25.
+var ExcludedGroups = map[string]string{
+	"VC/vc001":                 xsd11Untagged + " (vc:minVersion)",
+	"VC/vc002":                 xsd11Untagged + " (vc:minVersion)",
+	"VC/vc014":                 xsd11Untagged + " (vc:, xs:error)",
+	"VC/vc024-11":              xsd11Untagged + " (vc:, xs:error)",
+	"anyAttribute/s3_10_6ii01": xsd11Untagged + " (notQName, notNamespace)",
+	"anyAttribute/s3_10_6ii02": xsd11Untagged + " (notQName, notNamespace)",
+	"anyAttribute/s3_10_6ii04": xsd11Untagged + " (notQName, notNamespace)",
+	"wildcard/s3_10_1ii08":     xsd11Untagged + " (notQName, notNamespace)",
+	"wildcard/s3_10_1ii09":     xsd11Untagged + " (notQName, notNamespace)",
+}
+
+const xsd11Untagged = "XSD 1.1 construct without a version token"
+
 // Kind odróżnia test schematu od testu dokumentu.
 type Kind string
 
@@ -103,7 +119,7 @@ func Load(fsys fs.FS, tokens []string) ([]*Case, error) {
 		contributor := contributorOf(p)
 		setReason := excludedBy(set.Version, supported)
 		for _, g := range set.Groups {
-			groupReason := first(setReason, excludedBy(g.Version, supported))
+			groupReason := first(first(setReason, excludedBy(g.Version, supported)), ExcludedGroups[set.Name+"/"+g.Name])
 			var docs []string
 			if g.Schema != nil {
 				for _, d := range g.Schema.Docs {

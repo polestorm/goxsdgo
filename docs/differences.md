@@ -16,7 +16,6 @@ wpis: przypadek, oba wyniki, co mówi rekomendacja (rozdział i reguła), kto ma
 | Przypadek | `goxsdgo` | Oczekiwane | Uzasadnienie | Propozycja |
 |---|---|---|---|---|
 | Saxonica Missing: missing001, missing002, missing003, missing006 | błąd `src-resolve` | poprawny | 43 przypadki Sun i Microsoft oczekują błędu dla nierozwiązanego odwołania; ADR 0006 | zostawić jako różnicę |
-| Saxonica VC: vc001, vc002, vc014, vc024-11; IBM s3_10_6ii01, s3_10_6ii02, s3_10_6ii04, s3_10_1ii08, s3_10_1ii09 | błąd | poprawny | konstrukcje XSD 1.1 (`vc:`, `xs:error`, `notQName`, `notNamespace`) bez żetonu wersji w metadanych; w XSD 1.0 schemat jest błędny | wyłączyć z powodem „XSD 1.1 bez żetonu” |
 | Saxonica XmlVersions: xv001, xv004 | błąd | poprawny | „Dĳkstra” (U+0133) nie jest NCName według znaków nazw XML 1.0 2e, z których korzysta XSD 1.0 2e | zostawić jako różnicę |
 | MS IDREFS_length006, NMTOKENS_length006 (stable), errF001 (queried) | błąd `length-minLength-maxLength` | poprawny | `length` i `minLength` w jednym kroku restrykcji są błędem według 4.3.1.4, punkty 1.2 i 2.2 | zostawić jako różnicę |
 | MS ste110 (queried) | błąd `src-simple-type.4` | poprawny | unia z cyklem w definicji | zostawić jako różnicę |
@@ -28,6 +27,7 @@ wpis: przypadek, oba wyniki, co mówi rekomendacja (rozdział i reguła), kto ma
 | Grupa / przypadek | Powód |
 |---|---|
 | przypadki XSD 1.1 (`version="1.1"` na zestawie, grupie albo przypadku): 2 250 | poza zakresem (ADR 0001) |
+| 9 grup z konstrukcjami XSD 1.1 bez żetonu wersji w metadanych: Saxonica VC vc001, vc002, vc014, vc024-11 (`vc:`, `xs:error`); IBM anyAttribute s3_10_6ii01, s3_10_6ii02, s3_10_6ii04 i wildcard s3_10_1ii08, s3_10_1ii09 (`notQName`, `notNamespace`) | w XSD 1.0 te schematy są błędne, a zestaw oczekuje „poprawny”; lista `internal/w3c.ExcludedGroups`, decyzja właściciela z 2026-11-25 |
 | oczekiwany wynik `indeterminate`: 16 | rekomendacja nie rozstrzyga wyniku (metadane zestawu, `common/xsts.xsd`) |
 | brak oczekiwanego wyniku dla XSD 1.0 2e: 7 | oczekiwane wyniki podano tylko dla wersji Unicode albo XSD 1.1; pytanie 7 |
 | przypadek tylko dla Unicode 4.0.0 (`version="Unicode_4.0.0"`): 1 | wersja Unicode do decyzji; pytanie 7 |
