@@ -4,7 +4,7 @@
 
 | Warstwa | Gdzie | Co sprawdza |
 |---|---|---|
-| zestaw W3C | `testdata/w3c/xsdtests/` (ADR 0003), `TestW3CSuite`, czytnik `internal/w3c` | werdykt dla każdego schematu i dokumentu z zestawu XSD 1.0 2e; raport w podziale na dostawców (NIST, Microsoft, Sun, Boeing, IBM, Saxonica, W3C); wyłączenia z powodem; zapadka `testdata/w3c/xsdtests.ratchet` |
+| zestaw W3C | `testdata/w3c/xsdtests/` (ADR 0003), `TestW3CSuite`, czytnik `internal/w3c` | werdykt dla każdego schematu i dokumentu z zestawu XSD 1.0 2e; raport w podziale na dostawców (NIST, Microsoft, Sun, Boeing, IBM, Saxonica, W3C); wyłączenia z powodem; zapadka `testdata/w3c/xsdtests.ratchet`; `TestW3CSuiteNameRules5` raportuje wynik z regułami nazw XML 1.0 5e (bez osobnej zapadki, K1 liczymy w ustawieniu domyślnym) |
 | zgodność XML | `internal/xmlreader`, `TestXMLConformance` | czytnik XML na zestawie W3C XML Conformance (dobra forma, przestrzenie nazw, druga postać kanoniczna tam, gdzie zestaw ją podaje); zapadka `testdata/w3c/xmlconf.ratchet`, `go test ./internal/xmlreader -update` |
 | typy proste (pośrednio) | `internal/datatypes`, `TestW3CDatatypes` | przypadki NIST i Microsoft (DataTypes, Regex) z zestawu W3C przez adapter w testach, który czyta schematy o prostym kształcie; nie jest to K1, bo bez etapu 3 brak prawdziwego wczytania schematu; zapadki `testdata/w3c/nist-datatypes.ratchet`, `ms-datatypes.ratchet` |
 | wymagania | `requirements/*.md`, `TestRequirementsCovered` | każde wymaganie ma test albo plik korpusu; każde odwołanie `REQ:` wskazuje istniejące wymaganie |
@@ -65,6 +65,7 @@ Wyniki zapisujemy tutaj z datą, wersją i sposobem pomiaru.
 
 | Data | Commit | W3C (zaliczone / w zakresie) | Korpus MF | Zgodność z libxml2 | Uwagi |
 |---|---|---|---|---|---|
+| 2026-11-25 | `7ab2316` | 39 367 / 39 439 (domyślnie); z `NameRules: NamesXML10Edition5` 39 383 / 39 439 (+16: 15 XmlVersions i `reZ006i`, 0 utraconych) | bez zmian | bez zmian | ADR 0012; zrzut wszystkich błędów w ustawieniu domyślnym identyczny przed i po |
 | 2026-11-25 | `355ec91` (`tools/bench`) | W3C z 39 439: goxsdgo 39 367, knroy/go-xml 39 386, cB-Sigma/xsd 39 329, jacoelho/xsd 39 083, libxml2 38 662 | MF: 170 / 170 (jacoelho/xsd 168) | — | 200 MB JPK: goxsdgo 3,96 s, libxml2 3,85 s, jacoelho/xsd 3,79 s; knroy/go-xml i cB-Sigma/xsd budują drzewo (11× i 22× rozmiaru pliku w pamięci); pojedyncze przebiegi przy obciążeniu 2–3 |
 | 2026-11-25 | `50eaebc` + xml.pro `4c07f5b5` | bez zmian | bez zmian | xml.pro przez silnik goxsdgo: 172 pliki klientów (1,61 GB), ten sam status i werdykt 172 / 172, wiersz pierwszego błędu 50 / 51 | etap 8, K8: testy xml.pro 2029 pass / 1 fail (ta sama porażka niezwiązana z walidacją co na `origin/main`) w obu silnikach, `-tags libxml2` 1103 / 0; czas 1,03× (200 MB) i 1,09× (korpus) względem gomfxml |
 | 2026-11-25 | `2e813e9` | 39 367 / 39 439 (bez zmian) | 170 / 170, 15 / 15 | korpus prywatny (151 plików z schematem, 1,59 GB): werdykt 151 / 151, wiersz pierwszego błędu 50 / 51 | etap 7; K6: 1 GB, szczyt 6,3 MB; K7: 200 MB 1,05×, korpus prywatny 1,19× (największy plik 227 MB: 1,33×); `BenchmarkValidateJPK` 47–48 MB/s (było 41); K5: 15 min / 24 h (`docs/fuzzing.md`) |

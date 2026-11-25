@@ -19,7 +19,7 @@
    `Reason`, `ExpectedNamespace`, `Type`, `TypeNamespace`, `Builtin`, `InsertLine`, `InsertColumn` i pakiet `messages`;
    ADR 0010. Kodem podstawowym zostają nazwy reguł W3C; numer libxml2 tylko przez `LibXML2Code`, przejściowo
    (decyzja właściciela z 2026-11-25). Etap 7: `DocumentLimits`, `Config.Document`, `DefaultDocumentLimits`;
-   ADR 0011.) Czy wystawiamy skompilowany model schematu (typy, deklaracje) do odczytu, np. dla edytorów
+   ADR 0011. Opcja `Config.NameRules` (domyślnie XML 1.0 2e, na życzenie 5e); ADR 0012.) Czy wystawiamy skompilowany model schematu (typy, deklaracje) do odczytu, np. dla edytorów
    z podpowiedziami i dla generatorów formularzy, czy tylko `Compile` i `Validate`? Rekomendacja na start: tylko
    walidacja, model po pierwszym konsumencie.
 6. ~~**Wartości typowane w wyniku.**~~ Rozstrzygnięte w ADR 0009 (2026-11-25): `Config.OnValue(TypedValue)` (ścieżka,
@@ -43,3 +43,7 @@
    `(a{2,3}){1,50000}`, na długim dokumencie przekracza `MaxConfigurations` i kończy się `ErrLimit` zamiast werdyktu
    (ADR 0011). Ścisłe łączenie zbiorów wartości liczników usunęłoby to ograniczenie kosztem złożoności. Rekomendacja:
    zostawić `ErrLimit` (w zestawie W3C i korpusie MF takich przypadków nie ma) i wrócić, jeśli trafi się u odbiorcy.
+10. ~~**Odwołania nierozwiązane (grupa Missing).**~~ Rozstrzygnięte 2026-11-25: bez zmian (ADR 0012). Zestaw W3C oczekuje
+    sprzecznych werdyktów dla tej samej sytuacji: `missing001` (nieużywany element z `type="absent"`) poprawny,
+    a `elemM002`, `xsd015`, `xsd016`, `idB005` błędny; żadna zasada z rekomendacji nie godzi obu grup. Decyzja
+    właściciela: w porównaniach z innymi walidatorami takie przypadki są sporne (pomijane albo z zastrzeżeniem).
