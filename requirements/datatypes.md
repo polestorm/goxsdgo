@@ -1,0 +1,25 @@
+# Wymagania: typy proste
+
+Źródło: XML Schema Part 2: Datatypes Second Edition (2004-10-28), dalej „część 2”. Decyzje: `docs/adr/0005-datatypes-and-regex.md`.
+Kod: `internal/datatypes`. Pomiar pośredni na zestawie W3C: `TestW3CDatatypes` (adapter w testach, nie kryterium K1).
+
+| Id | Wymaganie |
+|---|---|
+| DT-001 | Dostępne są wszystkie 44 typy wbudowane: 19 pierwotnych (3.2) i 25 pochodnych (3.3), z typami bazowymi, typami elementów list i aspektami jak w dodatku A. Typy pochodne powstają z typów bazowych tym samym mechanizmem restrykcji i listy, którego używa schemat. |
+| DT-002 | Normalizacja białych znaków według aspektu whiteSpace (4.3.6): preserve, replace, collapse. Dla typów innych niż string i pochodne od niego whiteSpace to collapse z fixed; listy mają collapse; unie normalizuje typ składowy, według którego tekst przechodzi walidację. Ograniczenie whiteSpace-valid-restriction. |
+| DT-003 | Typy pochodne od string (3.3.1–3.3.12): normalizedString, token, language, NMTOKEN, NMTOKENS, Name, NCName, ID, IDREF, IDREFS, ENTITY, ENTITIES; znaki nazw według XML 1.0 Second Edition i Namespaces in XML. ID, IDREF i ENTITY sprawdzamy tylko leksykalnie (jednoznaczność i odwołania w etapie 5). |
+| DT-004 | boolean (3.2.2): literały true, false, 1, 0; postać kanoniczna true i false. |
+| DT-005 | decimal (3.2.3) i typy całkowite (3.3.13–3.3.25): przestrzeń leksykalna, wartość bez ograniczenia liczby cyfr, równość i porządek liczb, zakresy typów pochodnych, postacie kanoniczne decimal i integer. |
+| DT-006 | float i double (3.2.4, 3.2.5): mantysa i wykładnik, INF, -INF, NaN; odwzorowanie na najbliższą wartość z zaokrągleniem do parzystej; jedno zero; NaN równy sobie i nieporównywalny z innymi wartościami, więc wypada przy każdej innej granicy; postać kanoniczna. |
+| DT-007 | duration (3.2.6): przestrzeń leksykalna; porządek częściowy przez dodanie do czterech dat odniesienia (3.2.6.2, dodatek E); porównanie nieokreślone przy aspektach granicznych to fałsz (3.2.6.3). |
+| DT-008 | dateTime, time, date, gYearMonth, gYear, gMonthDay, gDay, gMonth (3.2.7–3.2.14): przestrzenie leksykalne (rok bez 0000 i bez „+”, 24:00:00, strefy do ±14:00), sprowadzenie strefy do UTC, porządek częściowy z 3.2.7.4 (dwie osie, nieokreśloność w zakresie 14 godzin), równość, postacie kanoniczne (dla date ze strefą odzyskiwalną). |
+| DT-009 | hexBinary i base64Binary (3.2.15, 3.2.16): przestrzenie leksykalne (dla base64 produkcja Base64Binary), wartość jako ciąg oktetów, długość w oktetach, postacie kanoniczne. |
+| DT-010 | anyURI (3.2.17): przestrzeń leksykalna w zakresie niezależnym od schematu adresu (sekwencje %HH, jeden „#”, składnia schematu); długość w znakach. |
+| DT-011 | QName i NOTATION (3.2.18, 3.2.19): przestrzeń leksykalna według Namespaces in XML, wartość {przestrzeń nazw, nazwa lokalna} z prefiksem rozwiązanym w kontekście; length, minLength i maxLength nie ograniczają tych typów; typ NOTATION bez enumeration jest zgłaszany do etapu 3 (enumeration-required-notation). |
+| DT-012 | Listy (2.5.1.2, 4.1.2.2): podział na elementy po normalizacji collapse, walidacja każdego elementu (cvc-datatype-valid.1.2.2), aspekty długości liczone w elementach, wzorzec dotyczy całego literału listy, typ elementu nie może być listą (cos-list-of-atomic). |
+| DT-013 | Unie (2.5.1.3, 4.1.2.3): typy składowe sprawdzane w kolejności, pierwszy pasujący daje wartość; aspekty pattern i enumeration na unii; brak dopasowania to cvc-datatype-valid.1.2.3. |
+| DT-014 | Reguły walidacji aspektów (4.3.x.3): length, minLength, maxLength, pattern (wzorce z jednego kroku łączy „lub”, z różnych kroków „i”, 4.3.4.3), enumeration (w przestrzeni wartości), maxInclusive, maxExclusive, minInclusive, minExclusive, totalDigits (\|i\| < 10^td i n <= td), fractionDigits. Wzorzec sprawdzamy na tekście po normalizacji białych znaków. |
+| DT-015 | Tabela stosowalności aspektów (cos-applicable-facets, 4.1.5) dla typów atomowych według typu pierwotnego, dla list i dla unii. |
+| DT-016 | Ograniczenia poprawności aspektów przy restrykcji (4.1.3, 4.3.x.4): src-single-facet-value, length-minLength-maxLength, length-valid-restriction, minLength-less-than-equal-to-maxLength, minLength-valid-restriction, maxLength-valid-restriction, enumeration-valid-restriction, whiteSpace-valid-restriction, reguły granic w jednym typie i względem typu bazowego, totalDigits-valid-restriction, fractionDigits-totalDigits, fractionDigits-valid-restriction, aspekty z fixed (kod facet-fixed), wartości aspektów spoza wymaganego typu (kod facet-value). |
+| DT-017 | Każdy błąd ma stały kod z nazwą reguły rekomendacji (cvc-datatype-valid.1.2.1, cvc-pattern-valid, cvc-length-valid, …), sprawdzany tekst, nazwę aspektu i wartość aspektu. Naruszenie wzorca typu wbudowanego zgłaszamy jako cvc-datatype-valid.1.2.1, bo ten wzorzec definiuje przestrzeń leksykalną. |
+| DT-018 | Ograniczenia implementacji są udokumentowane (3.2.3, 3.2.6, 3.2.7) i sprawdzane testem: rok do 12 cyfr, pola duration do 15 cyfr, cyfry decimal i ułamka sekundy bez ograniczenia. |
