@@ -17,9 +17,10 @@
 | bezpieczeństwo | `TestSafeByDefault` (od etapu 5) | brak sieci i encji zewnętrznych, limity głębokości i rozmiaru, schemat spoza `fs.FS` odrzucony |
 | pamięć | `TestStreamingMemory` (od etapu 5) | syntetyczny JPK generowany w teście, nie plik: 200 MB w zwykłym przebiegu, 1 GB z `GOXSDGO_STREAM_MB=1024`; szczyt pamięci < 64 MB |
 | powtarzalność | `TestDeterministic` (od etapu 5, także walidacja współbieżna) | wielokrotna walidacja daje te same błędy w tej samej kolejności |
-| odporność | `FuzzCompile`, `FuzzValidate`, `FuzzContentModel` (automat porównywany z niezależnym, prostym dopasowaniem), `FuzzReader`, `FuzzRegexTranslate`, `FuzzLexical` | dowolny schemat i dokument: bez paniki, czas ograniczony |
-| patologiczne | `TestPathological` (`internal/schema`: modele zawartości; etap 7: wzorce, klucze, zagnieżdżenia dokumentu) | wzorce z zagnieżdżonymi powtórzeniami, `maxOccurs` w setkach tysięcy, głębokie zagnieżdżenia, tysiące kluczy: czas rośnie liniowo |
-| wydajność | `BenchmarkCorpus` | porównanie z `goxsdval` (kryterium K7) |
+| odporność | `FuzzCompile`, `FuzzValidate`, `FuzzContentModel` (automat porównywany z niezależnym, prostym dopasowaniem), `FuzzReader`, `FuzzRegexTranslate`, `FuzzLexical`, `FuzzDecimal`; kampania `tools/fuzz` (paczka dla serwera bez Go: `-pack`, dziennik: `-import`), dziennik godzin w `docs/fuzzing.md`; fuzzing według reguły z globalnego `CLAUDE.md` właściciela (Synology, lokalnie tylko w nocy na zasilaniu sieciowym) | dowolny schemat i dokument: bez paniki, czas ograniczony |
+| patologiczne | `TestPathological` (`internal/schema`: modele zawartości; `xsd`: wzorce, liczności, zagnieżdżenia, długie atrybuty i teksty, klucze, ID, wyliczenia, listy, symbole wieloznaczne, encje; iloraz czasów 2n/n ≤ 3,2; wejścia ponad limitem kończą się `ErrLimit`) | wzorce z zagnieżdżonymi powtórzeniami, `maxOccurs` w setkach tysięcy, głębokie zagnieżdżenia, tysiące kluczy: czas rośnie liniowo |
+| wydajność | `BenchmarkValidateJPK`, `BenchmarkCorpus`, `tools/compare private` i `timefile` | porównanie z libxml2 przez `goxsdval` (K7); korpus prywatny z `GOXSDGO_PRIVATE_CORPUS`, wyłącznie liczby zbiorcze |
+| bez zmian wyników | `TestDumpErrors` (`GOXSDGO_DUMP_ERRORS`) | zrzut wszystkich błędów zestawu W3C i korpusu przed i po optymalizacji; różnica musi być pusta |
 
 ## CI i dane testowe
 
@@ -62,6 +63,7 @@ Wyniki zapisujemy tutaj z datą, wersją i sposobem pomiaru.
 
 | Data | Commit | W3C (zaliczone / w zakresie) | Korpus MF | Zgodność z libxml2 | Uwagi |
 |---|---|---|---|---|---|
+| 2026-11-25 | `2e813e9` | 39 367 / 39 439 (bez zmian) | 170 / 170, 15 / 15 | korpus prywatny (151 plików z schematem, 1,59 GB): werdykt 151 / 151, wiersz pierwszego błędu 50 / 51 | etap 7; K6: 1 GB, szczyt 6,3 MB; K7: 200 MB 1,05×, korpus prywatny 1,19× (największy plik 227 MB: 1,33×); `BenchmarkValidateJPK` 47–48 MB/s (było 41); K5: 15 min / 24 h (`docs/fuzzing.md`) |
 | 2026-11-25 | `12a5436` | bez zmian | bez zmian | bez zmian | etap 6b; 184 kombinacje kod/wariant zaobserwowane na W3C i korpusie MF opisane w EN i PL; `BenchmarkValidateJPK` ok. 41 MB/s, bez zmian |
 | 2026-11-25 | `a497d5b` | 39 367 / 39 439 (bez zmian) | 170 / 170, 15 / 15 | bez zmian; 528 rozbieżności werdyktu z libxml2 opisanych w `differences-libxml2.md` (rację ma goxsdgo w 519, libxml2 w 9) | etap 6: compat 223 / 223 kodów; 52 ze 117 kodów odbiorcy są odpowiednikiem kodu dokumentu; `BenchmarkValidateJPK` bez `OnValue` 41 MB/s (bez zmian), z `OnValue` 33 MB/s |
 | 2026-11-25 | `8f02159` | 39 367 / 39 439 (testy schematów 14 370 / 14 384; testy dokumentów 24 997 / 25 055: poprawne 14 016 / 14 040, błędne 10 981 / 11 015) | schematy 170 / 170, dokumenty 15 / 15 (8 MF i 7 syntetycznych, z kodem, wierszem i ścieżką) | testy dokumentów: ten sam werdykt w 99,69% z 24 903 porównywalnych, ten sam wiersz pierwszego błędu w 99,7% z 10 912; korpus: werdykt 15 / 15, wiersz 6 / 6 | etap 5; K6: plik 1 GB, szczyt pamięci 5,8 MB; K7: 200 MB w 5,05 s wobec 3,87 s `xmllint --stream` (1,30×); `BenchmarkValidateJPK` 41,9 MB/s |

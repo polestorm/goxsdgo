@@ -18,7 +18,8 @@
    Etap 6: `OnValue`, `TypedValue`, `Codes`, `LookupCode`, `LibXML2Code`; ADR 0009. Etap 6b: pola `Error.Namespace`,
    `Reason`, `ExpectedNamespace`, `Type`, `TypeNamespace`, `Builtin`, `InsertLine`, `InsertColumn` i pakiet `messages`;
    ADR 0010. Kodem podstawowym zostają nazwy reguł W3C; numer libxml2 tylko przez `LibXML2Code`, przejściowo
-   (decyzja właściciela z 2026-11-25).) Czy wystawiamy skompilowany model schematu (typy, deklaracje) do odczytu, np. dla edytorów
+   (decyzja właściciela z 2026-11-25). Etap 7: `DocumentLimits`, `Config.Document`, `DefaultDocumentLimits`;
+   ADR 0011.) Czy wystawiamy skompilowany model schematu (typy, deklaracje) do odczytu, np. dla edytorów
    z podpowiedziami i dla generatorów formularzy, czy tylko `Compile` i `Validate`? Rekomendacja na start: tylko
    walidacja, model po pierwszym konsumencie.
 6. ~~**Wartości typowane w wyniku.**~~ Rozstrzygnięte w ADR 0009 (2026-11-25): `Config.OnValue(TypedValue)` (ścieżka,
@@ -37,3 +38,7 @@
    nie podaje. Rekomendacja: zostawić koniec znacznika jako pozycję główną (zgodność z odbiorcą, K3) i dodać początek
    jako osobne pole, jeśli odbiorca o to poprosi. Do decyzji przy przepięciu odbiorcy (etap 8). Od etapu 6b API
    podaje też miejsce wstawienia brakującego elementu (`InsertLine`, `InsertColumn`); pozycja główna bez zmian.
+9. **Modele niejednoznaczne co do liczników.** Model zgodny z UPA, ale niejednoznaczny co do liczników, np.
+   `(a{2,3}){1,50000}`, na długim dokumencie przekracza `MaxConfigurations` i kończy się `ErrLimit` zamiast werdyktu
+   (ADR 0011). Ścisłe łączenie zbiorów wartości liczników usunęłoby to ograniczenie kosztem złożoności. Rekomendacja:
+   zostawić `ErrLimit` (w zestawie W3C i korpusie MF takich przypadków nie ma) i wrócić, jeśli trafi się u odbiorcy.

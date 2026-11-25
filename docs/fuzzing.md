@@ -81,3 +81,12 @@ go -C tools/fuzz run . -root ../.. -import /ścieżka/do/journal.tsv   # wynik z
 Stan K5 (2026-11-25): na kandydacie `2e813e9` zaliczone 15 min (`FuzzDecimal`, bez błędów); do 24 h brakuje
 23 h 45 min. Wcześniejsze przebiegi z etapów 1–5 (łącznie ok. 30 min, na innych commitach, poza dziennikiem) i 90 s `FuzzDecimal` na kodzie
 przed commitem nie liczą się do K5.
+
+## Zlecenie na Synology (2026-11-25)
+
+Paczka z `7aa29c4` (kod biblioteki jak w kandydacie `2e813e9`) wgrana do `~/fuzz/goxsdgo/7aa29c4/` na Synology
+„StormSyn” (DS224+, x86_64, 4 rdzenie Celeron J4125) i ustawiona 2026-11-25 16:22 we wspólnej kolejce `~/fuzz/queue.sh`:
+1425 min (23 h 45 min brakujące do K5), 3 workery, `nice -n 19`. Ziarna wszystkich 7 fuzzerów przechodzą na serwerze.
+Kampania ruszy po zakończeniu trwającego fuzzingu `gomdgo`. Po zakończeniu: skopiować
+`~/fuzz/goxsdgo/7aa29c4/fuzzpack/work/journal.tsv` i dopisać `go -C tools/fuzz run . -root ../.. -import journal.tsv`;
+wejścia łamiące niezmiennik leżą w `fuzzpack/tree/<pakiet>/testdata/fuzz/`.
