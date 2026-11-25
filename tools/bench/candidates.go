@@ -73,11 +73,20 @@ type compiled interface {
 
 // --- goxsdgo ---
 
-type goxsdgoCand struct{}
+// goxsdgoCand to goxsdgo; names5 włącza reguły znaków nazw XML 1.0 5e (Config.NameRules, ADR 0012). Wariant
+// z names5 występuje tylko w porównaniu na zestawie W3C, jako dodatkowa kolumna.
+type goxsdgoCand struct{ names5 bool }
 
-func (goxsdgoCand) name() string { return "goxsdgo" }
+func (c goxsdgoCand) name() string {
+	if c.names5 {
+		return goxsdgo5Name
+	}
+	return "goxsdgo"
+}
 
-func (goxsdgoCand) config(e env) (xsd.Config, fs.FS) {
+const goxsdgo5Name = "goxsdgo (XML 1.0 5e names)"
+
+func (c goxsdgoCand) config(e env) (xsd.Config, fs.FS) {
 	// Pliki spoza katalogu głównego (xml.xsd, xlink.xsd) podłączamy pod prefiksem, jak w TestW3CSuite.
 	const extra = "_extra"
 	loc := map[string]string{}
@@ -94,7 +103,11 @@ func (goxsdgoCand) config(e env) (xsd.Config, fs.FS) {
 	if extraDir != "" {
 		fsys = testkit.Overlay(fsys, extra, os.DirFS(extraDir))
 	}
-	return xsd.Config{Locations: loc}, fsys
+	cfg := xsd.Config{Locations: loc}
+	if c.names5 {
+		cfg.NameRules = xsd.NamesXML10Edition5
+	}
+	return cfg, fsys
 }
 
 type goxsdgoSet struct {

@@ -10,6 +10,7 @@
 //	go -C tools/bench run . -root ../.. probe      # bezpieczeństwo, konstrukcje, błędy, wzorce
 //	go -C tools/bench run . -root ../.. perf       # czas i pamięć (osobne procesy, /usr/bin/time)
 //	go -C tools/bench run . -root ../.. size       # rozmiar programu i linie kodu
+//	go -C tools/bench run . -root ../.. -docs contested  # przypadki sporne W3C i wyniki bez nich (po w3c)
 //
 // Wyniki maszynowe: <root>/out/bench/*.json i *.tsv.
 package main
@@ -26,6 +27,7 @@ import (
 func main() {
 	root := flag.String("root", "../..", "goxsdgo repository root")
 	only := flag.String("only", "", "comma-separated candidate names (default: all)")
+	docs := flag.Bool("docs", false, "contested: also write docs/contested-cases.md")
 	flag.Parse()
 	// Ścieżki bezwzględne: część kandydatów wylicza z nich adresy bazowe dokumentów.
 	if abs, err := filepath.Abs(*root); err == nil {
@@ -45,7 +47,11 @@ func main() {
 	switch flag.Arg(0) {
 	case "w3c":
 		var all []*w3cResult
-		for _, c := range pick() {
+		list := pick()
+		if *only == "" || strings.Contains(","+*only+",", ","+goxsdgo5Name+",") {
+			list = append(list, goxsdgoCand{names5: true})
+		}
+		for _, c := range list {
 			r, e := runW3C(*root, out, c)
 			if e != nil {
 				err = e
@@ -80,8 +86,10 @@ func main() {
 		err = perfOne(*root, flag.Args()[1:])
 	case "size":
 		err = runSize(*root, out)
+	case "contested":
+		err = runContested(*root, out, *docs)
 	default:
-		fmt.Fprintln(os.Stderr, "usage: bench [-root DIR] [-only NAMES] w3c|corpus|probe|perf|size")
+		fmt.Fprintln(os.Stderr, "usage: bench [-root DIR] [-only NAMES] [-docs] w3c|corpus|probe|perf|size|contested")
 		os.Exit(2)
 	}
 	if err != nil {
