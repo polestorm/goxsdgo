@@ -62,6 +62,8 @@ type file struct {
 	Namespace string   `json:"namespace,omitempty"`
 	Imports   []string `json:"imports,omitempty"`
 	Note      string   `json:"note,omitempty"`
+	// LocalOnly oznacza plik bez adresu w sieci: bierzemy go tylko z -from, a bez -from pomijamy.
+	LocalOnly bool `json:"local_only,omitempty"`
 }
 
 type options struct {
@@ -250,8 +252,14 @@ func (o *options) filesSet(s *dataset) []error {
 		}
 		counts[r.source]++
 	}
-	fmt.Printf("%s: %d/%d ok (present %d, downloaded %d, local copy %d)\n", s.Name, len(s.Files)-len(errs),
-		len(s.Files), counts["present"], counts["download"], counts["local"])
+	fmt.Printf("%s: %d/%d ok (present %d, downloaded %d, local copy %d, skipped %d)\n", s.Name,
+		len(s.Files)-len(errs)-counts["skipped"], len(s.Files), counts["present"], counts["download"], counts["local"],
+		counts["skipped"])
+	for i, r := range results {
+		if r.source == "skipped" {
+			fmt.Printf("  skipped %s: local only, pass -from with a local copy\n", s.Files[i].Path)
+		}
+	}
 	return errs
 }
 
@@ -262,6 +270,9 @@ func (o *options) fetchFile(f *file, dest string) (string, error) {
 	target := filepath.Join(dest, filepath.FromSlash(f.Path))
 	if b, err := os.ReadFile(target); err == nil && f.SHA256 != "" && hexSum(b) == f.SHA256 {
 		return "present", nil
+	}
+	if f.LocalOnly && o.from == "" {
+		return "skipped", nil
 	}
 	if o.verify {
 		return "", errors.New("missing or checksum mismatch")

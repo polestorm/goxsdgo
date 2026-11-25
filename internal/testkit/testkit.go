@@ -1,0 +1,150 @@
+// Package testkit to wspólne narzędzia testów zgodności: zapadka zaliczonych przypadków i manifest danych testowych.
+//
+// Zapadka (ratchet) to plik z listą identyfikatorów przypadków, które już przechodzą. Test zgodności kończy się
+// błędem, gdy któryś z nich przestaje przechodzić, a z flagą -update zapisuje nową listę. Liczba zaliczonych
+// przypadków nie spada więc między commitami bez widocznej zmiany tego pliku (CLAUDE.md, „Jak pracujemy”).
+//
+// Pakiet służy tylko testom; biblioteka go nie importuje.
+package testkit
+
+import (
+	"bufio"
+	"encoding/json"
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+)
+
+// ReadList czyta plik zapadki: jeden identyfikator w wierszu, wiersze od „#” to komentarze. Brak pliku oznacza
+// pustą listę.
+func ReadList(path string) (map[string]bool, error) {
+	f, err := os.Open(path)
+	if os.IsNotExist(err) {
+		return map[string]bool{}, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	ids := map[string]bool{}
+	sc := bufio.NewScanner(f)
+	for sc.Scan() {
+		line := strings.TrimSpace(sc.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		ids[line] = true
+	}
+	return ids, sc.Err()
+}
+
+// WriteList zapisuje plik zapadki: nagłówek jako komentarze i posortowane identyfikatory.
+func WriteList(path, header string, ids map[string]bool) error {
+	var b strings.Builder
+	for _, line := range strings.Split(strings.TrimSpace(header), "\n") {
+		b.WriteString("# " + line + "\n")
+	}
+	sorted := make([]string, 0, len(ids))
+	for id := range ids {
+		sorted = append(sorted, id)
+	}
+	sort.Strings(sorted)
+	for _, id := range sorted {
+		b.WriteString(id + "\n")
+	}
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(path, []byte(b.String()), 0o644)
+}
+
+// Regressions zwraca posortowane identyfikatory z listy zapadki, które teraz nie przechodzą.
+func Regressions(list, passed map[string]bool) []string {
+	var out []string
+	for id := range list {
+		if !passed[id] {
+			out = append(out, id)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// Sources to manifest testdata/sources.json (ADR 0003), w części potrzebnej testom.
+type Sources struct {
+	Sets []struct {
+		Name  string `json:"name"`
+		Kind  string `json:"kind"`
+		Dest  string `json:"dest"`
+		Files []struct {
+			Path      string   `json:"path"`
+			URLs      []string `json:"urls"`
+			Namespace string   `json:"namespace"`
+			LocalOnly bool     `json:"local_only"`
+		} `json:"files"`
+	} `json:"sets"`
+}
+
+// LoadSources czyta manifest z katalogu głównego repozytorium root.
+func LoadSources(root string) (*Sources, error) {
+	b, err := os.ReadFile(filepath.Join(root, "testdata", "sources.json"))
+	if err != nil {
+		return nil, err
+	}
+	var s Sources
+	if err := json.Unmarshal(b, &s); err != nil {
+		return nil, fmt.Errorf("sources.json: %w", err)
+	}
+	return &s, nil
+}
+
+// Locations zwraca dla zestawu typu "files" przypisanie adresów do ścieżek w jego katalogu: katalog schematów
+// dla schemaLocation w importach.
+func (s *Sources) Locations(set string) map[string]string {
+	m := map[string]string{}
+	for _, ds := range s.Sets {
+		if ds.Name != set {
+			continue
+		}
+		for _, f := range ds.Files {
+			for _, u := range f.URLs {
+				m[u] = f.Path
+			}
+		}
+	}
+	return m
+}
+
+// FetchHint to komunikat dla testu pomijanego z powodu braku pobranych danych.
+const FetchHint = "test data not fetched; run: go -C tools/fetch run . -root ../.. (or: python tools/fetch/fetch.py)"
+
+// Overlay zwraca fs, w którym ścieżki zaczynające się od prefix+"/" pochodzą z extra, a pozostałe z base.
+// Służy do podłączenia schematów W3C (xml.xsd, xlink.xsd) obok zestawu testów pod jednym fs.FS.
+func Overlay(base fs.FS, prefix string, extra fs.FS) fs.FS {
+	return overlay{base, prefix, extra}
+}
+
+type overlay struct {
+	base   fs.FS
+	prefix string
+	extra  fs.FS
+}
+
+func (o overlay) Open(name string) (fs.File, error) {
+	if rest, ok := strings.CutPrefix(name, o.prefix+"/"); ok {
+		return o.extra.Open(rest)
+	}
+	return o.base.Open(name)
+}
+
+// PrefixLocations dopisuje prefix do każdej ścieżki w przypisaniu adresów (zob. Overlay).
+func PrefixLocations(m map[string]string, prefix string) map[string]string {
+	out := make(map[string]string, len(m))
+	for u, p := range m {
+		out[u] = prefix + "/" + p
+	}
+	return out
+}

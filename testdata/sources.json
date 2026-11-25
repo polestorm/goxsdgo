@@ -23,11 +23,83 @@
       "file_count": 3386
     },
     {
+      "name": "w3c-schemas",
+      "kind": "files",
+      "dest": "testdata/w3c/schemas",
+      "note": "Schematy W3C importowane z sieci przez xsts.xsd i przypadki zestawu W3C (xml.xsd, xlink.xsd). Biblioteka nie sięga do sieci, więc testy i tools/compare rozwiązują te adresy przez katalog z tego zestawu.",
+      "files": [
+        {
+          "path": "xml.xsd",
+          "urls": [
+            "http://www.w3.org/2001/xml.xsd"
+          ],
+          "sha256": "61960fb3131e38022caad5360e2f33a3382578ab3c80cd58bd74320ede61b20c",
+          "namespace": "http://www.w3.org/XML/1998/namespace",
+          "note": "Schemat przestrzeni nazw xml: (xml:lang, xml:space, xml:base, xml:id)."
+        },
+        {
+          "path": "xlink.xsd",
+          "urls": [
+            "http://www.w3.org/XML/2008/06/xlink.xsd"
+          ],
+          "sha256": "c83df86c7fdc16eb9c862b83dfb53fc1b1a4bcafd6e1d1217199e0188b82f24a",
+          "namespace": "http://www.w3.org/1999/xlink",
+          "imports": [
+            "http://www.w3.org/2001/xml.xsd"
+          ],
+          "note": "Schemat XLink 1.1."
+        }
+      ]
+    },
+    {
       "name": "mf-schemas",
       "kind": "files",
       "dest": "testdata/schemas/mf",
       "note": "Schematy MF i KAS (JPK, KSeF, e-Sprawozdania) z importami. Lista i adresy z katalogu xml.pro (internal/importing/schemas/auxiliary.json, stan 2026-11-25); sumy oryginałów MF.",
       "files": [
+        {
+          "path": "auxiliary/2020-03-11/ElementarneTypyDanych_v6-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/ElementarneTypyDanych_v6-0E.xsd"
+          ],
+          "sha256": "6dde449a89e2515d622ae23c0804d08d5e1c1fcd2b51ef5c342314744e7e9886",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/KodyUrzedowSkarbowych_v6-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/KodyKrajow_v6-0E.xsd"
+          ],
+          "note": "Plik pomocniczy importowany przez auxiliary/2020-03-11/StrukturyDanych_v6-0E.xsd. Dodane 2026-11-25, poza katalogiem xml.pro."
+        },
+        {
+          "path": "auxiliary/2020-03-11/KodyKrajow_v6-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/KodyKrajow_v6-0E.xsd"
+          ],
+          "sha256": "ab0be78e7874d819e42ce2c28ac8c46f6eef68110dff3644bb0d8c3fae7d85f8",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/",
+          "note": "Plik pomocniczy importowany przez auxiliary/2020-03-11/ElementarneTypyDanych_v6-0E.xsd. Dodane 2026-11-25, poza katalogiem xml.pro."
+        },
+        {
+          "path": "auxiliary/2020-03-11/KodyUrzedowSkarbowych_v6-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/KodyUrzedowSkarbowych_v6-0E.xsd"
+          ],
+          "sha256": "e6c8f205620ae9f84a468f5f61bd78c332e0a37f8af462d2bab6cf6eb06b8e48",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/",
+          "note": "Plik pomocniczy importowany przez auxiliary/2020-03-11/ElementarneTypyDanych_v6-0E.xsd. Dodane 2026-11-25, poza katalogiem xml.pro."
+        },
+        {
+          "path": "auxiliary/2020-03-11/StrukturyDanych_v6-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"
+          ],
+          "sha256": "9102df97681d999091dcc2ae523497de9b65a6933078552192e92fd8d5ab2a08",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/ElementarneTypyDanych_v6-0E.xsd"
+          ],
+          "note": "Plik pomocniczy importowany przez jpk_v7m_1.xsd. Dodane 2026-11-25, poza katalogiem xml.pro."
+        },
         {
           "path": "auxiliary/ASIStrukturyDanychSprFin_v1-2.xsd",
           "urls": [
@@ -2067,7 +2139,8 @@
             "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/StrukturyDanych_v10-0E.xsd",
             "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/KodyUrzedowSkarbowych/KodyUrzedowSkarbowych_v8-0E.xsd"
           ],
-          "note": "Księgi rachunkowe podmiotów prowadzących działalność gospodarczą — wariant 1 (2024-09-04). Przesyłany w trybie raportowym (JPK CIT). Brak znanego adresu pliku u MF; pobieranie tylko przez -from z lokalnej kopii."
+          "note": "Księgi rachunkowe podmiotów prowadzących działalność gospodarczą — wariant 1 (2024-09-04). Przesyłany w trybie raportowym (JPK CIT). Brak znanego adresu pliku u MF: tylko z lokalnej kopii (-from), bez niej pomijany.",
+          "local_only": true
         },
         {
           "path": "jpk_mag_1.xsd",
@@ -2096,6 +2169,18 @@
           "note": "Podatkowa księga przychodów i rozchodów — wariant 1 (2016-03-09)."
         },
         {
+          "path": "jpk_v7k_1.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2020/05/08/9394/schemat.xsd"
+          ],
+          "sha256": "47bf78f6e547e22f60a7b7b27e0118c2c6eb73641a1543b51bfa769cf7c5936a",
+          "namespace": "http://crd.gov.pl/wzor/2020/05/08/9394/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"
+          ],
+          "note": "JPK_V7K(1), deklaracja i ewidencja VAT kwartalna (2020-10-01 — 2021-12-31). Dodane 2026-11-25, poza katalogiem xml.pro."
+        },
+        {
           "path": "jpk_v7k_2.xsd",
           "urls": [
             "http://crd.gov.pl/wzor/2021/12/27/11149/schemat.xsd"
@@ -2121,6 +2206,18 @@
             "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2023/09/06/eD/KodyKrajow/KodyKrajow_v13-0E.xsd"
           ],
           "note": "JPK_V7K wariant 3 (2025-12-19) — main schema. Pierwotny URL z index.json (JPK_V7K3.xsd) zwraca HTTP 202; działający jest /schemat.xsd pod tym samym wzorem"
+        },
+        {
+          "path": "jpk_v7m_1.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2020/05/08/9393/schemat.xsd"
+          ],
+          "sha256": "76737257191841eabc98c3bd35be7a692af72e6f146061a019b3f2266f44e843",
+          "namespace": "http://crd.gov.pl/wzor/2020/05/08/9393/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2020/03/11/eD/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"
+          ],
+          "note": "JPK_V7M(1), deklaracja i ewidencja VAT miesięczna (2020-10-01 — 2021-12-31). Dodane 2026-11-25, poza katalogiem xml.pro."
         },
         {
           "path": "jpk_v7m_2.xsd",

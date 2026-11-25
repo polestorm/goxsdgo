@@ -11,5 +11,12 @@ wpis: przypadek, oba wyniki, co mówi rekomendacja (rozdział i reguła), kto ma
 
 | Grupa / przypadek | Powód |
 |---|---|
-| przypadki XSD 1.1 (`version="1.1"` w metadanych) | poza zakresem (ADR 0001) |
-| przypadki wymagające walidacji DTD | poza zakresem (ADR 0001) |
+| przypadki XSD 1.1 (`version="1.1"` na zestawie, grupie albo przypadku): 2 250 | poza zakresem (ADR 0001) |
+| oczekiwany wynik `indeterminate`: 16 | rekomendacja nie rozstrzyga wyniku (metadane zestawu, `common/xsts.xsd`) |
+| brak oczekiwanego wyniku dla XSD 1.0 2e: 7 | oczekiwane wyniki podano tylko dla wersji Unicode albo XSD 1.1; pytanie 7 |
+| przypadek tylko dla Unicode 4.0.0 (`version="Unicode_4.0.0"`): 1 | wersja Unicode do decyzji; pytanie 7 |
+| przypadki wymagające walidacji DTD | poza zakresem (ADR 0001); lista powstanie w etapie 1 |
+
+Liczby z 2026-11-25 dla zestawu z commitu `7bc3365c`; liczy je `TestW3CSuite`. W zakresie zostaje 39 461 przypadków:
+14 393 testy schematów i 25 068 testów dokumentów. Przypadki ze statusem `queried`, `disputed-test` i `disputed-spec`
+zostają w zakresie, dopóki nie rozstrzygniemy ich pojedynczo.

@@ -1,0 +1,86 @@
+[
+  {
+    "path": "mf/jpk_v7m_3_organization.xml",
+    "schema": "jpk_v7m_3.xsd",
+    "valid": true,
+    "note": "Przykład opublikowany przez MF; poprawny z założenia."
+  },
+  {
+    "path": "mf/jpk_v7m_3_person.xml",
+    "schema": "jpk_v7m_3.xsd",
+    "valid": true,
+    "note": "Przykład opublikowany przez MF; poprawny z założenia."
+  },
+  {
+    "path": "mf/jpk_v7m_3_initupload.xml",
+    "schema": "",
+    "valid": false,
+    "note": "InitUpload (przestrzeń http://e-dokumenty.mf.gov.pl): schematu metadanych przesyłki nie ma w korpusie."
+  },
+  {
+    "path": "mf/jpk_v7k_3_organization.xml",
+    "schema": "jpk_v7k_3.xsd",
+    "valid": true,
+    "note": "Przykład opublikowany przez MF; poprawny z założenia."
+  },
+  {
+    "path": "mf/jpk_v7k_3_person.xml",
+    "schema": "jpk_v7k_3.xsd",
+    "valid": true,
+    "note": "Przykład opublikowany przez MF; poprawny z założenia."
+  },
+  {
+    "path": "mf/jpk_v7k_3_initupload.xml",
+    "schema": "",
+    "valid": false,
+    "note": "InitUpload (przestrzeń http://e-dokumenty.mf.gov.pl): schematu metadanych przesyłki nie ma w korpusie."
+  },
+  {
+    "path": "mf/jpk_v7m_2.xml",
+    "schema": "jpk_v7m_2.xsd",
+    "valid": true,
+    "note": "Przykład opublikowany przez MF; poprawny z założenia."
+  },
+  {
+    "path": "mf/jpk_v7k_2.xml",
+    "schema": "jpk_v7k_2.xsd",
+    "valid": true,
+    "note": "Przykład opublikowany przez MF; poprawny z założenia."
+  },
+  {
+    "path": "mf/jpk_v7m_2_initupload.xml",
+    "schema": "",
+    "valid": false,
+    "note": "InitUpload (przestrzeń http://e-dokumenty.mf.gov.pl): schematu metadanych przesyłki nie ma w korpusie."
+  },
+  {
+    "path": "mf/jpk_v7k_2_initupload.xml",
+    "schema": "",
+    "valid": false,
+    "note": "InitUpload (przestrzeń http://e-dokumenty.mf.gov.pl): schematu metadanych przesyłki nie ma w korpusie."
+  },
+  {
+    "path": "mf/jpk_v7m_1.xml",
+    "schema": "jpk_v7m_1.xsd",
+    "valid": true,
+    "note": "Przykład opublikowany przez MF; poprawny z założenia."
+  },
+  {
+    "path": "mf/jpk_v7k_1.xml",
+    "schema": "jpk_v7k_1.xsd",
+    "valid": true,
+    "note": "Przykład opublikowany przez MF; poprawny z założenia."
+  },
+  {
+    "path": "mf/jpk_v7m_1_initupload.xml",
+    "schema": "",
+    "valid": false,
+    "note": "InitUpload (przestrzeń http://e-dokumenty.mf.gov.pl): schematu metadanych przesyłki nie ma w korpusie."
+  },
+  {
+    "path": "mf/jpk_v7k_1_initupload.xml",
+    "schema": "",
+    "valid": false,
+    "note": "InitUpload (przestrzeń http://e-dokumenty.mf.gov.pl): schematu metadanych przesyłki nie ma w korpusie."
+  }
+]

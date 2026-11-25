@@ -1,0 +1,2 @@
+# W3C XML Schema test suite: cases goxsdgo passes (TestW3CSuite, go test ./xsd -update).
+# A case leaves this list only with an explanation in the commit message.

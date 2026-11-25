@@ -4,6 +4,7 @@
 # dane pobierane narzędziem tools/fetch (testdata/sources.json, ADR 0003) nie trafiają do repozytorium
 /testdata/w3c/xsdtests/
 /testdata/w3c/xmlconf/
+/testdata/w3c/schemas/
 /testdata/schemas/mf/
 /testdata/instances/mf/
 /testdata/**/.fetch-*/

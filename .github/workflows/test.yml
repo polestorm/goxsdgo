@@ -24,6 +24,18 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.go }}
+      # dane testowe (ADR 0003): pobierane według manifestu, w pamięci podręcznej według jego sumy
+      - uses: actions/cache@v4
+        with:
+          path: |
+            testdata/w3c/xsdtests
+            testdata/w3c/xmlconf
+            testdata/w3c/schemas
+            testdata/schemas/mf
+            testdata/instances/mf
+          key: testdata-${{ hashFiles('testdata/sources.json') }}
+      - name: fetch test data
+        run: go -C tools/fetch run . -root ../..
       - name: gofmt
         if: matrix.os == 'ubuntu-latest'
         run: test -z "$(gofmt -l .)"

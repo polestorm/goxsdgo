@@ -1,0 +1,2 @@
+# MF corpus: schemas that compile and documents with the expected verdict
+# (TestSchemaCorpus, TestInstanceCorpus; go test ./xsd -update).

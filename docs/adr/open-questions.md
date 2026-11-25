@@ -16,3 +16,8 @@
 6. **Wartości typowane w wyniku.** Czy walidator ma oddawać wartości po normalizacji (np. `xs:decimal` jako tekst
    kanoniczny, `xs:date`), żeby odbiorca nie parsował drugi raz? Rekomendacja: punkt rozszerzenia (funkcja zwrotna dla
    elementu z typem prostym) w etapie 6, nie w API rdzenia.
+7. **Wersja Unicode w zestawie W3C.** 16 oczekiwanych wyników w zestawie zależy od wersji Unicode (żetony
+   `Unicode_4.0.0` i `Unicode_6.0.0`), a jeden przypadek dotyczy tylko Unicode 4.0.0. Dotyczy to klas znaków
+   w wyrażeniach regularnych i znaków nazw. Biblioteka standardowa Go ma tablice Unicode 15. Rekomendacja: przyjąć
+   `Unicode_6.0.0` jako bliższy temu, co da `unicode` z Go, i opisać różnice w `differences.md`. Do rozstrzygnięcia
+   w etapie 2, razem z tłumaczem wyrażeń regularnych. Do tego czasu przypadki są wyłączone z powodem.

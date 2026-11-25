@@ -196,6 +196,8 @@ class Fetcher:
             with open(target, "rb") as fh:
                 if hex_sum(fh.read()) == f["sha256"]:
                     return "present"
+        if f.get("local_only") and not self.from_dir:
+            return "skipped"
         if self.verify:
             raise FetchError("missing or checksum mismatch")
         tried = []
@@ -242,17 +244,23 @@ class Fetcher:
         dest = self.dest(s)
         files = s.get("files") or []
         errors = []
-        counts = {"present": 0, "download": 0, "local": 0}
+        counts = {"present": 0, "download": 0, "local": 0, "skipped": 0}
+        skipped = []
         with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
             futures = [pool.submit(self.fetch_file, f, dest) for f in files]
             for f, fut in zip(files, futures):
                 try:
-                    counts[fut.result()] += 1
+                    source = fut.result()
+                    counts[source] += 1
+                    if source == "skipped":
+                        skipped.append(f["path"])
                 except (FetchError, OSError) as e:
                     errors.append("%s: %s" % (f["path"], e))
-        print("%s: %d/%d ok (present %d, downloaded %d, local copy %d)"
-              % (s["name"], len(files) - len(errors), len(files),
-                 counts["present"], counts["download"], counts["local"]))
+        print("%s: %d/%d ok (present %d, downloaded %d, local copy %d, skipped %d)"
+              % (s["name"], len(files) - len(errors) - counts["skipped"], len(files),
+                 counts["present"], counts["download"], counts["local"], counts["skipped"]))
+        for p in skipped:
+            print("  skipped %s: local only, pass --from with a local copy" % p)
         return errors
 
 
