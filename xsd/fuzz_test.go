@@ -22,6 +22,7 @@ const fuzzSchema = `<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 </xs:schema>`
 
 func FuzzCompile(f *testing.F) {
+	seedSchemas(f)
 	f.Add([]byte(fuzzSchema))
 	f.Add([]byte(`<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"><xs:include schemaLocation="s.xsd"/></xs:schema>`))
 	f.Add([]byte(`<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"><xs:simpleType name="p"><xs:restriction base="xs:string"><xs:pattern value="(a*)*b"/></xs:restriction></xs:simpleType></xs:schema>`))
@@ -71,8 +72,9 @@ const fuzzIdentitySchema = `<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchem
 </xs:schema>`
 
 // FuzzValidate (K5) sprawdza walidację dokumentu: brak paniki, powtarzalność (dwa wywołania dają te same błędy),
-// każdy błąd z kodem i pozycją w granicach dokumentu, ograniczony czas. REQ: VAL-019
+// każdy błąd z kodem i pozycją w granicach dokumentu, ograniczony czas. Kampania: tools/fuzz. REQ: VAL-019, DET-003
 func FuzzValidate(f *testing.F) {
+	seedPairs(f, 300)
 	f.Add([]byte(fuzzSchema), []byte(`<a c="x"><b>1.5</b><b>2</b></a>`))
 	f.Add([]byte(fuzzSchema), []byte(`<a><b>x</b></a>`))
 	f.Add([]byte(fuzzSchema), []byte(`<!DOCTYPE a [<!ENTITY e SYSTEM "file:///etc/passwd">]><a>&e;</a>`))

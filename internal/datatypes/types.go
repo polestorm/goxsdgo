@@ -324,10 +324,11 @@ func parseCount(s string, positive bool) (uint64, bool) {
 	if !ok || !d.IsInteger() || strings.Contains(s, ".") || d.Sign() < 0 || (positive && d.Sign() == 0) {
 		return 0, false
 	}
-	if !d.unscaled.IsUint64() {
+	u, ok := d.uint64Value()
+	if !ok {
 		return math.MaxUint64, true
 	}
-	return d.unscaled.Uint64(), true
+	return u, true
 }
 
 func (f *facets) count(k FacetKind) uint64 {

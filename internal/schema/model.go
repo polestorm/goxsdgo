@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 // Model zawartości skompilowany do automatu pozycji z licznikami.
@@ -78,7 +79,20 @@ type posIdx struct {
 	wildSet   map[string][]int // symbole wieloznaczne z listą przestrzeni, według przestrzeni
 	wildOther []int            // ##any i ##other
 	all       []int
+	// small to te same wpisy co byName (pierwsza pozycja dla nazwy), gdy jest ich najwyżej smallIndex: porównanie
+	// kilku napisów jest szybsze niż mieszanie QName w mapie, a w modelach JPK większość indeksów ma jedną nazwę
+	// (etap 7, ADR 0011). useSmall mówi, czy lista jest kompletna.
+	small    []namePos
+	useSmall bool
 }
+
+type namePos struct {
+	name QName
+	pos  int
+}
+
+// smallIndex to największa liczba nazw, dla której indeks przeszukujemy liniowo.
+const smallIndex = 8
 
 type bitset []uint64
 
@@ -100,6 +114,102 @@ type cmEdge struct {
 	incr  int
 	keep  int
 	exits []int
+	// lazy to scalony indeks pozycji krawędzi w sekwencji (etap 7, ADR 0011), budowany przy pierwszym użyciu;
+	// wskaźnik, bo krawędzie są kopiowane, a indeks ma być jeden. nil dla krawędzi do jednego węzła.
+	lazy *edgeIndex
+}
+
+// edgeIndex to leniwie budowany scalony indeks krawędzi; model jest używany z wielu goroutines, więc budowa
+// przez sync.Once.
+type edgeIndex struct {
+	once sync.Once
+	ix   *mergedIdx
+}
+
+// mergedIdx łączy indeksy kolejnych dzieci sekwencji, do których prowadzi krawędź (do pierwszego dziecka bez
+// pustki), z tym samym pierwszeństwem co przeglądanie po kolei: wcześniejsze dziecko wygrywa, a w obrębie jednego
+// dziecka deklaracja elementu wygrywa z symbolem wieloznacznym.
+type mergedIdx struct {
+	byName map[QName]orderedPos
+	wild   []orderedIdx // dzieci z symbolami wieloznacznymi, w kolejności
+}
+
+type orderedPos struct{ pos, order int }
+
+type orderedIdx struct {
+	order int
+	ix    *posIdx
+}
+
+// Rozpiętość krawędzi (liczba przeglądanych dzieci), dla której opłaca się indeks scalony: przy krótszej
+// przeglądanie po kolei jest tańsze, dłuższa ograniczałaby pamięć modelu z tysiącami cząstek.
+const (
+	minMergedSpan = 5
+	maxMergedSpan = 256
+)
+
+// mergedIndex zwraca indeks scalony krawędzi albo nil, gdy jej rozpiętość jest poza zakresem.
+func (e *cmEdge) mergedIndex() *mergedIdx {
+	if e.lazy == nil {
+		return nil
+	}
+	e.lazy.once.Do(func() {
+		var span []*cmNode
+		for _, k := range e.seq.kids[e.from:] {
+			span = append(span, k)
+			if !k.nullable || len(span) > maxMergedSpan {
+				break
+			}
+		}
+		if len(span) < minMergedSpan || len(span) > maxMergedSpan {
+			return
+		}
+		mi := &mergedIdx{byName: map[QName]orderedPos{}}
+		for order, k := range span {
+			for name, p := range k.idx.byName {
+				if _, ok := mi.byName[name]; !ok {
+					mi.byName[name] = orderedPos{p, order}
+				}
+			}
+			if len(k.idx.wildSet) > 0 || len(k.idx.wildOther) > 0 {
+				mi.wild = append(mi.wild, orderedIdx{order, k.idx})
+			}
+		}
+		e.lazy.ix = mi
+	})
+	return e.lazy.ix
+}
+
+func (mi *mergedIdx) lookup(name QName, m *ContentModel) int {
+	p, order := -1, maxMergedSpan+1
+	if op, ok := mi.byName[name]; ok {
+		p, order = op.pos, op.order
+	}
+	for _, w := range mi.wild {
+		if w.order >= order {
+			break
+		}
+		if q := w.ix.lookupWild(name, m); q >= 0 {
+			return q
+		}
+	}
+	return p
+}
+
+// lookup zwraca pozycję, do której krawędź prowadzi dla elementu name, albo -1.
+func (e *cmEdge) lookup(name QName, m *ContentModel) int {
+	if e.target != nil {
+		return e.target.idx.lookup(name, m)
+	}
+	if mi := e.mergedIndex(); mi != nil {
+		return mi.lookup(name, m)
+	}
+	p := -1
+	e.indexes(func(ix *posIdx) bool {
+		p = ix.lookup(name, m)
+		return p < 0
+	})
+	return p
 }
 
 // ContentModel to skompilowany model zawartości typu złożonego. Jest tylko do odczytu, więc można go używać
@@ -318,18 +428,35 @@ func (m *ContentModel) index(first []int) *posIdx {
 		for _, e := range lf.members {
 			if _, ok := ix.byName[e.Name]; !ok {
 				ix.byName[e.Name] = p
+				ix.small = append(ix.small, namePos{e.Name, p})
 			}
 			ix.byNameAll[e.Name] = append(ix.byNameAll[e.Name], p)
 		}
+	}
+	if len(ix.small) <= smallIndex {
+		ix.useSmall = true
+	} else {
+		ix.small = nil
 	}
 	return ix
 }
 
 // lookup zwraca pozycję z indeksu dla elementu name (najpierw deklaracje, potem symbole wieloznaczne) albo -1.
 func (ix *posIdx) lookup(name QName, m *ContentModel) int {
-	if p, ok := ix.byName[name]; ok {
+	if ix.useSmall {
+		for i := range ix.small {
+			if ix.small[i].name.Local == name.Local && ix.small[i].name.Space == name.Space {
+				return ix.small[i].pos
+			}
+		}
+	} else if p, ok := ix.byName[name]; ok {
 		return p
 	}
+	return ix.lookupWild(name, m)
+}
+
+// lookupWild zwraca pozycję symbolu wieloznacznego z indeksu, który dopuszcza element name, albo -1.
+func (ix *posIdx) lookupWild(name QName, m *ContentModel) int {
 	if ps := ix.wildSet[name.Space]; len(ps) > 0 {
 		return ps[0]
 	}
@@ -393,7 +520,7 @@ func (m *ContentModel) edges(src *cmNode) []cmEdge {
 		if par := cur.parent; par != nil && par.kind == cmSequence {
 			if i := indexOf(par.kids, cur); i+1 < len(par.kids) {
 				out = append(out, cmEdge{seq: par, from: i + 1, join: par, incr: -1, keep: keepFor(par),
-					exits: append([]int(nil), exits...)})
+					exits: append([]int(nil), exits...), lazy: &edgeIndex{}})
 			}
 		}
 	}
@@ -809,11 +936,7 @@ func (mt *Matcher) Step(name QName) (Match, bool) {
 			if src >= 0 && !m.guardHolds(src, vals, e) {
 				continue
 			}
-			p := -1
-			e.indexes(func(ix *posIdx) bool {
-				p = ix.lookup(name, m)
-				return p < 0
-			})
+			p := e.lookup(name, m)
 			if p < 0 || (target >= 0 && p != target) {
 				continue // drugi cel byłby naruszeniem UPA; schemat poprawny go nie ma
 			}

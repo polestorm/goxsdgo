@@ -12,7 +12,29 @@ import (
 
 	"github.com/polestorm/goxsdgo/internal/schema"
 	"github.com/polestorm/goxsdgo/internal/validate"
+	"github.com/polestorm/goxsdgo/internal/xmlreader"
 )
+
+// DocumentLimits to limity czytania walidowanego dokumentu (Config.Document). Chronią przed dokumentami
+// złośliwymi: każdy limit ogranicza pamięć albo czas niezależnie od schematu (ADR 0004, ADR 0011).
+type DocumentLimits struct {
+	MaxDepth           int // głębokość zagnieżdżenia elementów
+	MaxNameLength      int // długość nazwy elementu albo atrybutu w bajtach UTF-8
+	MaxAttributes      int // atrybuty jednego elementu, łącznie z deklaracjami przestrzeni nazw
+	MaxTextSize        int // tekst jednego elementu albo atrybutu, komentarza, PI, w bajtach
+	MaxEntityExpansion int // łączna długość tekstu z rozwiniętych encji wewnętrznych w dokumencie, w bajtach
+	MaxEntityDepth     int // zagnieżdżenie odwołań do encji
+	MaxDTDSize         int // długość deklaracji DOCTYPE z podzbiorem wewnętrznym, w bajtach
+}
+
+// DefaultDocumentLimits zwraca domyślne limity czytania dokumentu: głębokość 512, nazwa 16 KiB, 4096 atrybutów,
+// tekst 16 MiB, rozwinięcia encji 4 MiB, zagnieżdżenie encji 32, DOCTYPE 1 MiB.
+func DefaultDocumentLimits() DocumentLimits {
+	l := xmlreader.DefaultLimits()
+	return DocumentLimits{MaxDepth: l.MaxDepth, MaxNameLength: l.MaxNameLength, MaxAttributes: l.MaxAttributes,
+		MaxTextSize: l.MaxTextSize, MaxEntityExpansion: l.MaxEntityExpansion, MaxEntityDepth: l.MaxEntityDepth,
+		MaxDTDSize: l.MaxDTDSize}
+}
 
 // ErrLimit oznacza przekroczenie limitu biblioteki podczas walidacji (głębokość, rozmiar tekstu, liczba wpisów
 // ID i ograniczeń tożsamości, złożoność dopasowania modelu zawartości). To nie jest werdykt o dokumencie.
@@ -54,6 +76,11 @@ type Config struct {
 	// Wywołania są synchroniczne, w kolejności dokumentu, z goroutine wywołującej Validate. Bez funkcji walidacja
 	// nie liczy nic ponad to, co sama potrzebuje.
 	OnValue func(TypedValue)
+
+	// Document to limity czytania walidowanego dokumentu (głębokość, nazwy, atrybuty, tekst, encje, DOCTYPE).
+	// Wartość zerowa pola oznacza wartość domyślną z DefaultDocumentLimits, ujemna brak limitu. Przekroczenie
+	// limitu kończy walidację błędem ErrLimit, nie błędem dokumentu (ADR 0011).
+	Document DocumentLimits
 }
 
 // TypedValue to poprawna wartość typu prostego w dokumencie, przekazywana do Config.OnValue.
@@ -157,7 +184,11 @@ func (s *Set) Validate(r io.Reader) ([]Error, error) {
 // rozwiązywane względne wskazówki xsi:schemaLocation (gdy Config.SchemaLocationHints). Bez wskazówek name służy
 // tylko komunikatom i może być puste.
 func (s *Set) ValidateDocument(r io.Reader, name string) ([]Error, error) {
-	opts := validate.Options{MaxErrors: s.cfg.MaxErrors, MaxIdentityEntries: s.cfg.MaxIdentityEntries}
+	d := s.cfg.Document
+	opts := validate.Options{MaxErrors: s.cfg.MaxErrors, MaxIdentityEntries: s.cfg.MaxIdentityEntries,
+		MaxTextSize: d.MaxTextSize, Reader: xmlreader.Limits{MaxDepth: d.MaxDepth, MaxNameLength: d.MaxNameLength,
+			MaxAttributes: d.MaxAttributes, MaxTextSize: d.MaxTextSize, MaxEntityExpansion: d.MaxEntityExpansion,
+			MaxEntityDepth: d.MaxEntityDepth, MaxDTDSize: d.MaxDTDSize}}
 	if f := s.cfg.OnValue; f != nil {
 		opts.OnValue = func(ev validate.ValueEvent) {
 			f(TypedValue{Path: ev.Path, Name: ev.Name, Attribute: ev.Attribute, Type: ev.Type, Builtin: ev.Builtin,

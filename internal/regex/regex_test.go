@@ -2,10 +2,13 @@ package regex
 
 import (
 	"errors"
+	"html"
 	"regexp"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/polestorm/goxsdgo/internal/testkit"
 )
 
 type matchCase struct {
@@ -311,6 +314,20 @@ func TestTranslateIsValidRE2(t *testing.T) {
 func FuzzRegexTranslate(f *testing.F) {
 	for _, s := range []string{"a*b", "[a-z-[aeiou]]", `\p{IsBasicLatin}{2,5}`, `(\d{3}){400}`, `[^\i]`, "a{1,3000}", "((a)|b)*"} {
 		f.Add(s)
+	}
+	// Wzorce ze schematów MF i z próbki zestawu W3C (ADR 0011), z pobranych danych, bez commitowania.
+	pat := regexp.MustCompile(`<(?:xs|xsd):pattern\s+value="([^"]*)"`)
+	for _, dir := range []string{"../../testdata/schemas/mf", "../../testdata/w3c/xsdtests/msData/regex"} {
+		seen := map[string]bool{}
+		for _, b := range testkit.SampleFiles(dir, []string{".xsd"}, 400, 256<<10) {
+			for _, m := range pat.FindAllSubmatch(b, -1) {
+				s := html.UnescapeString(string(m[1]))
+				if !seen[s] && len(s) <= 256 {
+					seen[s] = true
+					f.Add(s)
+				}
+			}
+		}
 	}
 	f.Fuzz(func(t *testing.T, pattern string) {
 		if len(pattern) > 256 {

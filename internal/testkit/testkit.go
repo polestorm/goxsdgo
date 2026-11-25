@@ -196,3 +196,39 @@ func PrefixLocations(m map[string]string, prefix string) map[string]string {
 	}
 	return out
 }
+
+// SampleFiles zwraca do max plików o rozszerzeniach exts z katalogu dir (rekurencyjnie), każdy nie większy niż
+// maxSize bajtów, wybranych równomiernie z posortowanej listy, więc wybór jest powtarzalny. Brak katalogu daje pustą
+// listę. Służy jako wejścia startowe fuzzerów z pobranych danych testowych (ADR 0011), których nie commitujemy.
+func SampleFiles(dir string, exts []string, max, maxSize int) [][]byte {
+	var paths []string
+	filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return nil
+		}
+		for _, e := range exts {
+			if strings.HasSuffix(p, e) {
+				if info, err := d.Info(); err == nil && info.Size() <= int64(maxSize) {
+					paths = append(paths, p)
+				}
+				break
+			}
+		}
+		return nil
+	})
+	sort.Strings(paths)
+	if len(paths) == 0 || max <= 0 {
+		return nil
+	}
+	step := 1
+	if len(paths) > max {
+		step = len(paths) / max
+	}
+	var out [][]byte
+	for i := 0; i < len(paths) && len(out) < max; i += step {
+		if b, err := os.ReadFile(paths[i]); err == nil {
+			out = append(out, b)
+		}
+	}
+	return out
+}

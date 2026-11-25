@@ -37,7 +37,7 @@ func main() {
 	messages := flag.String("messages", "", "consumer messages.json (default <root>/../controls/goxsdval/messages/messages.json)")
 	docs := flag.Bool("docs", false, "w3c: also write docs/differences-libxml2.md")
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: compare [-root DIR] [-out DIR] [-docs] [-messages FILE] w3c|corpus|compat")
+		fmt.Fprintln(os.Stderr, "usage: compare [-root DIR] [-out DIR] [-docs] [-messages FILE] w3c|corpus|probe|compat|private|timefile")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -52,6 +52,18 @@ func main() {
 		err = runCorpus(*root, *out)
 	case "probe":
 		err = runProbe(*out)
+	case "private":
+		err = runPrivate(*root)
+	case "timefile":
+		if flag.NArg() < 3 {
+			err = fmt.Errorf("usage: compare timefile FILE SCHEMA [RUNS]")
+			break
+		}
+		runs := 3
+		if flag.NArg() > 3 {
+			fmt.Sscan(flag.Arg(3), &runs)
+		}
+		err = runTimeFile(*root, flag.Arg(1), flag.Arg(2), runs)
 	case "compat":
 		if *messages == "" {
 			*messages = filepath.Join(*root, "..", "controls", "goxsdval", "messages", "messages.json")

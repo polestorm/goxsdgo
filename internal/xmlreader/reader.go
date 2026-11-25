@@ -175,9 +175,12 @@ type Reader struct {
 	attrs []rawAttr
 	// attrSet przyspiesza sprawdzanie powtórzeń przy wielu atrybutach (bez niego czas byłby kwadratowy).
 	attrSet map[string]bool
-	out     []Attr
-	names   map[string]string
-	qnames  map[string]qsplit
+	// expSet robi to samo dla nazw rozwiniętych atrybutów z przestrzenią nazw (NSC Attributes Unique, etap 7):
+	// klucz to przestrzeń i nazwa lokalna, bez prefiksu.
+	expSet map[expandedName]bool
+	out    []Attr
+	names  map[string]string
+	qnames map[string]qsplit
 
 	dtd        dtd
 	expanded   int
@@ -986,6 +989,7 @@ func (r *Reader) startTag(l, c int) (Token, error) {
 	}
 	r.attrs = r.attrs[:0]
 	clear(r.attrSet)
+	clear(r.expSet)
 	selfClosing := false
 	for {
 		space := r.skipSpace()
@@ -1322,13 +1326,35 @@ func (r *Reader) duplicateExpanded(n Name) bool {
 		// atrybut bez przestrzeni nazw: powtórzenie wykrył już WFC Unique Att Spec
 		return false
 	}
-	for _, o := range r.out {
-		if o.Name.Space == n.Space && o.Name.Local == n.Local {
-			return true
+	if len(r.out) < 32 {
+		for _, o := range r.out {
+			if o.Name.Space == n.Space && o.Name.Local == n.Local {
+				return true
+			}
+		}
+		return false
+	}
+	// Przy wielu atrybutach zbiór zamiast przeglądania listy: inaczej czas byłby kwadratowy (TestPathological).
+	if len(r.expSet) == 0 {
+		if r.expSet == nil {
+			r.expSet = map[expandedName]bool{}
+		}
+		for _, o := range r.out {
+			if o.Name.Space != "" {
+				r.expSet[expandedName{o.Name.Space, o.Name.Local}] = true
+			}
 		}
 	}
+	k := expandedName{n.Space, n.Local}
+	if r.expSet[k] {
+		return true
+	}
+	r.expSet[k] = true // wywołujący zaraz dopisze n do r.out
 	return false
 }
+
+// expandedName to nazwa rozwinięta (Namespaces in XML 1.0, 2.1): przestrzeń i nazwa lokalna, bez prefiksu.
+type expandedName struct{ space, local string }
 
 type qsplit struct {
 	prefix, local string

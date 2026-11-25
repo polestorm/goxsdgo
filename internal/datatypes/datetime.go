@@ -547,7 +547,7 @@ func parseDuration(s string) (*DurationValue, bool) {
 	total.Mul(total, big.NewInt(60)).Add(total, big.NewInt(vals[4]))
 	total.Mul(total, big.NewInt(60))
 	sec := Decimal{}
-	sec.unscaled.Set(total)
+	sec.setUnscaled(total)
 	if secs != nil {
 		sec = addDecimal(&sec, secs)
 	}
@@ -560,30 +560,32 @@ func parseDuration(s string) (*DurationValue, bool) {
 
 func addDecimal(a, b *Decimal) Decimal {
 	scale := max(a.scale, b.scale)
-	x := new(big.Int).Mul(&a.unscaled, pow10(scale-a.scale))
-	y := new(big.Int).Mul(&b.unscaled, pow10(scale-b.scale))
+	x := new(big.Int).Mul(a.unscaledBig(), pow10(scale-a.scale))
+	y := new(big.Int).Mul(b.unscaledBig(), pow10(scale-b.scale))
 	var r Decimal
-	r.unscaled.Add(x, y)
+	r.setUnscaled(x.Add(x, y))
 	r.scale = scale
 	r.normalize()
 	return r
 }
 
 func (d *Decimal) normalize() {
-	if d.unscaled.Sign() == 0 {
-		d.scale = 0
+	if d.Sign() == 0 {
+		d.small, d.big, d.scale = 0, nil, 0
 		return
 	}
+	u := d.unscaledBig()
 	ten := big.NewInt(10)
 	q, m := new(big.Int), new(big.Int)
 	for d.scale > 0 {
-		q.QuoRem(&d.unscaled, ten, m)
+		q.QuoRem(u, ten, m)
 		if m.Sign() != 0 {
 			break
 		}
-		d.unscaled.Set(q)
+		u.Set(q)
 		d.scale--
 	}
+	d.setUnscaled(u)
 }
 
 // durationRefs to daty odniesienia z 3.2.6.2.
@@ -596,7 +598,7 @@ func (d *DurationValue) endInstant(ref [3]int64) Decimal {
 	months, secs := d.Months, d.Seconds
 	if d.Negative {
 		months = -months
-		secs.unscaled.Neg(&secs.unscaled)
+		secs = secs.negated()
 	}
 	temp := ref[1] + months
 	m := mod(temp-1, 12) + 1
@@ -606,7 +608,7 @@ func (d *DurationValue) endInstant(ref [3]int64) Decimal {
 		day = dim
 	}
 	var start Decimal
-	start.unscaled.SetInt64(daysFromCivil(y, int(m), int(day)) * secondsPerDay)
+	start.small = daysFromCivil(y, int(m), int(day)) * secondsPerDay
 	return addDecimal(&start, &secs)
 }
 
@@ -620,7 +622,7 @@ func (d *DurationValue) signedMonths() int64 {
 func (d *DurationValue) signedSeconds() *Decimal {
 	s := d.Seconds
 	if d.Negative {
-		s.unscaled.Neg(&s.unscaled)
+		s = s.negated()
 	}
 	return &s
 }
@@ -658,7 +660,7 @@ func (d *DurationValue) String() string {
 			fmt.Fprintf(&b, "%dM", m)
 		}
 	}
-	whole := new(big.Int).Set(&d.Seconds.unscaled)
+	whole := d.Seconds.unscaledBig()
 	frac := ""
 	if d.Seconds.scale > 0 {
 		s := d.Seconds.String()

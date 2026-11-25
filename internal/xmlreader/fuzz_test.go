@@ -6,6 +6,8 @@ import (
 	"io"
 	"testing"
 	"unicode/utf8"
+
+	"github.com/polestorm/goxsdgo/internal/testkit"
 )
 
 // FuzzReader: dowolne wejście nie powoduje paniki, czytanie się kończy, a pozycje tokenów i błędów leżą
@@ -20,6 +22,15 @@ func FuzzReader(f *testing.F) {
 		"<a>\r\n\r</a>",
 	} {
 		f.Add([]byte(s))
+	}
+	// Wejścia startowe z pobranych danych (ADR 0011): przykłady MF, schematy MF, próbka XML Conformance.
+	for _, dir := range []struct {
+		path string
+		max  int
+	}{{"../../testdata/instances/mf", 20}, {"../../testdata/schemas/mf", 30}, {"../../testdata/w3c/xmlconf", 150}} {
+		for _, b := range testkit.SampleFiles(dir.path, []string{".xml", ".xsd"}, dir.max, 128<<10) {
+			f.Add(b)
+		}
 	}
 	f.Fuzz(func(t *testing.T, data []byte) {
 		lines := bytes.Count(data, []byte{'\n'}) + bytes.Count(data, []byte{'\r'}) + 1
