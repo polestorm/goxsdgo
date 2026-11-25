@@ -4,7 +4,7 @@ Szacunki z 2026-11-24, w godzinach pracy z asystentem. Kryteria zakończenia ca�
 
 | Etap | Zakres | Szacunek | Stan |
 |---|---|---|---|
-| 0 | infrastruktura testów: pobranie i przypięcie zestawu W3C (pytanie 1), czytnik metadanych zestawu (`*.testSet`, oczekiwane werdykty), raport zaliczeń według grup (Microsoft, Sun, NIST, Boeing, IBM), test pokrycia wymagań, szkielet fuzzingu, `tools/compare` z `goxsdval` (`-tags libxml2`), korpus MF z plikiem oczekiwań | 6–10 h | — |
+| 0 | infrastruktura testów: pobranie i przypięcie zestawu W3C (pytanie 1), czytnik metadanych zestawu (`*.testSet`, oczekiwane werdykty), raport zaliczeń według grup (Microsoft, Sun, NIST, Boeing, IBM), test pokrycia wymagań, szkielet fuzzingu, `tools/compare` z `goxsdval` (`-tags libxml2`), korpus MF z plikiem oczekiwań | 6–10 h | w toku: pobieranie danych (`tools/fetch`, ADR 0003) gotowe 2026-11-25 |
 | 1 | czytnik XML: XML 1.0 Fifth Edition i przestrzenie nazw, strumieniowo, wiersz i kolumna, dobra forma, DOCTYPE bez rozwijania encji zewnętrznych, limity (pytanie 3) | 12–18 h | — |
 | 2 | typy proste: 44 typy wbudowane, przestrzeń wartości i leksykalna, normalizacja białych znaków, wszystkie aspekty (`length`, `pattern`, `enumeration`, `totalDigits`, `fractionDigits`, zakresy…), listy i unie, tłumacz wyrażeń regularnych XSD → RE2 | 20–30 h | — |
 | 3 | wczytanie schematu: komponenty z dokumentu schematu, `include`, `import`, `redefine`, rozwiązywanie nazw i przestrzeni, `fs.FS` bez sieci, katalog przestrzeń → plik, ograniczenia poprawności schematu (rozdział 3 części 1) z kodami błędów | 20–30 h | — |

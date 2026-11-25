@@ -1,8 +1,14 @@
 .DS_Store
 /.claude/*
 !/.claude/CLAUDE.md
-# pobrany zestaw testów W3C (pytanie 1) i wyniki porównań nie trafiają do repozytorium
+# dane pobierane narzędziem tools/fetch (testdata/sources.json, ADR 0003) nie trafiają do repozytorium
 /testdata/w3c/xsdtests/
+/testdata/w3c/xmlconf/
+/testdata/schemas/mf/
+/testdata/instances/mf/
+/testdata/**/.fetch-*/
+__pycache__/
+# wyniki porównań
 /out/
 /ref/
 # skompilowane programy

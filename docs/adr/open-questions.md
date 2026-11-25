@@ -1,15 +1,9 @@
 # Pytania otwarte
 
-1. **Zestaw testów W3C w repozytorium.** Zestaw `w3c/xsdtests` (licencja W3C Test Suite / W3C Software and Document
-   License, dopuszcza rozpowszechnianie z notą) ma kilkadziesiąt tysięcy plików. Rekomendacja: pobierać skryptem
-   `tools/fetch-w3c` do `testdata/w3c/xsdtests/` (ignorowane), przypiąć commit i sumę kontrolną archiwum
-   w `testdata/w3c/README.md`; do repozytorium trafia tylko wyciąg wyników oczekiwanych i lista wyłączeń. Testy bez
-   pobranego zestawu są pomijane z komunikatem, a CI pobiera go z pamięci podręcznej. Alternatywa: całość w repozytorium
-   (testy bez sieci, ale duże repozytorium).
-2. **Schematy i przykłady MF w repozytorium.** Schematy JPK, KSeF i e-Sprawozdań są publikowane przez organy państwa
-   (urzędowe materiały, art. 4 ustawy o prawie autorskim). Rekomendacja: trzymać w `testdata/schemas/` niezmienione,
-   ze źródłem, datą pobrania i SHA-256 w `testdata/README.md`; przykładowe dokumenty tylko opublikowane przez MF
-   i syntetyczne.
+1. ~~**Zestaw testów W3C w repozytorium.**~~ Rozstrzygnięte w ADR 0003 (2026-11-25): pobierany narzędziem
+   `tools/fetch`, przypięty commit i suma drzewa w `testdata/sources.json`, poza repozytorium.
+2. ~~**Schematy i przykłady MF w repozytorium.**~~ Rozstrzygnięte w ADR 0003 (2026-11-25): pobierane tak samo, poza
+   repozytorium, z sumą każdego pliku w manifeście.
 3. **Własny czytnik XML czy `encoding/xml`.** `encoding/xml` nie zgłasza części błędów dobrej formy, nie daje kolumny,
    inaczej traktuje przestrzenie nazw i DOCTYPE. Rekomendacja: własny czytnik strumieniowy XML 1.0 + przestrzenie nazw
    (ok. 1,5–2 tys. linii), z testami z zestawu W3C XML Conformance (pobierany jak w pytaniu 1). Do rozstrzygnięcia

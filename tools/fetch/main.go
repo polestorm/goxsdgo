@@ -1,0 +1,449 @@
+// Command fetch pobiera dane testowe opisane w testdata/sources.json: zestawy W3C, schematy MF i przykłady MF.
+//
+// Pobrane pliki nie trafiają do repozytorium. Każdy plik i każde rozpakowane drzewo jest sprawdzane sumą SHA-256
+// z manifestu. Narzędzie jest osobnym modułem, żeby kod sieciowy nie należał do biblioteki (ADR 0003).
+//
+// Użycie (z katalogu głównego repozytorium):
+//
+//	go -C tools/fetch run . -root ../..                 # pobiera wszystko, czego brakuje
+//	go -C tools/fetch run . -root ../.. -set mf-schemas # jeden zestaw
+//	go -C tools/fetch run . -root ../.. -verify         # tylko sprawdza to, co już pobrane
+//	go -C tools/fetch run . -root ../.. -from DIR       # brakujące pliki zestawów "files" kopiuje z DIR
+//	go -C tools/fetch run . -root ../.. -record         # dopisuje do manifestu brakujące sumy (nowe wpisy)
+package main
+
+import (
+	"archive/tar"
+	"bytes"
+	"compress/gzip"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"flag"
+	"fmt"
+	"io"
+	"io/fs"
+	"net/http"
+	"os"
+	"path"
+	"path/filepath"
+	"sort"
+	"strings"
+	"sync"
+	"time"
+)
+
+// maxDownload ogranicza rozmiar jednego pobrania (archiwum W3C ma kilka MB).
+const maxDownload = 256 << 20
+
+type manifest struct {
+	Note string     `json:"note,omitempty"`
+	Sets []*dataset `json:"sets"`
+}
+
+type dataset struct {
+	Name       string  `json:"name"`
+	Kind       string  `json:"kind"` // "archive" albo "files"
+	Dest       string  `json:"dest"`
+	Note       string  `json:"note,omitempty"`
+	URL        string  `json:"url,omitempty"`
+	Strip      int     `json:"strip,omitempty"`
+	SHA256     *string `json:"sha256,omitempty"`
+	TreeSHA256 string  `json:"tree_sha256,omitempty"`
+	FileCount  int     `json:"file_count,omitempty"`
+	Files      []*file `json:"files,omitempty"`
+}
+
+type file struct {
+	Path      string   `json:"path"`
+	URLs      []string `json:"urls"`
+	SHA256    string   `json:"sha256"`
+	Namespace string   `json:"namespace,omitempty"`
+	Imports   []string `json:"imports,omitempty"`
+	Note      string   `json:"note,omitempty"`
+}
+
+type options struct {
+	root, from     string
+	verify, record bool
+	client         *http.Client
+}
+
+func main() {
+	var o options
+	var only, manifestPath string
+	flag.StringVar(&o.root, "root", ".", "repository root")
+	flag.StringVar(&manifestPath, "manifest", "testdata/sources.json", "manifest path, relative to -root")
+	flag.StringVar(&only, "set", "", "fetch only this set")
+	flag.StringVar(&o.from, "from", "", "directory with local copies for sets of kind \"files\" (checked by SHA-256)")
+	flag.BoolVar(&o.verify, "verify", false, "do not download, only verify what is present")
+	flag.BoolVar(&o.record, "record", false, "write missing checksums into the manifest")
+	flag.Parse()
+	o.client = &http.Client{Timeout: 5 * time.Minute}
+
+	mpath := filepath.Join(o.root, filepath.FromSlash(manifestPath))
+	m, err := readManifest(mpath)
+	if err != nil {
+		fail(err)
+	}
+	var failed []string
+	found := false
+	for _, s := range m.Sets {
+		if only != "" && s.Name != only {
+			continue
+		}
+		found = true
+		var errs []error
+		switch s.Kind {
+		case "archive":
+			errs = o.archiveSet(s)
+		case "files":
+			errs = o.filesSet(s)
+		default:
+			errs = []error{fmt.Errorf("unknown kind %q", s.Kind)}
+		}
+		for _, e := range errs {
+			failed = append(failed, s.Name+": "+e.Error())
+		}
+	}
+	if !found {
+		fail(fmt.Errorf("no set named %q", only))
+	}
+	if o.record {
+		if err := writeManifest(mpath, m); err != nil {
+			fail(err)
+		}
+	}
+	if len(failed) > 0 {
+		fmt.Fprintf(os.Stderr, "\n%d problem(s):\n", len(failed))
+		for _, f := range failed {
+			fmt.Fprintln(os.Stderr, "  "+f)
+		}
+		os.Exit(1)
+	}
+}
+
+func fail(err error) {
+	fmt.Fprintln(os.Stderr, "fetch:", err)
+	os.Exit(1)
+}
+
+func readManifest(p string) (*manifest, error) {
+	b, err := os.ReadFile(p)
+	if err != nil {
+		return nil, err
+	}
+	var m manifest
+	dec := json.NewDecoder(bytes.NewReader(b))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(&m); err != nil {
+		return nil, fmt.Errorf("%s: %w", p, err)
+	}
+	return &m, nil
+}
+
+func writeManifest(p string, m *manifest) error {
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetEscapeHTML(false)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(m); err != nil {
+		return err
+	}
+	return os.WriteFile(p, buf.Bytes(), 0o644)
+}
+
+// archiveSet pobiera archiwum tar.gz, rozpakowuje je do katalogu tymczasowego, sprawdza sumę drzewa i dopiero
+// wtedy podmienia katalog docelowy.
+func (o *options) archiveSet(s *dataset) []error {
+	dest := filepath.Join(o.root, filepath.FromSlash(s.Dest))
+	if sum, n, err := treeSum(dest); err == nil && s.TreeSHA256 != "" {
+		if sum == s.TreeSHA256 && n == s.FileCount {
+			fmt.Printf("%s: ok (%d files, present)\n", s.Name, n)
+			return nil
+		}
+		if o.verify {
+			return []error{fmt.Errorf("tree checksum mismatch in %s: %d files, %s", s.Dest, n, sum)}
+		}
+	} else if o.verify {
+		return []error{fmt.Errorf("%s missing or not pinned", s.Dest)}
+	}
+
+	fmt.Printf("%s: downloading %s\n", s.Name, s.URL)
+	body, err := o.download(s.URL)
+	if err != nil {
+		return []error{err}
+	}
+	got := hexSum(body)
+	if s.SHA256 != nil && *s.SHA256 != "" && *s.SHA256 != got {
+		return []error{fmt.Errorf("archive checksum %s, manifest %s", got, *s.SHA256)}
+	}
+	tmp, err := os.MkdirTemp(filepath.Dir(dest), ".fetch-"+s.Name+"-")
+	if err != nil {
+		if err := os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
+			return []error{err}
+		}
+		if tmp, err = os.MkdirTemp(filepath.Dir(dest), ".fetch-"+s.Name+"-"); err != nil {
+			return []error{err}
+		}
+	}
+	defer os.RemoveAll(tmp)
+	if err := extractTarGz(bytes.NewReader(body), tmp, s.Strip); err != nil {
+		return []error{err}
+	}
+	sum, n, err := treeSum(tmp)
+	if err != nil {
+		return []error{err}
+	}
+	if s.TreeSHA256 == "" || (s.SHA256 != nil && *s.SHA256 == "") {
+		if !o.record {
+			return []error{fmt.Errorf("not pinned (archive %s, tree %s, %d files); run with -record", got, sum, n)}
+		}
+		s.TreeSHA256, s.FileCount = sum, n
+		if s.SHA256 != nil {
+			*s.SHA256 = got
+		}
+		fmt.Printf("%s: recorded tree %s, %d files\n", s.Name, sum, n)
+	} else if sum != s.TreeSHA256 || n != s.FileCount {
+		return []error{fmt.Errorf("tree checksum %s (%d files), manifest %s (%d files)", sum, n, s.TreeSHA256, s.FileCount)}
+	}
+	if err := os.RemoveAll(dest); err != nil {
+		return []error{err}
+	}
+	if err := os.Rename(tmp, dest); err != nil {
+		return []error{err}
+	}
+	fmt.Printf("%s: ok (%d files)\n", s.Name, n)
+	return nil
+}
+
+// filesSet pobiera pojedyncze pliki: każdy adres po kolei, potem kopię z -from; przyjmuje tylko plik o sumie
+// z manifestu.
+func (o *options) filesSet(s *dataset) []error {
+	dest := filepath.Join(o.root, filepath.FromSlash(s.Dest))
+	type result struct {
+		err    error
+		source string
+	}
+	results := make([]result, len(s.Files))
+	sem := make(chan struct{}, 8)
+	var wg sync.WaitGroup
+	for i, f := range s.Files {
+		wg.Add(1)
+		go func(i int, f *file) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+			src, err := o.fetchFile(f, dest)
+			results[i] = result{err, src}
+		}(i, f)
+	}
+	wg.Wait()
+
+	var errs []error
+	counts := map[string]int{}
+	for i, r := range results {
+		if r.err != nil {
+			errs = append(errs, fmt.Errorf("%s: %w", s.Files[i].Path, r.err))
+			continue
+		}
+		counts[r.source]++
+	}
+	fmt.Printf("%s: %d/%d ok (present %d, downloaded %d, local copy %d)\n", s.Name, len(s.Files)-len(errs),
+		len(s.Files), counts["present"], counts["download"], counts["local"])
+	return errs
+}
+
+func (o *options) fetchFile(f *file, dest string) (string, error) {
+	if err := checkRelPath(f.Path); err != nil {
+		return "", err
+	}
+	target := filepath.Join(dest, filepath.FromSlash(f.Path))
+	if b, err := os.ReadFile(target); err == nil && f.SHA256 != "" && hexSum(b) == f.SHA256 {
+		return "present", nil
+	}
+	if o.verify {
+		return "", errors.New("missing or checksum mismatch")
+	}
+	var tried []string
+	accept := func(b []byte, where string) (bool, error) {
+		if looksLikeHTML(b) {
+			tried = append(tried, where+": HTML page instead of a file")
+			return false, nil
+		}
+		got := hexSum(b)
+		if f.SHA256 == "" {
+			if !o.record {
+				tried = append(tried, where+": no checksum in manifest, got "+got+" (run with -record)")
+				return false, nil
+			}
+			f.SHA256 = got
+		} else if got != f.SHA256 {
+			tried = append(tried, where+": checksum "+got)
+			return false, nil
+		}
+		return true, writeFile(target, b)
+	}
+	for _, u := range f.URLs {
+		b, err := o.download(u)
+		if err != nil {
+			tried = append(tried, err.Error())
+			continue
+		}
+		if ok, err := accept(b, u); ok || err != nil {
+			return "download", err
+		}
+	}
+	if o.from != "" {
+		local := filepath.Join(o.from, filepath.FromSlash(f.Path))
+		b, err := os.ReadFile(local)
+		if err != nil {
+			tried = append(tried, err.Error())
+		} else if ok, err := accept(b, local); ok || err != nil {
+			return "local", err
+		}
+	}
+	if len(tried) == 0 {
+		return "", errors.New("no source (no URL; use -from)")
+	}
+	return "", errors.New(strings.Join(tried, "; "))
+}
+
+func (o *options) download(u string) ([]byte, error) {
+	req, err := http.NewRequest(http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", "goxsdgo-fetch")
+	resp, err := o.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("%s: HTTP %d", u, resp.StatusCode)
+	}
+	b, err := io.ReadAll(io.LimitReader(resp.Body, maxDownload+1))
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", u, err)
+	}
+	if len(b) > maxDownload {
+		return nil, fmt.Errorf("%s: larger than %d bytes", u, maxDownload)
+	}
+	return b, nil
+}
+
+// looksLikeHTML wykrywa „miękkie 404”: gov.pl i crd.gov.pl zwracają stronę HTML zamiast brakującego pliku,
+// czasem z kodem 200.
+func looksLikeHTML(b []byte) bool {
+	b = bytes.TrimPrefix(b, []byte("\xef\xbb\xbf"))
+	b = bytes.TrimLeft(b, " \t\r\n")
+	head := strings.ToLower(string(b[:min(len(b), 64)]))
+	return strings.HasPrefix(head, "<!doctype html") || strings.HasPrefix(head, "<html")
+}
+
+// extractTarGz rozpakowuje tylko zwykłe pliki i katalogi, odrzuca ścieżki wychodzące poza katalog docelowy;
+// pierwsze strip składników ścieżki jest pomijane.
+func extractTarGz(r io.Reader, dir string, strip int) error {
+	gz, err := gzip.NewReader(r)
+	if err != nil {
+		return err
+	}
+	tr := tar.NewReader(gz)
+	for {
+		h, err := tr.Next()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		name := path.Clean(strings.TrimPrefix(h.Name, "./"))
+		parts := strings.Split(name, "/")
+		if len(parts) <= strip {
+			continue
+		}
+		rel := strings.Join(parts[strip:], "/")
+		if err := checkRelPath(rel); err != nil {
+			return fmt.Errorf("archive entry %q: %w", h.Name, err)
+		}
+		target := filepath.Join(dir, filepath.FromSlash(rel))
+		switch h.Typeflag {
+		case tar.TypeDir:
+			if err := os.MkdirAll(target, 0o755); err != nil {
+				return err
+			}
+		case tar.TypeReg:
+			b, err := io.ReadAll(io.LimitReader(tr, maxDownload+1))
+			if err != nil {
+				return err
+			}
+			if len(b) > maxDownload {
+				return fmt.Errorf("archive entry %q too large", h.Name)
+			}
+			if err := writeFile(target, b); err != nil {
+				return err
+			}
+		default:
+			// dowiązania, urządzenia, nagłówki pax: pomijamy
+		}
+	}
+}
+
+// checkRelPath przyjmuje tylko ścieżkę względną w postaci kanonicznej, bez wyjścia poza katalog; dwukropek
+// odrzuca, bo na Windows oznacza dysk albo strumień NTFS.
+func checkRelPath(p string) error {
+	if p == "" || !fs.ValidPath(p) || strings.ContainsAny(p, `\:`) {
+		return fmt.Errorf("unsafe path %q", p)
+	}
+	return nil
+}
+
+func writeFile(target string, b []byte) error {
+	if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(target, b, 0o644)
+}
+
+// treeSum liczy sumę drzewa: SHA-256 z posortowanych wierszy „<sha256 pliku>  <ścieżka>\n”, jak w wyniku
+// sha256sum. Nie zależy od sposobu spakowania archiwum.
+func treeSum(dir string) (string, int, error) {
+	var lines []string
+	err := filepath.WalkDir(dir, func(p string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !d.Type().IsRegular() {
+			return nil
+		}
+		b, err := os.ReadFile(p)
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(dir, p)
+		if err != nil {
+			return err
+		}
+		lines = append(lines, hexSum(b)+"  "+filepath.ToSlash(rel)+"\n")
+		return nil
+	})
+	if err != nil {
+		return "", 0, err
+	}
+	if len(lines) == 0 {
+		return "", 0, errors.New("empty")
+	}
+	sort.Strings(lines)
+	h := sha256.New()
+	for _, l := range lines {
+		io.WriteString(h, l)
+	}
+	return hex.EncodeToString(h.Sum(nil)), len(lines), nil
+}
+
+func hexSum(b []byte) string {
+	s := sha256.Sum256(b)
+	return hex.EncodeToString(s[:])
+}

@@ -1,0 +1,2325 @@
+{
+  "note": "Źródła danych testowych pobieranych narzędziem tools/fetch. Pobrane pliki nie trafiają do repozytorium (.gitignore). Opis: testdata/README.md.",
+  "sets": [
+    {
+      "name": "w3c-xsdtests",
+      "kind": "archive",
+      "dest": "testdata/w3c/xsdtests",
+      "note": "W3C XML Schema test suite, github.com/w3c/xsdtests, commit 7bc3365c652a322f3d762021b3879eb92dae7e30 (2026-04-01). Archiwum generuje GitHub, więc jego suma bywa niestała: sprawdzamy sumę drzewa plików.",
+      "url": "https://codeload.github.com/w3c/xsdtests/tar.gz/7bc3365c652a322f3d762021b3879eb92dae7e30",
+      "strip": 1,
+      "tree_sha256": "a4d51969d4096f131629488aeceeeae1ab531bec2981bef06df4641b8d23087e",
+      "file_count": 42270
+    },
+    {
+      "name": "w3c-xmlconf",
+      "kind": "archive",
+      "dest": "testdata/w3c/xmlconf",
+      "note": "W3C XML Conformance Test Suite 20130923 (czytnik XML, etap 1).",
+      "url": "https://www.w3.org/XML/Test/xmlts20130923.tar.gz",
+      "strip": 1,
+      "sha256": "9b61db9f5dbffa545f4b8d78422167083a8568c59bd1129f94138f936cf6fc1f",
+      "tree_sha256": "df92eaea937153a50914dc55c1445c8ec28d670c56e8eba279409ad642d1a857",
+      "file_count": 3386
+    },
+    {
+      "name": "mf-schemas",
+      "kind": "files",
+      "dest": "testdata/schemas/mf",
+      "note": "Schematy MF i KAS (JPK, KSeF, e-Sprawozdania) z importami. Lista i adresy z katalogu xml.pro (internal/importing/schemas/auxiliary.json, stan 2026-11-25); sumy oryginałów MF.",
+      "files": [
+        {
+          "path": "auxiliary/ASIStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/ASIStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/19df3b38-79ec-4692-b55d-fd14b3370215"
+          ],
+          "sha256": "e5865604fc3a36c84f89485ab4bea08900f5d5dbb8b71b175c98a3116caf072b",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/08/10/ASIStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie finansowe ASI (alternatywna spółka inwestycyjna) wariant 1-2"
+        },
+        {
+          "path": "auxiliary/ASIStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/ASIStruktury/ASIStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "39f529f584527d6c04c5bbe924cf6147699aa586ad902a3b8541e473f4cae2a7",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/ASIStrukturyDanychSprFin_v3-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2026/01/15/eD/ASIStruktury/ASIStrukturyDanychSprFin_v3-0E.xsd"
+          ],
+          "sha256": "85654e1334b6b9c19f20cc8c9247c8b75452e7ea325ba552a0c4bcb3a75cc327",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/ASIWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/ASIWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/fb19779d-7718-4071-b249-dc08ffff4f25"
+          ],
+          "sha256": "54644db5def4591defe99fb87e25b0053d1887108dae3934942c8bc599d04a7f",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/08/10/ASIWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/ASIStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "ASI w tysiącach złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/ASIWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/ASIWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/2d1dc194-37d2-4a10-980e-0e928f0ea06a"
+          ],
+          "sha256": "af3c16a06e366527723327e165208b1832d17b86a18786934f0b9b0e7b27a525",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/08/10/ASIWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/ASIStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "ASI w złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/BankStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/BankStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/6231fb16-4fbb-4ece-abda-65a51c9abe36"
+          ],
+          "sha256": "1781a9e62382fb47380a34cfe75ddaf68b56f5a111ad5c17cc12e338d9f6eafd",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/BankStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie finansowe banku wariant 1-2"
+        },
+        {
+          "path": "auxiliary/BankStrukturyDanychSprFin_v1-5.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/BankStruktury/BankStrukturyDanychSprFin_v1-5.xsd"
+          ],
+          "sha256": "4bbce034834b553cf8bfcb050c90def7e9d897c12261d86c548f3e45f4fea18b",
+          "namespace": "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/BankStruktury/",
+          "imports": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/DefinicjeTypySprawozdaniaFinansowe/StrukturyDanychSprFin_v1-5.xsd"
+          ],
+          "note": "Sprawozdanie finansowe banku wariant 1-5 (2020-09-22) — nowsza wersja Bank"
+        },
+        {
+          "path": "auxiliary/BankStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/BankStruktury/BankStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "9abdf2ff0a33109aa013f4df697eb9eca632d4b69b1e2572f59df3ebf5d4041a",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/BankWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/BankWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/2bd12968-ed2c-4b20-a1cf-5bd67d3cce48"
+          ],
+          "sha256": "d51b12c7570fc9f69b308d2757a04190bb70d22496150859246eeaa8dbdf82ab",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/BankWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/BankStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Bank w tysiącach złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/BankWTysiacach_1_v1-5.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/BankWTysiacach/BankWTysiacach(1)_v1-5.xsd"
+          ],
+          "sha256": "ee0948ec36dbb5baa473c88e6dd54b4237950591a265cc75adb3086c532470d9",
+          "namespace": "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/BankWTysiacach",
+          "imports": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/BankStruktury/BankStrukturyDanychSprFin_v1-5.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/DefinicjeTypySprawozdaniaFinansowe/StrukturyDanychSprFin_v1-5.xsd",
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"
+          ],
+          "note": "Bank w tysiącach złotych wariant 1-5"
+        },
+        {
+          "path": "auxiliary/BankWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/BankWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/9cd7c825-6aec-4520-b6dc-c5a2cff4d93c"
+          ],
+          "sha256": "2ac98e922fdc0773840b926501f4c24bd941e9b2cef1e78e71700f7846da9378",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/BankWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/BankStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Bank w złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/BankWZlotych_1_v1-5.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/BankWZlotych/BankWZlotych(1)_v1-5.xsd"
+          ],
+          "sha256": "83a418ba851e1c501445892e71af3cd9b5cf05ef6ee4ac45bf2a43ea051f36dc",
+          "namespace": "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/BankWZlotych",
+          "imports": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/BankStruktury/BankStrukturyDanychSprFin_v1-5.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/DefinicjeTypySprawozdaniaFinansowe/StrukturyDanychSprFin_v1-5.xsd",
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"
+          ],
+          "note": "Bank w złotych wariant 1-5"
+        },
+        {
+          "path": "auxiliary/CountryCode.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/zewnetrzne/2008/05/09/CountryCode.xsd"
+          ],
+          "sha256": "bda9c6135f36fa70b7f395d58c71eaaaebbb078f607762b6bf42981b5d57c365",
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/DomMaklerskiStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/DomMaklerskiStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/8fd91318-2db3-48f1-bec9-4713df968fc3"
+          ],
+          "sha256": "10b7487d607e85cb41fc13d18850ade55a9dae39314cdca64d3005feef1a1360",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/DomMaklerskiStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie finansowe domu maklerskiego wariant 1-2"
+        },
+        {
+          "path": "auxiliary/DomMaklerskiStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/DomMaklerskiStruktury/DomMaklerskiStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "dc7c84580eea8bba69e535162431f92f5c5c1db15039c2a47e7e37b5ade9307f",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/DomMaklerskiWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/DomMaklerskiWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/97e4d0fb-9ca9-48f9-8970-f3c050987d2a"
+          ],
+          "sha256": "cf0d264411ec0c984a60c59e96f4b3eeb6c8f6464b6d1e6ff1a0db9704f6c51f",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/DomMaklerskiWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/DomMaklerskiStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "DomMaklerski w tysiącach złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/DomMaklerskiWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/DomMaklerskiWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/e268a9d0-96b4-4aee-b65c-b9eabd5c1c27"
+          ],
+          "sha256": "2ed90c1c0846de20551bcc906c597f9190fae0fb32d1c940ee6855f7e8b828ce",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/DomMaklerskiWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/DomMaklerskiStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "DomMaklerski w złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/ElementarneTypyDanych_v10-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/ElementarneTypyDanych_v10-0E.xsd"
+          ],
+          "sha256": "8a531cb181d3e298d11b28766655ae91fee2d7851440095932ffc82137ed2be1",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/KodyKrajow_v10-0E.xsd"
+          ],
+          "note": "Elementarne typy danych wariant 10 (2022-01-05) — auxiliary; included by StrukturyDanych_v10"
+        },
+        {
+          "path": "auxiliary/ElementarneTypyDanych_v4-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/ElementarneTypyDanych_v4-0E.xsd"
+          ],
+          "sha256": "f755041536245044d113306a7611c1a44a7f6a1024a00cf11ec05973b11bf039",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/KodyKrajow_v4-1E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/KodyUrzedowSkarbowych_v4-0E.xsd"
+          ],
+          "note": "Elementarne typy danych wariant 4 (2016-01-25) — auxiliary, included by StrukturyDanych_v4 (chain legacy JPK v1)"
+        },
+        {
+          "path": "auxiliary/ElementarneTypyDanych_v5-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/ElementarneTypyDanych_v5-0E.xsd"
+          ],
+          "sha256": "6d83d644472a03f95fdc63f7022be923f2884db4d78651ab6381f85313d0c4df",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/KodyKrajow_v5-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/KodyUrzedowSkarbowych_v5-0E.xsd"
+          ],
+          "note": "Elementarne typy danych wariant 5 (2018-08-24) — auxiliary, dociągany przez xsd:include ze StrukturyDanych_v5 (łańcuch JPK_FA(4))"
+        },
+        {
+          "path": "auxiliary/ElementarneTypyDanych_v6-0E.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/ElementarneTypyDanych_v6-0E.xsd"
+          ],
+          "sha256": "6119fc32b5010ce9d7ee386dcb51ada3f0e6343fc3443f208afc10853b91c6f7",
+          "namespace": "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/",
+          "imports": [
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/KodyKrajow_v6-0E.xsd",
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/KodyUrzedowSkarbowych_v6-0E.xsd"
+          ],
+          "note": "Elementarne typy danych wariant 6-0E z gov.pl/finanse"
+        },
+        {
+          "path": "auxiliary/ElementarneTypyDanych_v8-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/ElementarneTypyDanych_v8-0E.xsd"
+          ],
+          "sha256": "bf2a183d31da73dfb5605e919302083db0a813ee96f86d2b562c886ecc7b371c",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/KodyKrajow_v8-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/KodyUrzedowSkarbowych_v7-0E.xsd"
+          ],
+          "note": "Elementarne typy danych wariant 8 (2021-06-08) — auxiliary, included by StrukturyDanych_v8 (chain JPK_V7M v2 / JPK_V7K v2)"
+        },
+        {
+          "path": "auxiliary/FunduszInwestycyjnyPolaczonySubfundusze_v1-6.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyPolaczonySubfundusze/FunduszInwestycyjnyPolaczonySubfundusze_v1-6.xsd"
+          ],
+          "sha256": "77aff2a06555e3454cf8e261635a7830c77ad08400a8e9e52667ede2effc4979",
+          "namespace": "https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyPolaczonySubfundusze/",
+          "imports": [
+            "https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyStruktury/FunduszInwestycyjnyStrukturyDanychSprFin_v1-6.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/12/31/DefinicjeTypySprawozdaniaFinansowe/StrukturyDanychSprFin_v1-6.xsd",
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"
+          ],
+          "note": "Sprawozdanie funduszu inwestycyjnego z subfunduszami wariant 1-6"
+        },
+        {
+          "path": "auxiliary/FunduszInwestycyjnyPolaczony_v1-6.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyPolaczony/FunduszInwestycyjnyPolaczony_v1-6.xsd"
+          ],
+          "sha256": "4637bb8f2e36f1cc32434566d4d5f8cf0e56555f63ed9d2ae91b3b7caceac842",
+          "namespace": "https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyPolaczony/",
+          "imports": [
+            "https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyStruktury/FunduszInwestycyjnyStrukturyDanychSprFin_v1-6.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/12/31/DefinicjeTypySprawozdaniaFinansowe/StrukturyDanychSprFin_v1-6.xsd",
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"
+          ],
+          "note": "Sprawozdanie funduszu inwestycyjnego połączonego wariant 1-6"
+        },
+        {
+          "path": "auxiliary/FunduszInwestycyjnyStrukturyDanychSprFin_v1-6.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyStruktury/FunduszInwestycyjnyStrukturyDanychSprFin_v1-6.xsd"
+          ],
+          "sha256": "84618aa008a2ce7c27ce4bf885219219fc5ad9b865be3f8add1f9f026c2e327a",
+          "namespace": "https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyStruktury/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/KodyCechKrajow_v3-0E.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/12/31/DefinicjeTypySprawozdaniaFinansowe/StrukturyDanychSprFin_v1-6.xsd",
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"
+          ],
+          "note": "Wspólne typy dla sprawozdań funduszy inwestycyjnych wariant 1-6"
+        },
+        {
+          "path": "auxiliary/FunduszInwestycyjnyStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/FunduszInwestycyjnyStruktury/FunduszInwestycyjnyStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "dc7e942baffc14e3c791ed6f1adce830d32429545730aeed0905ad1cacd79dc7",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/01/01/eD/KodyCECHKRAJOW/KodyCechKrajowWaluty_v6-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/FunduszInwestycyjny_v1-6.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjny/FunduszInwestycyjny_v1-6.xsd"
+          ],
+          "sha256": "9fd3d8a36f51c1402f1791af1cff19a56d1b8dc190b78255114ed98f4dc01d05",
+          "namespace": "https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjny/",
+          "imports": [
+            "https://www.gov.pl/static/finanse/SF/2020/12/31/FunduszInwestycyjnyStruktury/FunduszInwestycyjnyStrukturyDanychSprFin_v1-6.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/12/31/DefinicjeTypySprawozdaniaFinansowe/StrukturyDanychSprFin_v1-6.xsd",
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"
+          ],
+          "note": "Sprawozdanie funduszu inwestycyjnego wariant 1-6"
+        },
+        {
+          "path": "auxiliary/JednostkaEmitent_v1-0.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaEmitent_v1-0.xsd",
+            "https://www.gov.pl/attachment/931316ff-d6f7-49ce-861c-5eec80d3661c"
+          ],
+          "sha256": "6938a1629d2ac762b673c016b72bc13eb731d29bc94aef5b3bd89097d41b30b6",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2019/01/22/JednostkaEmitent",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.mf.gov.pl/documents/764034/6464789/StrukturyDanychSprFin_v1-0.xsd"
+          ],
+          "note": "Sprawozdanie jednostki będącej emitentem papierów wartościowych wariant 1-0"
+        },
+        {
+          "path": "auxiliary/JednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/df9f95d2-ed06-4df2-9338-b486174f124c"
+          ],
+          "sha256": "28fadb2d77b86a459b4a7c48734516357c6040a51c9d31b3569d04a30566557d",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaInnaStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Struktury danych sprawozdania finansowego — JednostkaInna, wariant 1-2 (2019-09-01). Auxiliary: xs:import z odpowiadających mu schematów W Zlotych / W Tysiacach."
+        },
+        {
+          "path": "auxiliary/JednostkaInnaStrukturyDanychSprFin_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaInnaStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "sha256": "60b25f05e76407621ea28fadaa9811bf57c866eb5977b8a4f89c349cc63338ca",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaInnaStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie finansowe jednostki innej (pełne) wariant 1-3 (2024-10-24)"
+        },
+        {
+          "path": "auxiliary/JednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaInnaStruktury/JednostkaInnaStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "a0077b666d9737670ac5dbdd3cb65083a9e27207bf6d1369a2e176562a4adee5",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/JednostkaInnaWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaInnaWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/1170b1ee-5b78-42b3-8e09-a82adc39bd7d"
+          ],
+          "sha256": "c38b34e736dbb54516b08f2e6f2993ea7e29bd333f30065881bc1120cebbfc74",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaInnaWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "JednostkaInna v1-2 (historyczna)"
+        },
+        {
+          "path": "auxiliary/JednostkaInnaWTysiacach_1_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaInnaWTysiacach(1)_v1-3.xsd"
+          ],
+          "sha256": "31cd84a10bb89cfe6dda90334c6c6faafe666ceed3c29d7cc6023c6e6d1a6026",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaInnaWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaInnaStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "note": "JednostkaInna w tysiącach złotych wariant 1-3"
+        },
+        {
+          "path": "auxiliary/JednostkaInnaWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaInnaWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/419a55e1-ed6f-4e81-bfde-4968c066d912"
+          ],
+          "sha256": "e28992eb3fb1a2944d5b5b32dc6df40b3375b33c772a8235d04576101b9417cb",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaInnaWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "JednostkaInna v1-2 (historyczna)"
+        },
+        {
+          "path": "auxiliary/JednostkaInnaWZlotych_1_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaInnaWZlotych(1)_v1-3.xsd"
+          ],
+          "sha256": "2b9c342dded84a3272ed84173326653f152a29430361b687ae576d2b2f59a7a4",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaInnaWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaInnaStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "note": "JednostkaInna w złotych wariant 1-3"
+        },
+        {
+          "path": "auxiliary/JednostkaMalaStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMalaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/86547f60-9971-4b88-aec7-7b16ce3bb5de"
+          ],
+          "sha256": "ab144598f9fe4515ded3fdd10ef704807a3c12f6affd5bf48f2e965517a30a4a",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaMalaStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Struktury danych sprawozdania finansowego — JednostkaMala, wariant 1-2 (2019-09-01). Auxiliary: xs:import z odpowiadających mu schematów W Zlotych / W Tysiacach."
+        },
+        {
+          "path": "auxiliary/JednostkaMalaStrukturyDanychSprFin_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMalaStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "sha256": "b298406d0d67db7866688b973b565b70dad355d6b3ee67ea23e80d2321a2a4cf",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaMalaStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie finansowe jednostki małej wariant 1-3"
+        },
+        {
+          "path": "auxiliary/JednostkaMalaStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaMalaStruktury/JednostkaMalaStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "a599651a7d5d324b95c6fd13d4c1d0531552064f623e3bad712bdf5e7e929da1",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/JednostkaMalaWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMalaWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/6447927d-9103-4945-ae9e-142f90937fdf"
+          ],
+          "sha256": "8b0908e5f93b8c6721f3f8840c7519cb921b4206ddea104973745b92a55578bb",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaMalaWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMalaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "JednostkaMala v1-2 (historyczna)"
+        },
+        {
+          "path": "auxiliary/JednostkaMalaWTysiacach_1_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMalaWTysiacach(1)_v1-3.xsd"
+          ],
+          "sha256": "4fc91d0bc775c923ea0533a320d80f6b8821ae222a13aa7326dec4a5bdfdb534",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaMalaWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaInnaStrukturyDanychSprFin_v1-3.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMalaStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "note": "JednostkaMala w tysiącach złotych wariant 1-3"
+        },
+        {
+          "path": "auxiliary/JednostkaMalaWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMalaWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/e9bdabee-64d1-4628-9673-14ae948ad2f6"
+          ],
+          "sha256": "d5b25fdd4c2c582f9dac99e298b1edd99d4ec70f990ab7028e38abdfda2677b8",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaMalaWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMalaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "JednostkaMala v1-2 (historyczna)"
+        },
+        {
+          "path": "auxiliary/JednostkaMalaWZlotych_1_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMalaWZlotych(1)_v1-3.xsd"
+          ],
+          "sha256": "68d152be136b801452dc47953909e7c50b4ed6458290d6aa203d0556a0f71c43",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaMalaWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaInnaStrukturyDanychSprFin_v1-3.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMalaStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "note": "JednostkaMala w złotych wariant 1-3"
+        },
+        {
+          "path": "auxiliary/JednostkaMikroStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMikroStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/4b18d29e-6053-4fa1-90da-65b4ff871de2"
+          ],
+          "sha256": "2bf2d51dac06a6688f5f695736980c1c08985d37a0ce620d241e27f633d79dcf",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaMikroStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Struktury danych sprawozdania finansowego — JednostkaMikro, wariant 1-2 (2019-09-01). Auxiliary: xs:import z odpowiadających mu schematów W Zlotych / W Tysiacach."
+        },
+        {
+          "path": "auxiliary/JednostkaMikroStrukturyDanychSprFin_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMikroStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "sha256": "a8d6ac5ea8284ce149f59fcf725a8ca040d9523ecd73bee485d993c284ab3498",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaMikroStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie finansowe jednostki mikro wariant 1-3"
+        },
+        {
+          "path": "auxiliary/JednostkaMikroStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaMikroStruktury/JednostkaMikroStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "7fce74c846c53af8b978890fa5afb2f4bc10bca332be2c1411eecf28af2ad1b2",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/JednostkaMikroWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMikroWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/2031819d-d733-4811-8a7a-95c87592ca84"
+          ],
+          "sha256": "09151d2e52ba43c6c8616a3a39f01966ea61c3e0cb9100567caf5a6104bcc516",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaMikroWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMalaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMikroStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "JednostkaMikro v1-2 (historyczna)"
+        },
+        {
+          "path": "auxiliary/JednostkaMikroWTysiacach_1_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMikroWTysiacach(1)_v1-3.xsd"
+          ],
+          "sha256": "8c342af4617d7e6b9c0cff84dab803cc650ed39abcdbd5bd706810689bc9a778",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaMikroWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaInnaStrukturyDanychSprFin_v1-3.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMalaStrukturyDanychSprFin_v1-3.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMikroStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "note": "JednostkaMikro w tysiącach złotych wariant 1-3"
+        },
+        {
+          "path": "auxiliary/JednostkaMikroWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMikroWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/0411ed25-ba82-4233-a92f-f380f5d0605b"
+          ],
+          "sha256": "c76892c349a5d2a32e4938d85dcafff9fbaf1558d81a4bce41f55fb7f44eb798",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaMikroWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMalaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaMikroStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "JednostkaMikro v1-2 (historyczna)"
+        },
+        {
+          "path": "auxiliary/JednostkaMikroWZlotych_1_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMikroWZlotych(1)_v1-3.xsd"
+          ],
+          "sha256": "ac122b83e7e0c145b3602904de2b907d1f4c63fadfd33d45f6c7257a71964793",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaMikroWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaInnaStrukturyDanychSprFin_v1-3.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMalaStrukturyDanychSprFin_v1-3.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaMikroStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "note": "JednostkaMikro w złotych wariant 1-3"
+        },
+        {
+          "path": "auxiliary/JednostkaOpStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaOpStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/6cadf930-6bc7-4f2c-8468-bddb34c67225"
+          ],
+          "sha256": "448d0277637b383dccdc1069bbe9b749aead435c155b67007b0a5486f1d729cf",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaOpStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Struktury danych sprawozdania finansowego — JednostkaOp, wariant 1-2 (2019-09-01). Auxiliary: xs:import z odpowiadających mu schematów W Zlotych / W Tysiacach."
+        },
+        {
+          "path": "auxiliary/JednostkaOpStrukturyDanychSprFin_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaOpStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "sha256": "79af14780b56d02573fb97e21d02525bf7ca1c1b5d273e71aca479e4e10d936f",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaOpStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie finansowe organizacji pożytku publicznego (OPP) wariant 1-3"
+        },
+        {
+          "path": "auxiliary/JednostkaOpStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaOpStruktury/JednostkaOpStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "9b8f086c7b8d3cec586367d1e9ab86b46b2a6935248a8566000b7ff68a061863",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/JednostkaOpWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaOpWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/4fec50cc-e8fa-4b76-88b8-d9a5635a0a75"
+          ],
+          "sha256": "6a1d98b2eb3b08d08f89bb69b51744666652f0823ddfda497c6523d4babc0af1",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaOrganizacjiPozarzadowejWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaOpStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "JednostkaOp v1-2 (historyczna)"
+        },
+        {
+          "path": "auxiliary/JednostkaOpWTysiacach_1_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaOpWTysiacach(1)_v1-3.xsd"
+          ],
+          "sha256": "9321387b067f9e4cbfc3954c4d58134f432638e7693ee6b51ca1f73e79380a90",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaOrganizacjiPozarzadowejWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaInnaStrukturyDanychSprFin_v1-3.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaOpStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "note": "JednostkaOp w tysiącach złotych wariant 1-3"
+        },
+        {
+          "path": "auxiliary/JednostkaOpWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaOpWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/27442750-0b92-4d4a-a9a2-ca2939394bbc"
+          ],
+          "sha256": "bf48ef562e83b745b6161d909f28cc57b9f62af83eb0a0c421fb09d38cc9d5f8",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/JednostkaOrganizacjiPozarzadowejWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/JednostkaOpStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "JednostkaOp v1-2 (historyczna)"
+        },
+        {
+          "path": "auxiliary/JednostkaOpWZlotych_1_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaOpWZlotych(1)_v1-3.xsd"
+          ],
+          "sha256": "7eebcd3e5947b9172cce67e18711bf866b7436a5f318ea049cd8b92d43c93575",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/01/JednostkaOrganizacjiPozarzadowejWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaInnaStrukturyDanychSprFin_v1-3.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/JednostkaOpStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "note": "JednostkaOp w złotych wariant 1-3"
+        },
+        {
+          "path": "auxiliary/KodyCechKrajowWaluty_v6-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/01/01/eD/KodyCECHKRAJOW/KodyCechKrajowWaluty_v6-0E.xsd"
+          ],
+          "sha256": "215199738d3fa6e551319e07f62f8491dba551626628da692f9c25c1715f1507",
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/KodyCechKrajow_v3-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/KodyCechKrajow_v3-0E.xsd"
+          ],
+          "sha256": "4087f29027b69099397d34b276f9e26c7d6c1d835d988105b0f96df754ab321c",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/",
+          "note": "Słownik kodów cech krajów wariant 3 (2013-05-23) — auxiliary used by all legacy JPK v1"
+        },
+        {
+          "path": "auxiliary/KodyKrajow_v10-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/KodyKrajow_v10-0E.xsd"
+          ],
+          "sha256": "1d41a1b3184188f2d20a51d3afde26204dda182ec5dacf018204dcc9870dc644",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/",
+          "note": "Słownik krajów wariant 10 (2022-01-05) — auxiliary used by KSeF FA(2)/FA(3); inna ścieżka i wariant niż KodyKrajow_v13 (JPK_V7M v3)"
+        },
+        {
+          "path": "auxiliary/KodyKrajow_v13-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2023/09/06/eD/KodyKrajow/KodyKrajow_v13-0E.xsd"
+          ],
+          "sha256": "447efc6e1a84de71d433666c60635856b8e01f090e5eedb3410b1afe545f8117",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2023/09/06/eD/KodyKrajow/",
+          "note": "Słownik krajów wariant 13 (2023-09-06) — auxiliary used by JPK_V7M v3, JPK_V7K v3"
+        },
+        {
+          "path": "auxiliary/KodyKrajow_v4-1E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/KodyKrajow_v4-1E.xsd"
+          ],
+          "sha256": "02275945cbdbca7b3f92e6d6ef034987ccd029b73a2c0d015294a2872e141d28",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/",
+          "note": "Słownik krajów wariant 4-1E (2016-01-25) pod DefinicjeTypy — auxiliary, included by ElementarneTypyDanych_v4"
+        },
+        {
+          "path": "auxiliary/KodyKrajow_v5-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/KodyKrajow_v5-0E.xsd"
+          ],
+          "sha256": "e6983b43f92901d1357daba5b0921c007f556bab45a9d0aa847378aec0436bab",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/",
+          "note": "Kody krajów wariant 5 (2018-08-24) — auxiliary, xsd:include z ElementarneTypyDanych_v5"
+        },
+        {
+          "path": "auxiliary/KodyKrajow_v6-0E.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/KodyKrajow_v6-0E.xsd"
+          ],
+          "sha256": "8550d3a70740ce266228964cce143bbe22602a252ac20c4b51372987299c2359",
+          "namespace": "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/",
+          "note": "Kody krajów wariant 6 — auxiliary, xsd:include z ElementarneTypyDanych_v6"
+        },
+        {
+          "path": "auxiliary/KodyKrajow_v8-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/KodyKrajow_v8-0E.xsd"
+          ],
+          "sha256": "b7a3d01f05abdc7782e7fff6806859ed43d7883a12faf8c73ed69b817b7745ad",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/",
+          "note": "Słownik krajów wariant 8 (2021-06-08) pod DefinicjeTypy — auxiliary, included by ElementarneTypyDanych_v8; różny od KodyKrajow_v13 (JPK_V7M v3) i KodyKrajow_v10 (KSeF)"
+        },
+        {
+          "path": "auxiliary/KodyPKD_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/02/01/eD/KodyPKD/KodyPKD_v2-0E.xsd"
+          ],
+          "sha256": "1ddbef3feecc4a5b17a96cf2bf531d8cd1a8680d1c9858089171f2c6ddf6d1be",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/02/01/eD/KodyPKD/",
+          "note": "Słownik kodów PKD wariant 2-0E z CRD"
+        },
+        {
+          "path": "auxiliary/KodyPKD_v3-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/08/18/eD/KodyPKD/KodyPKD_v3-0E.xsd"
+          ],
+          "sha256": "98ec0252fdb6363075df6d330902549a943a00442a63cd0601a07ee1406b7ffb",
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/KodyPKD_v4-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/01/01/eD/KodyPKD/KodyPKD_v4-0E.xsd"
+          ],
+          "sha256": "e34cfb13eabe3bb70c402ddc00999fbf928161b4ef522eddedcc6121d89044a6",
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/KodyUrzedowSkarbowych_v4-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/KodyUrzedowSkarbowych_v4-0E.xsd"
+          ],
+          "sha256": "f12b96a080f32cf1b07e42764680c3c3983433e516342c50060b9738d671bc0a",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/",
+          "note": "Kody urzędów skarbowych wariant 4 (2016-01-25) — auxiliary, included by ElementarneTypyDanych_v4"
+        },
+        {
+          "path": "auxiliary/KodyUrzedowSkarbowych_v5-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/KodyUrzedowSkarbowych_v5-0E.xsd"
+          ],
+          "sha256": "61bb3f3c25012167ce8ea2adc31423fbd70db0d8f984238f600bbcf92bf40e59",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/",
+          "note": "Kody urzędów skarbowych wariant 5 (2018-08-24) — auxiliary, xsd:include z ElementarneTypyDanych_v5"
+        },
+        {
+          "path": "auxiliary/KodyUrzedowSkarbowych_v6-0E.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/KodyUrzedowSkarbowych_v6-0E.xsd"
+          ],
+          "sha256": "421f972678115ec45734a6d971db5b8a8551b849aa8c70c59609eb15e95c4e03",
+          "namespace": "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/",
+          "note": "Kody urzędów skarbowych wariant 6 — auxiliary, xsd:include z ElementarneTypyDanych_v6"
+        },
+        {
+          "path": "auxiliary/KodyUrzedowSkarbowych_v7-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/KodyUrzedowSkarbowych_v7-0E.xsd"
+          ],
+          "sha256": "bb256afa9202c8db2fcdb01cb6d4f220011be5621e899a13e9125b82bd187ec9",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/",
+          "note": "Kody urzędów skarbowych wariant 7 (2021-06-08) — auxiliary, included by ElementarneTypyDanych_v8"
+        },
+        {
+          "path": "auxiliary/KodyUrzedowSkarbowych_v8-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/KodyUrzedowSkarbowych/KodyUrzedowSkarbowych_v8-0E.xsd"
+          ],
+          "sha256": "af27f583ea1ceb44ed37e0ec0d9bfdf2bfda74aadd5841ccbf0fc241175c2e91",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/KodyUrzedowSkarbowych/",
+          "note": "Kody urzędów skarbowych wariant 8 (2022-01-05) — auxiliary used by JPK_V7M v3, JPK_V7K v3, JPK_KR_PD v1"
+        },
+        {
+          "path": "auxiliary/MalaSKOKStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/MalaSKOKStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/009306d5-1dc8-4fb3-88be-cafbeac05dfd"
+          ],
+          "sha256": "fad6e2a0a7aee658815a79754d17aed219089c2d9a1a6087cbe62ac138479bc4",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/MSKOKStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie finansowe małej SKOK wariant 1-2"
+        },
+        {
+          "path": "auxiliary/MalaSKOKStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/MSKOKStruktury/MalaSKOKStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "22c152ecbbb5bb3147c610209e803a99ccae65dcc79cdabe897c99d910be474a",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/MalaSKOKWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/MalaSKOKWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/6c777818-d6d2-4c87-ade5-e0ad0f36f2c0"
+          ],
+          "sha256": "cfee944dd0a26b382b616ba1ceb8c3147f88e234b324e673ece15f5cc583c31e",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/MSKOKWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/MalaSKOKStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "MalaSKOK w tysiącach złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/MalaSKOKWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/MalaSKOKWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/c6d938ee-a338-4fea-a52c-1646ea78d0be"
+          ],
+          "sha256": "3222f5c9039bf015fd3226f7d8ac6a1547485d526260937e1332e68e73aa3250",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/MSKOKWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/MalaSKOKStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "MalaSKOK w złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/OrganizacjaInna_v1-0.xsd",
+          "urls": [
+            "https://www.gov.pl/attachment/31eb3f1d-885c-43d8-9e6b-d9a6c2263653"
+          ],
+          "sha256": "21d941a22b619bf27479d0b6876b0b61a37ece987a4ecb03c912ce13ea0cc536",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/StrukturyDanych_v5-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Organizacja Inna — wariant 1-0 (otwarty)."
+        },
+        {
+          "path": "auxiliary/PSFFIS_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/09/19/13860/schemat.xsd"
+          ],
+          "sha256": "9db17a3a8a2a4c8ac3f3551c999b4593504fdc262d9e270cdd2dafbfbadf1f61",
+          "namespace": "http://crd.gov.pl/wzor/2025/09/19/13860/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/FunduszInwestycyjnyStruktury/FunduszInwestycyjnyStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "PSFFIS(2) v1-0E — Fundusz Inwestycyjny Połączony z Subfunduszami, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/PSFFI_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/06/13814/schemat.xsd"
+          ],
+          "sha256": "f1a9ff15914f590bfaa3170c289daebd1a4c6c50c15519467ae2ac17d40f78b7",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/06/13814/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/FunduszInwestycyjnyStruktury/FunduszInwestycyjnyStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "PSFFI(2) v1-0E — Fundusz Inwestycyjny Połączony, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFASIT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/12/13823/schemat.xsd"
+          ],
+          "sha256": "f6a398116462e65904ad8ec9db0c5be859b15dcbf656ff878521d5f05abd69bc",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/12/13823/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/ASIStruktury/ASIStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFASIT(2) v1-0E — Alternatywne Spółki Inwestycyjne w tysiącach, nowy wzór CRD. UWAGA: zastąpiony przez wersję v2-0E (wzór 2026/02/13/14163) z tą samą datą początkową."
+        },
+        {
+          "path": "auxiliary/SFASIT_2_v2_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2026/02/13/14163/schemat.xsd"
+          ],
+          "sha256": "25b3a965b7929030c8681fc12c27940d8b06022addde212df9ec46d38d0c3d73",
+          "namespace": "http://crd.gov.pl/wzor/2026/02/13/14163/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2026/01/15/eD/ASIStruktury/ASIStrukturyDanychSprFin_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFASIT(2) v2-0E — Alternatywne Spółki Inwestycyjne w tysiącach, zaktualizowana wersja wzoru z 2026-02-13 (zastępuje v1-0E ID 13823)."
+        },
+        {
+          "path": "auxiliary/SFASIZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/12/13824/schemat.xsd"
+          ],
+          "sha256": "f19b57fdd8838b8fed922eadd7b8dad0286dc7b2a0643857860910551c24a082",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/12/13824/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/ASIStruktury/ASIStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFASIZ(2) v1-0E — Alternatywne Spółki Inwestycyjne w złotych, nowy wzór CRD. UWAGA: zastąpiony przez wersję v2-0E (wzór 2026/02/10/14162) z tą samą datą początkową."
+        },
+        {
+          "path": "auxiliary/SFASIZ_2_v2_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2026/02/10/14162/schemat.xsd"
+          ],
+          "sha256": "760646d7bdd025f862a41a8317966106c08e5a39efa6c47f9843e19aa67e70b7",
+          "namespace": "http://crd.gov.pl/wzor/2026/02/10/14162/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2026/01/15/eD/ASIStruktury/ASIStrukturyDanychSprFin_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFASIZ(2) v2-0E — Alternatywne Spółki Inwestycyjne w złotych, zaktualizowana wersja wzoru z 2026-02-10 (zastępuje v1-0E ID 13824)."
+        },
+        {
+          "path": "auxiliary/SFBNKT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/12/13825/schemat.xsd"
+          ],
+          "sha256": "bb35a0864c0e2911ead3d2e8086a381c0b87bbd9d589fa49f9025b3011ccfb0c",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/12/13825/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/BankStruktury/BankStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFBNKT(2) v1-0E — Banki w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFBNKZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/12/13826/schemat.xsd"
+          ],
+          "sha256": "90e96589aa8f2cfbe5607b3acd8a9aa9e987d1d72bd14d587d0553848ddbaa91",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/12/13826/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/BankStruktury/BankStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFBNKZ(2) v1-0E — Banki w złotych, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFDMAT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/12/13827/schemat.xsd"
+          ],
+          "sha256": "2452452c54921a9fe9f4f103c5c5e7693c363ea1efbae9e00e3f4aadbdad73df",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/12/13827/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/DomMaklerskiStruktury/DomMaklerskiStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFDMAT(2) v1-0E — Domy Maklerskie w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFDMAZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/14/13829/schemat.xsd"
+          ],
+          "sha256": "97c4eef4aedea075ab628611cf1d6d41e2ab2f595210fdbfa96125e1be4fb34a",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/14/13829/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/DomMaklerskiStruktury/DomMaklerskiStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFDMAZ(2) v1-0E — Domy Maklerskie w złotych, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFE_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/14/13830/schemat.xsd"
+          ],
+          "sha256": "3a77a160953ae9c2645655873f51139e642c768e0373ce2c0a691ba5014bc138",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/14/13830/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFE(2) v1-0E — Emitenci (jednostki emitujące papiery wartościowe), nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFFI_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/07/23/13802/schemat.xsd"
+          ],
+          "sha256": "600318c0c55075b5a0c4daf238bd030dfc32c61399e00b70112b38db2bfff6f2",
+          "namespace": "http://crd.gov.pl/wzor/2025/07/23/13802/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/FunduszInwestycyjnyStruktury/FunduszInwestycyjnyStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFFI(2) v1-0E — Fundusz Inwestycyjny, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFJINT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/04/13810/schemat.xsd"
+          ],
+          "sha256": "c347267ea0be650948ad165bb98bbceb828785bf148c79882418773f5bd89ee6",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/04/13810/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaInnaStruktury/JednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFJINT(2) v1-0E — Jednostki inne w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFJINZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/07/13817/schemat.xsd"
+          ],
+          "sha256": "ee69992d4416f08c53e6b7ccd0d66350adc8ee1b5539d8e1ac8d900ec0e515bd",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/07/13817/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaInnaStruktury/JednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFJINZ(2) v1-0E — Jednostki inne w złotych, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFJMAT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/09/10/13846/schemat.xsd"
+          ],
+          "sha256": "87b69e6af9a0306d6dd743aa11eb25e0cc05849bfbbd65588377afc114706f80",
+          "namespace": "http://crd.gov.pl/wzor/2025/09/10/13846/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaInnaStruktury/JednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaMalaStruktury/JednostkaMalaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFJMAT(2) v1-0E — Jednostki małe w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFJMAZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/07/13818/schemat.xsd"
+          ],
+          "sha256": "cde6d07a29272574d0a6dc40e0f332dfc93e80e647bbfe2c7e919effdb08d233",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/07/13818/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaInnaStruktury/JednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaMalaStruktury/JednostkaMalaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFJMAZ(2) v1-0E — Jednostki małe (uproszczone), nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFJMIT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/11/13819/schemat.xsd"
+          ],
+          "sha256": "297ef3f69b27bd913fb6457a3950d6bda15cbc533f32877d5b98c6fc7a81c817",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/11/13819/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaInnaStruktury/JednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaMalaStruktury/JednostkaMalaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaMikroStruktury/JednostkaMikroStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFJMIT(2) v1-0E — Jednostki mikro w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFJMIZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/12/13821/schemat.xsd"
+          ],
+          "sha256": "eb20e39ca85aafc30d2367fcec00ec224854a791f0095d56d2cd99963cd9ec22",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/12/13821/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaInnaStruktury/JednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaMalaStruktury/JednostkaMalaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaMikroStruktury/JednostkaMikroStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFJMIZ(2) v1-0E — Jednostki mikro w złotych, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFJOPT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/12/13820/schemat.xsd"
+          ],
+          "sha256": "1748f9e6abb7b647295476890d279754e60150978ab091deee5a49e0d946bd01",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/12/13820/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaInnaStruktury/JednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaOpStruktury/JednostkaOpStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFJOPT(2) v1-0E — Organizacje Pożytku Publicznego w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFJOPZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/12/13822/schemat.xsd"
+          ],
+          "sha256": "f50b707be91808f00ec390b2f96934e4fe28e0fbb1c7c292eaacac840f93496a",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/12/13822/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaInnaStruktury/JednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/JednostkaOpStruktury/JednostkaOpStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFJOPZ(2) v1-0E — Organizacje Pożytku Publicznego w złotych, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFMSKOKT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/14/13828/schemat.xsd"
+          ],
+          "sha256": "c985e2937c77bd5182e1fdc9964794de26bdfa7031aa85ee6f6c54dcd9c27600",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/14/13828/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/MSKOKStruktury/MalaSKOKStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFMSKOKT(2) v1-0E — Małe SKOK w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFMSKOKZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/14/13831/schemat.xsd"
+          ],
+          "sha256": "08a817b1db1a51bdf15d58c66d6f48b9c33d0775ce18814486a364a502331a88",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/14/13831/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/MSKOKStruktury/MalaSKOKStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFMSKOKZ(2) v1-0E — Małe SKOK w złotych, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFSDMT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/09/12/13851/schemat.xsd"
+          ],
+          "sha256": "ae220370ad9f41eb7fd9e6600d7ff48e65064c506608aa2ac8faf42b6e010a40",
+          "namespace": "http://crd.gov.pl/wzor/2025/09/12/13851/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SkonsolidowanyDomMaklerskiStruktury/SkonsolidowanyDomMaklerskiStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFSDMT(2) v1-0E — Skonsolidowane domy maklerskie w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFSDMZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/09/12/13850/schemat.xsd"
+          ],
+          "sha256": "bd1e72b485f4c14649dd09a4b31a06ca12872c416e3398fd7e3eb7ff78eb29a4",
+          "namespace": "http://crd.gov.pl/wzor/2025/09/12/13850/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SkonsolidowanyDomMaklerskiStruktury/SkonsolidowanyDomMaklerskiStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFSDMZ(2) v1-0E — Skonsolidowane domy maklerskie w złotych, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFSINT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/25/13834/schemat.xsd"
+          ],
+          "sha256": "a17bccd69cfdf8f305d141eaa5f56bd2725be73abb6bbcc4c671fbbc280d2a32",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/25/13834/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SkonsolidowanaJednostkaInnaStruktury/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFSINT(2) v1-0E — Skonsolidowane jednostki inne w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFSINZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/09/16/13854/schemat.xsd"
+          ],
+          "sha256": "9fc0b734f6242e546d5af63d6307e2cd4688f59f8c2ceda378fd62e3ae1ec318",
+          "namespace": "http://crd.gov.pl/wzor/2025/09/16/13854/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SkonsolidowanaJednostkaInnaStruktury/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFSINZ(2) v1-0E — Skonsolidowane jednostki inne w złotych, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFSKOKT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/18/13833/schemat.xsd"
+          ],
+          "sha256": "b287141be148a83d971382b880c5cfb955564e41c04e0dd84422669ec33adc64",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/18/13833/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SKOKStruktury/SKOKStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFSKOKT(2) v1-0E — SKOK w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFSKOKZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/08/18/13832/schemat.xsd"
+          ],
+          "sha256": "860fd89e56d05a4e17c9455843e656aa99786b2cee2d78353d6b2fd8bb4819f7",
+          "namespace": "http://crd.gov.pl/wzor/2025/08/18/13832/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SKOKStruktury/SKOKStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFSKOKZ(2) v1-0E — SKOK w złotych, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFSZUT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/09/04/13842/schemat.xsd"
+          ],
+          "sha256": "a61ffa2a3216c1512189fb5dd6b7aef362a0e829056b16bbfee8d0889b68977d",
+          "namespace": "http://crd.gov.pl/wzor/2025/09/04/13842/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SkonsolidowanyZakladUbezpieczenStruktury/SkonsolidowanyZakladUbezpieczenStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFSZUT(2) v1-0E — Skonsolidowane zakłady ubezpieczeń w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFSZUZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/09/02/13841/schemat.xsd"
+          ],
+          "sha256": "104c5ac495528dbaea9779f54b7984ed83af218e83a630ae8ab93c86a198f36d",
+          "namespace": "http://crd.gov.pl/wzor/2025/09/02/13841/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SkonsolidowanyZakladUbezpieczenStruktury/SkonsolidowanyZakladUbezpieczenStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFSZUZ(2) v1-0E — Skonsolidowane zakłady ubezpieczeń w złotych, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFZURT_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/09/10/13847/schemat.xsd"
+          ],
+          "sha256": "6241cfc23fb5bf2aba6f37fca2e963a3600fcab5ab6e40bd7453f5459bfd4c1a",
+          "namespace": "http://crd.gov.pl/wzor/2025/09/10/13847/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/ZakladUbezpieczenStruktury/ZakladUbezpieczenStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFZURT(2) v1-0E — Zakłady Ubezpieczeń w tysiącach, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SFZURZ_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/09/11/13848/schemat.xsd"
+          ],
+          "sha256": "4b66c8dfe44e41b188b6d7a64e9cafe4adcf7551b59be280041759657d9341af",
+          "namespace": "http://crd.gov.pl/wzor/2025/09/11/13848/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/ZakladUbezpieczenStruktury/ZakladUbezpieczenStrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SFZURZ(2) v1-0E — Zakłady Ubezpieczeń w złotych, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SKOKStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SKOKStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/bd8cf078-3e30-4c4f-a934-2f6432a2b7e9"
+          ],
+          "sha256": "8a4c70f368dfdb78a7e36c44d87515b77c0f1bc93466c5d7729b2c13617d7604",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SKOKStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie finansowe SKOK (Spółdzielcza Kasa Oszczędnościowo-Kredytowa) wariant 1-2"
+        },
+        {
+          "path": "auxiliary/SKOKStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SKOKStruktury/SKOKStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "ba0a35c73de47e0fbb67a5e3ae6d5446d0b085c3b617c992e8d146044b2885d2",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/SKOKWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SKOKWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/669228a0-6dc9-46fe-b322-37e3d807584f"
+          ],
+          "sha256": "4fa534746aaafaf3d13e1d8afc936b8b9e7b9ba082d4c07c158fd5da5e738a5a",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SKOKWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/SKOKStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "SKOK w tysiącach złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/SKOKWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SKOKWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/9827311d-9c63-4723-ac6a-2d62c360e6f2"
+          ],
+          "sha256": "8a5e8fdab081f72f39dee78eb30af925970da4fbbd9b0f96413724924abb507c",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SKOKWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/SKOKStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "SKOK w złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/SOI_2_v1_0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/09/17/13856/schemat.xsd"
+          ],
+          "sha256": "583c53c2e592f8b91dd43894daa4021b383872d57769eff0195146ba73473564",
+          "namespace": "http://crd.gov.pl/wzor/2025/09/17/13856/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "note": "SOI(2) v1-0E — Pozostałe organizacje, nowy wzór CRD obowiązujący od 2026-01-01."
+        },
+        {
+          "path": "auxiliary/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "sha256": "53ffbbff3100cf1c6e8233320042ae205ad2ac82471e3ececd90b1c1a92cb911",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SkonsolidowanaJednostkaInnaStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Struktury danych sprawozdania finansowego — SkonsolidowanaJednostkaInna, wariant 1-2 (2019-09-01). Auxiliary: xs:import z odpowiadających mu schematów W Zlotych / W Tysiacach."
+        },
+        {
+          "path": "auxiliary/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v1-3.xsd",
+            "https://www.gov.pl/attachment/fd36aa04-298b-4ea7-8d63-51052e70ce46"
+          ],
+          "sha256": "c82efd8dd627e9160812c5cadc82389ebad6854f58a385f3d12ff210637933e2",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/27/SkonsolidowanaJednostkaInnaStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie skonsolidowane jednostki innej wariant 1-3"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SkonsolidowanaJednostkaInnaStruktury/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "a6f6e91f1db3fb5020f5f7fcbf2078dce0e6ebf54bcfbcffbb27444fd7683ca3",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanaJednostkaInnaWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanaJednostkaInnaWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/2b4ddfaf-9d92-4d3b-9cdb-9cd6db314684"
+          ],
+          "sha256": "ac05c6d8fd110497919a190d0783dc73db6b4482f3ced800033dd72dea8795c6",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SkonsolidowanaJednostkaInnaWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "SkonsolidowanaJednostkaInna v1-2 (historyczna)"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanaJednostkaInnaWTysiacach_1_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/SkonsolidowanaJednostkaInnaWTysiacach(1)_v1-3.xsd"
+          ],
+          "sha256": "db7a1f0738802600a22cd4fd776ae253c244fc1a5cde4cb67a8ad97f2a15b628",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/27/SkonsolidowanaJednostkaInnaWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "note": "SkonsolidowanaJednostkaInna w tysiącach złotych wariant 1-3"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanaJednostkaInnaWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanaJednostkaInnaWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/76f8a038-bcc3-42e7-9466-c6de2af10a0c"
+          ],
+          "sha256": "7c9ed516bb86dce134d8b1f146677b150c759391cd508266bfbaf9ef47543c31",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SkonsolidowanaJednostkaInnaWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "SkonsolidowanaJednostkaInna v1-2 (historyczna)"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanaJednostkaInnaWZlotych_1_v1-3.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/SkonsolidowanaJednostkaInnaWZlotych(1)_v1-3.xsd"
+          ],
+          "sha256": "8ed52b9199ac5c09c06fbb546e352f58fe3683461881e55acbbe1e1d426f886a",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2025/01/27/SkonsolidowanaJednostkaInnaWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2024/10/24/SkonsolidowanaJednostkaInnaStrukturyDanychSprFin_v1-3.xsd"
+          ],
+          "note": "SkonsolidowanaJednostkaInna w złotych wariant 1-3"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanyDomMaklerskiStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanyDomMaklerskiStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/6df23df4-02b3-41ec-8677-4afff936dd35"
+          ],
+          "sha256": "bc97a9670bcdfe0feaeba1cedf39fd45d755337445b576437a36f30d825eb5f9",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SkonsolidowanyDomMaklerskiStruktury",
+          "imports": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie skonsolidowane domu maklerskiego wariant 1-2"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanyDomMaklerskiStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SkonsolidowanyDomMaklerskiStruktury/SkonsolidowanyDomMaklerskiStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "c6db7853187f62807c85847d067d7b7b07a764c6e12f386727c9be79e36f9c0c",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanyDomMaklerskiWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanyDomMaklerskiWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/eb31e43a-a858-4918-8552-c7d028cdb759"
+          ],
+          "sha256": "8a74a4a217b4a9bbd1b67b6ecd1bc839542dfb868e3b86de85330bec42fea4bb",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SkonsolidowanyDomMaklerskiWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanyDomMaklerskiStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "SkonsolidowanyDomMaklerski w tysiącach złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanyDomMaklerskiWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanyDomMaklerskiWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/7234a2e2-32c3-4fef-87b9-160b10b1935b"
+          ],
+          "sha256": "96d34ad74ff65e0e028e51fa2c861a5ea05920d7fd7e3028b9743fa20d723b0b",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SkonsolidowanyDomMaklerskiWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanyDomMaklerskiStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "SkonsolidowanyDomMaklerski w złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanyZakladUbezpieczenStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanyZakladUbezpieczenStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/8883ac04-6925-4d5b-8f11-75dec597d94f"
+          ],
+          "sha256": "2318cb6013c5b2a84afcdc3f18b0e100b8c804ab5f5fef818a5939b6eee1e315",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SkonsolidowanyZakladUbezpieczenStruktury",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie skonsolidowane zakładu ubezpieczeń wariant 1-2"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanyZakladUbezpieczenStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/SkonsolidowanyZakladUbezpieczenStruktury/SkonsolidowanyZakladUbezpieczenStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "f36ca00bb3677ca2f66a306cf65ae9f940db4244c32f976a827eda883ab1dc8f",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanyZakladUbezpieczenWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanyZakladUbezpieczenWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/98df208c-5c61-49e4-a609-593478fd6ba5"
+          ],
+          "sha256": "19d6e5cbdb2994a074ae3e1e4984fbc77ed06c78af4a5c28ff3fc372783b4c85",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SkonsolidowanyZakladUbezpieczenWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanyZakladUbezpieczenStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "SkonsolidowanyZakladUbezpieczen w tysiącach złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/SkonsolidowanyZakladUbezpieczenWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanyZakladUbezpieczenWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/6f2fa1a7-586c-436e-95e0-bcaf4c71a069"
+          ],
+          "sha256": "ac6f1f8451f7d91d9eaf285f82ae0d1743f440ce4ab7c12e746c1df095ef575a",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/SkonsolidowanyZakladUbezpieczenWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/SkonsolidowanyZakladUbezpieczenStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "SkonsolidowanyZakladUbezpieczen w złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/StrukturyDanychSprFin_v1-0.xsd",
+          "urls": [
+            "https://www.mf.gov.pl/documents/764034/6464789/StrukturyDanychSprFin_v1-0.xsd",
+            "https://www.gov.pl/attachment/82ac90ae-c564-43f1-833b-b77ed78879fb"
+          ],
+          "sha256": "12d1be2c2fa5b4549c3a0d44b35427e88dab572b991a3d403eaaa40930bbeafd",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/DefinicjeTypySprawozdaniaFinansowe/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/02/01/eD/KodyPKD/KodyPKD_v2-0E.xsd"
+          ],
+          "note": "Wspólne typy dla sprawozdań finansowych wariant 1-0 (historyczna, mf.gov.pl)"
+        },
+        {
+          "path": "auxiliary/StrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/cf7fdaa7-d34a-4a15-923a-058f1a3efcff"
+          ],
+          "sha256": "581907f6c14992ea0aabef4efaf55d77ac40e2aea94d77a099e7564a3fb6ea58",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/DefinicjeTypySprawozdaniaFinansowe/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/02/01/eD/KodyPKD/KodyPKD_v2-0E.xsd"
+          ],
+          "note": "Wspólne typy dla sprawozdań finansowych wariant 1-2 (2018-07-09) — importowane przez v1-2 i v1-3"
+        },
+        {
+          "path": "auxiliary/StrukturyDanychSprFin_v1-5.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/DefinicjeTypySprawozdaniaFinansowe/StrukturyDanychSprFin_v1-5.xsd"
+          ],
+          "sha256": "bc9f4d80f370683abf8f02a400bac0b2024827def726cc4f00a037551e8a4bcc",
+          "namespace": "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/09/22/DefinicjeTypySprawozdaniaFinansowe/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/KodyCechKrajow_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/02/01/eD/KodyPKD/KodyPKD_v2-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/StrukturyDanych_v5-0E.xsd"
+          ],
+          "note": "Wspólne typy dla sprawozdań finansowych wariant 1-5 (2020-09-22)"
+        },
+        {
+          "path": "auxiliary/StrukturyDanychSprFin_v1-6.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/12/31/DefinicjeTypySprawozdaniaFinansowe/StrukturyDanychSprFin_v1-6.xsd"
+          ],
+          "sha256": "6ef9f7ab1d42c67e3d6953885fbea0b44f02c607c8e9bcd0b8c7025b85555e19",
+          "namespace": "https://www.gov.pl/static/finanse/SF/DefinicjeTypySprawozdaniaFinansowe/2020/12/31/DefinicjeTypySprawozdaniaFinansowe/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/KodyCechKrajow_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/02/01/eD/KodyPKD/KodyPKD_v2-0E.xsd",
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"
+          ],
+          "note": "Wspólne typy dla sprawozdań finansowych wariant 1-6 (2020-12-31)"
+        },
+        {
+          "path": "auxiliary/StrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "cbec85e7f791d9dfa0b0086b2ff5d0fac7684f75fb9e5a9d46af19ad9f19e8a5",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/08/18/eD/KodyPKD/KodyPKD_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2023/09/06/eD/KodyKrajow/KodyKrajow_v13-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/01/01/eD/KodyCECHKRAJOW/KodyCechKrajowWaluty_v6-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/01/01/eD/KodyPKD/KodyPKD_v4-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/StrukturyDanych_v10-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/StrukturyDanych_v10-0E.xsd"
+          ],
+          "sha256": "1137ce6e3c11c2b9ef3f05e4e72d6dcd6b4fa94908ea558f2ba15de0259bb2aa",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/ElementarneTypyDanych_v10-0E.xsd"
+          ],
+          "note": "Definicje typów wariant 10 (2022-01-05) — auxiliary used by KSeF FA(2), FA(3) and JPK_KR_PD v1; ten plik wymaga ElementarneTypyDanych_v10 via xsd:include"
+        },
+        {
+          "path": "auxiliary/StrukturyDanych_v12-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd"
+          ],
+          "sha256": "01c45f7515f46cfa9bec843feef1409c126af3bee4d4e25f0325ae6323a9d512",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/",
+          "note": "Definicje typów wariant 12 (2022-09-13) — auxiliary used by JPK_V7M v3, JPK_V7K v3"
+        },
+        {
+          "path": "auxiliary/StrukturyDanych_v4-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd"
+          ],
+          "sha256": "a552ffb48be94a6825e4633f32fbed49e0b9f7684a987798ea80f19dbb640dbc",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/ElementarneTypyDanych_v4-0E.xsd"
+          ],
+          "note": "Definicje typów wariant 4 (2016-01-25) — auxiliary used by all legacy JPK v1: JPK_KR, JPK_FA, JPK_MAG, JPK_WB, JPK_PKPIR, JPK_EWP, JPK_VAT"
+        },
+        {
+          "path": "auxiliary/StrukturyDanych_v5-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/StrukturyDanych_v5-0E.xsd"
+          ],
+          "sha256": "11c0a7d3d18fd07f87e3fb51eecfa31b87915bc708bca6b8868f465ae5791365",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/ElementarneTypyDanych_v5-0E.xsd"
+          ],
+          "note": "Struktury danych wariant 5-0E z CRD"
+        },
+        {
+          "path": "auxiliary/StrukturyDanych_v6-0E.xsd",
+          "urls": [
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/StrukturyDanych_v6-0E.xsd"
+          ],
+          "sha256": "f1a8098c96b50da0a979caa1d0a4ba64e89c7c9e0ade5cb9d65fa083adb3189c",
+          "namespace": "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/",
+          "imports": [
+            "https://www.gov.pl/static/finanse/typy/DefinicjeTypy/ElementarneTypyDanych_v6-0E.xsd"
+          ],
+          "note": "Struktury danych wariant 6-0E z gov.pl/finanse"
+        },
+        {
+          "path": "auxiliary/StrukturyDanych_v8-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/StrukturyDanych_v8-0E.xsd"
+          ],
+          "sha256": "ec0ee83d06b076c1ba4ad038f31aa0c35e3083fd19359fdb4c5cc20acaca4bba",
+          "namespace": "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/ElementarneTypyDanych_v8-0E.xsd"
+          ],
+          "note": "Definicje typów wariant 8 (2021-06-08) — auxiliary used by JPK_V7M v2, JPK_V7K v2"
+        },
+        {
+          "path": "auxiliary/ZakladUbezpieczenStrukturyDanychSprFin_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/ZakladUbezpieczenStrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/attachment/45bedd6c-3251-4269-b73a-2e1b293c4efe"
+          ],
+          "sha256": "c88a6e0bd0efae3f35c9ef5f44a87fc7f89ce50079b024a131e2fddcc6bb6e90",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/ZakladUbezpieczenStruktury",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "Sprawozdanie finansowe zakładu ubezpieczeń wariant 1-2"
+        },
+        {
+          "path": "auxiliary/ZakladUbezpieczenStrukturyDanychSprFin_v2-0E.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/ZakladUbezpieczenStruktury/ZakladUbezpieczenStrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "sha256": "9af78a9e5cd5d56931407ff72db15c1f1cbefed771f573b8c47b39ce93984988",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/07/31/eD/StrukturyDanychSprFin/StrukturyDanychSprFin_v2-0E.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/ZakladUbezpieczenWTysiacach1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/ZakladUbezpieczenWTysiacach(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/18fada7e-ae7d-4ebb-b395-abdd185ea6fb"
+          ],
+          "sha256": "4a8f16a7b96a6ea653c5d148768039b0165e7cca1d7ee6c09f956accd9a8d08b",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/ZakladUbezpieczenWTysiacach",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/ZakladUbezpieczenStrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "ZakladUbezpieczen w tysiącach złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/ZakladUbezpieczenWZlotych1_v1-2.xsd",
+          "urls": [
+            "https://www.gov.pl/documents/2034621/2182793/ZakladUbezpieczenWZlotych(1)_v1-2.xsd",
+            "https://www.gov.pl/attachment/12bfc3de-933b-4b60-9967-a439a453fee2"
+          ],
+          "sha256": "12f541fa873722f029a661efa8abd72ed210978f67f2e6df792d8811d583d35b",
+          "namespace": "http://www.mf.gov.pl/schematy/SF/DefinicjeTypySprawozdaniaFinansowe/2018/07/09/ZakladUbezpieczenWZlotych",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/StrukturyDanychSprFin_v1-2.xsd",
+            "https://www.gov.pl/documents/2034621/2182793/ZakladUbezpieczenStrukturyDanychSprFin_v1-2.xsd"
+          ],
+          "note": "ZakladUbezpieczen w złotych wariant 1-2"
+        },
+        {
+          "path": "auxiliary/adres.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/adres/2009/11/09/adres.xsd"
+          ],
+          "sha256": "4e09bc5931caba664bc11060e4d23296554af79ff0c56eb42f413be3a4a3a443",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/zewnetrzne/2008/05/09/CountryCode.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/instytucja.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/instytucja/2009/11/16/instytucja.xsd"
+          ],
+          "sha256": "9ac928bc1c91449e14cf4c9c04e8e2ea616e393e4cf47cc9691f6ad028f93ca3",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/adres/2009/11/09/adres.xsd",
+            "http://crd.gov.pl/xml/schematy/osoba/2009/11/16/osoba.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/meta.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/meta/2009/11/16/meta.xsd"
+          ],
+          "sha256": "fe9e92f38474318a3891313bd427f14b415f7ded295c88eaec3d010b2e41884e",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/instytucja/2009/11/16/instytucja.xsd",
+            "http://crd.gov.pl/xml/schematy/osoba/2009/11/16/osoba.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/osoba.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/osoba/2009/11/16/osoba.xsd"
+          ],
+          "sha256": "98ddc0fc996380f0f1b7077fe0d5247638393d9e8f2faa504178e4d019a351f6",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/adres/2009/11/09/adres.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "auxiliary/struktura.xsd",
+          "urls": [
+            "http://crd.gov.pl/xml/schematy/struktura/2009/11/16/struktura.xsd"
+          ],
+          "sha256": "43357b41167c34efb3780fccdb68030bce75de9a9b8fb0ff0ed9092cf6b878c6",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/meta/2009/11/16/meta.xsd"
+          ],
+          "note": "ESF 2026 (2) — definicje/struktura, dolaczony 2026-06-02 z CRD"
+        },
+        {
+          "path": "jpk_ewp_1.xsd",
+          "urls": [
+            "https://www.gov.pl/attachment/a582e8b8-d103-41f5-b0b7-f92ab4c75063"
+          ],
+          "sha256": "99609a92c676e99d17df192a059bc427633638a3d83365d802e61ae9d9be8a39",
+          "namespace": "http://jpk.mf.gov.pl/wzor/2016/03/09/03097/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/KodyCechKrajow_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd"
+          ],
+          "note": "Ewidencja przychodów (ryczałt) — wariant 1 (2016-03-09)."
+        },
+        {
+          "path": "jpk_fa_1.xsd",
+          "urls": [
+            "https://www.gov.pl/attachment/ddd11d46-c396-4175-be7f-f52dda99d84c"
+          ],
+          "sha256": "dfb8c59ff1674d4e92220d0551a7fcd70069e762b9166b14e1cef39f517bc551",
+          "namespace": "http://jpk.mf.gov.pl/wzor/2016/03/09/03095/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/KodyCechKrajow_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd"
+          ],
+          "note": "Faktury sprzedaży VAT — wariant 1 (2016-03-09)."
+        },
+        {
+          "path": "jpk_fa_4.xsd",
+          "urls": [
+            "https://www.gov.pl/attachment/aaa27be2-3663-46cd-bf53-f8925f0170b3"
+          ],
+          "sha256": "7ad0a6fb0476345b5af604c9a7ce4c967f97852592e7bd01e668ba2ab668dc51",
+          "namespace": "http://jpk.mf.gov.pl/wzor/2022/02/17/02171/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2018/08/24/eD/DefinicjeTypy/StrukturyDanych_v5-0E.xsd"
+          ],
+          "note": "Faktury sprzedaży VAT — wariant 4 (2022-02-17). Schemat nie jest dołączony."
+        },
+        {
+          "path": "jpk_kr_1.xsd",
+          "urls": [
+            "https://www.gov.pl/attachment/6fe929f1-398d-45ac-baa3-e4a12a336a42"
+          ],
+          "sha256": "eeda7c0924b4c889933083af92706a0f5f0c54155251e5063108c6ace4dcf9c1",
+          "namespace": "http://jpk.mf.gov.pl/wzor/2016/03/09/03091/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/KodyCechKrajow_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd"
+          ],
+          "note": "Księgi rachunkowe — wariant 1 (2016-03-09)."
+        },
+        {
+          "path": "jpk_kr_pd_1.xsd",
+          "urls": [],
+          "sha256": "4b28a37fff46bfbe99b75afdb2bb5116f567cc29ee60e0935ac20c5d61a8889f",
+          "namespace": "http://jpk.mf.gov.pl/wzor/2024/09/04/09041/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/StrukturyDanych_v10-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/KodyUrzedowSkarbowych/KodyUrzedowSkarbowych_v8-0E.xsd"
+          ],
+          "note": "Księgi rachunkowe podmiotów prowadzących działalność gospodarczą — wariant 1 (2024-09-04). Przesyłany w trybie raportowym (JPK CIT). Brak znanego adresu pliku u MF; pobieranie tylko przez -from z lokalnej kopii."
+        },
+        {
+          "path": "jpk_mag_1.xsd",
+          "urls": [
+            "https://www.gov.pl/attachment/7e129fc5-b9c4-415b-8d93-41a22393859b"
+          ],
+          "sha256": "d2da9c60d0f61c1b4ede1ea4fe596217dbf28764465c152bf3963179b22435af",
+          "namespace": "http://jpk.mf.gov.pl/wzor/2016/03/09/03093/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/KodyCechKrajow_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd"
+          ],
+          "note": "Magazyn — wariant 1 (2016-03-09)."
+        },
+        {
+          "path": "jpk_pkpir_1.xsd",
+          "urls": [
+            "https://www.gov.pl/attachment/8cebafb2-5782-445e-b73a-2051b7081d10"
+          ],
+          "sha256": "23e1434df0ea090e6872a492c6f7ed26000b325ec4a028d32a85e7c272b94f38",
+          "namespace": "http://jpk.mf.gov.pl/wzor/2016/03/09/03096/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/KodyCechKrajow_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd"
+          ],
+          "note": "Podatkowa księga przychodów i rozchodów — wariant 1 (2016-03-09)."
+        },
+        {
+          "path": "jpk_v7k_2.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2021/12/27/11149/schemat.xsd"
+          ],
+          "sha256": "321d7f8e3c90065a40759d978087e952a73f9cdafec17281c27ba0ecda53e358",
+          "namespace": "http://crd.gov.pl/wzor/2021/12/27/11149/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/StrukturyDanych_v8-0E.xsd"
+          ],
+          "note": "JPK_V7K wariant 2 (2021-12-27) — main schema"
+        },
+        {
+          "path": "jpk_v7k_3.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/12/19/14089/JPK_V7K3.xsd",
+            "http://crd.gov.pl/wzor/2025/12/19/14089/schemat.xsd"
+          ],
+          "sha256": "3e7b70f30debf7ffe35127ac694b465004a45c0786b3267a92d91c7c29595d34",
+          "namespace": "http://crd.gov.pl/wzor/2025/12/19/14089/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/KodyUrzedowSkarbowych/KodyUrzedowSkarbowych_v8-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2023/09/06/eD/KodyKrajow/KodyKrajow_v13-0E.xsd"
+          ],
+          "note": "JPK_V7K wariant 3 (2025-12-19) — main schema. Pierwotny URL z index.json (JPK_V7K3.xsd) zwraca HTTP 202; działający jest /schemat.xsd pod tym samym wzorem"
+        },
+        {
+          "path": "jpk_v7m_2.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2021/12/27/11148/schemat.xsd"
+          ],
+          "sha256": "90cb53e1217449f3ebc671962922fd62f7a892cca26be46a6f5de3d0dc01b96b",
+          "namespace": "http://crd.gov.pl/wzor/2021/12/27/11148/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2021/06/08/eD/DefinicjeTypy/StrukturyDanych_v8-0E.xsd"
+          ],
+          "note": "JPK_V7M wariant 2 (2021-12-27) — main schema"
+        },
+        {
+          "path": "jpk_v7m_3.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/12/19/14090/JPK_V7M3.xsd",
+            "http://crd.gov.pl/wzor/2025/12/19/14090/schemat.xsd"
+          ],
+          "sha256": "1870324001ba1318f0535841b963571e970b45ef32ba5ca3d433f0dc5da412df",
+          "namespace": "http://crd.gov.pl/wzor/2025/12/19/14090/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/KodyUrzedowSkarbowych/KodyUrzedowSkarbowych_v8-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2023/09/06/eD/KodyKrajow/KodyKrajow_v13-0E.xsd"
+          ],
+          "note": "JPK_V7M wariant 3 (2025-12-19) — main schema"
+        },
+        {
+          "path": "jpk_vat_1.xsd",
+          "urls": [
+            "https://www.gov.pl/attachment/4afcac6d-4c7a-491b-bbb6-3da82a2a211b"
+          ],
+          "sha256": "f411769fd117710eeaf168fc183118012b9f6b5a9ceaec5b59330609c63bc744",
+          "namespace": "http://jpk.mf.gov.pl/wzor/2016/03/09/03094/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/KodyCechKrajow_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd"
+          ],
+          "note": "Ewidencja VAT sprzedaży i zakupów — wariant 3 (poprzednik JPK_V7M/V7K, obowiązywał do końca września 2020)"
+        },
+        {
+          "path": "jpk_wb_1.xsd",
+          "urls": [
+            "https://www.gov.pl/attachment/a533f872-6d51-41a1-b683-64a5e6f7fc19"
+          ],
+          "sha256": "a2d141b5a6dd79388b309f8e5e3e26cbc1151906bf70d7f15c40e76861c52dd5",
+          "namespace": "http://jpk.mf.gov.pl/wzor/2016/03/09/03092/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2013/05/23/eD/KodyCECHKRAJOW/KodyCechKrajow_v3-0E.xsd",
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2016/01/25/eD/DefinicjeTypy/StrukturyDanych_v4-0E.xsd"
+          ],
+          "note": "Wyciąg bankowy — wariant 1 (2016-03-09)."
+        },
+        {
+          "path": "ksef_fa_2.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2023/06/29/12648/schemat.xsd"
+          ],
+          "sha256": "b8acb60f0692ac2b05ac40ffcb1929b4d68c12b3c486cac4322e1699796f6999",
+          "namespace": "http://crd.gov.pl/wzor/2023/06/29/12648/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/StrukturyDanych_v10-0E.xsd"
+          ],
+          "note": "KSeF FA(2) wariant 2023-06-29 (12648) — main schema; kanoniczne URL nieustalone"
+        },
+        {
+          "path": "ksef_fa_3.xsd",
+          "urls": [
+            "http://crd.gov.pl/wzor/2025/06/25/13775/schemat.xsd"
+          ],
+          "sha256": "b646b6b525f51adf1bb2545f111fc8ca6e7aa6dd2f98948f1667d3695c06d958",
+          "namespace": "http://crd.gov.pl/wzor/2025/06/25/13775/",
+          "imports": [
+            "http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/01/05/eD/DefinicjeTypy/StrukturyDanych_v10-0E.xsd"
+          ],
+          "note": "KSeF FA(3) wariant 2025-06-25 (13775) — main schema; kanoniczne URL nieustalone"
+        }
+      ]
+    },
+    {
+      "name": "mf-instances",
+      "kind": "files",
+      "dest": "testdata/instances/mf",
+      "note": "Przykładowe pliki JPK_VAT opublikowane przez MF: https://www.podatki.gov.pl/podatki-firmowe/jednolity-plik-kontrolny/jpk_vat-z-deklaracja/pliki-do-pobrania/ (dane fikcyjne MF).",
+      "files": [
+        {
+          "path": "jpk_v7m_3_organization.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/dytop1tf/jpk_v7m-3-przyk%C5%82adowy-plik-w-formacie-xml.xml"
+          ],
+          "sha256": "58368f5c2bf22efe5a1f72e5c0da908e21b510c9666a6f53889d8c827df98547",
+          "note": "JPK_V7M(3), przykład MF (organizacja)"
+        },
+        {
+          "path": "jpk_v7m_3_person.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/sf3h1dey/jpk_v7m-3-przyk%C5%82adowy-plik-w-formacie-xml.xml"
+          ],
+          "sha256": "b7e128b81df476894274047fd6970daab86495c26aed92ce0cb65644b9334a1a",
+          "note": "JPK_V7M(3), przykład MF (osoba fizyczna)"
+        },
+        {
+          "path": "jpk_v7m_3_initupload.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/zlnfyez0/initupload-jpk_v7m-3.xml"
+          ],
+          "sha256": "9e77527ca82c4d4e25a47381cf5b7517b1f5efdc9459ace0f8b539d3f44ca82a",
+          "note": "InitUpload dla JPK_V7M(3)"
+        },
+        {
+          "path": "jpk_v7k_3_organization.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/hivhu0oh/jpk_v7k-3-przyk%C5%82adowy-plik-w-formacie-xml.xml"
+          ],
+          "sha256": "771d6e54ad2cebab5e3139230462d55231585400eea11ea186a5908ababfa2c2",
+          "note": "JPK_V7K(3), przykład MF (organizacja)"
+        },
+        {
+          "path": "jpk_v7k_3_person.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/rhvjhlbm/jpk_v7k-3-przyk%C5%82adowy-plik-w-formacie-xml.xml"
+          ],
+          "sha256": "a5fc4f076fd00fd66af0e27be34d3f9a0d7de11e606c992f9a7da827c30cb3ed",
+          "note": "JPK_V7K(3), przykład MF (osoba fizyczna)"
+        },
+        {
+          "path": "jpk_v7k_3_initupload.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/l5cocyp5/initupload-jpk_v7k-3.xml"
+          ],
+          "sha256": "b4c1316d07d9d3dba015c284997c08122e561d772ea1a8eceae45defd7f4ffe5",
+          "note": "InitUpload dla JPK_V7K(3)"
+        },
+        {
+          "path": "jpk_v7m_2.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/z2fnuxkl/przykladowy_jpk_v7m-2-_04_01_2022.xml"
+          ],
+          "sha256": "cc43d1b2bee77d3bc2c6beb304e4631d1933de7409689a92c0622a2b94ffbc9a",
+          "note": "JPK_V7M(2), przykład MF"
+        },
+        {
+          "path": "jpk_v7k_2.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/pzpam50v/przykladowy_jpk_v7k-2-_04_01_2022.xml"
+          ],
+          "sha256": "7f391aa0b852dd3ce44d7bb9bb0f178ab430d8562ce633ae540b01fece767be6",
+          "note": "JPK_V7K(2), przykład MF"
+        },
+        {
+          "path": "jpk_v7m_2_initupload.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/ckup5zea/przykladowy_initupload_jpk_v7m-2.xml"
+          ],
+          "sha256": "4bac52ba89f81bd10e9f012c743278a7e3616d77b17d82bee7b3d7a600ec49e0",
+          "note": "InitUpload dla JPK_V7M(2)"
+        },
+        {
+          "path": "jpk_v7k_2_initupload.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/2nqgvv22/przykladowy_initupload_jpk_v7k-2.xml"
+          ],
+          "sha256": "8d92bebef90c90d8847d2168a5e7adcafedeca72e63831f90ecaf7b95fa6ae80",
+          "note": "InitUpload dla JPK_V7K(2)"
+        },
+        {
+          "path": "jpk_v7m_1.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/dp4jmowi/jpk_v7m-1-_v1-2e.xml"
+          ],
+          "sha256": "aa721a16b494d631c723510cc0970d5904a0ae0930dcedf2472492e8a97a4563",
+          "note": "JPK_V7M(1), przykład MF"
+        },
+        {
+          "path": "jpk_v7k_1.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/nixdtpox/jpk_v7k-1-_v1-2e.xml"
+          ],
+          "sha256": "f505d1b63e7a32a6349c16a197b40b71edc7e47a13b377d8ac3d9c40e858ae79",
+          "note": "JPK_V7K(1), przykład MF"
+        },
+        {
+          "path": "jpk_v7m_1_initupload.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/rjmhrauf/initupload_jpk_v7m_v1-2e.xml"
+          ],
+          "sha256": "a7df19ff35c57e5d8ec9093a1ea70298c68c01ca4036920ac5a494040abe648a",
+          "note": "InitUpload dla JPK_V7M(1)"
+        },
+        {
+          "path": "jpk_v7k_1_initupload.xml",
+          "urls": [
+            "https://www.podatki.gov.pl/media/h5wdpq5c/initupload_jpk_v7k_v1-2e.xml"
+          ],
+          "sha256": "878df2dfa13cf9805aab94547a1d1cb6781ca1e0277878a43157da25e6be9c22",
+          "note": "InitUpload dla JPK_V7K(1)"
+        }
+      ]
+    }
+  ]
+}

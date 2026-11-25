@@ -54,12 +54,17 @@ kolumnę „Stan” w `docs/roadmap.md`.
 Zasady:
 - **czysty rodowód** (`docs/provenance.md`): piszemy z rekomendacji W3C. Nie czytaj, nie kopiuj i nie przenoś kodu
   innych walidatorów XSD ani parserów XML z walidacją (libxml2, Xerces, Saxon, xmlschema dla Pythona, lxml,
-  go-libxml2, helium i podobne). Wolno uruchamiać je jako czarną skrzynkę, żeby porównać wynik;
+  go-libxml2, helium, walidatory XSD w Go i podobne). Wolno uruchamiać je jako czarną skrzynkę, żeby porównać wynik.
+  Po spełnieniu K1 i K2 przegląd kodu konkurencji według ADR 0002: czyta osobny agent, oddaje notatkę prozą bez kodu,
+  wpis w `docs/review/`;
 - **zero zależności i zero cgo**: `go.mod` w katalogu głównym nie ma sekcji `require`; `CGO_ENABLED=0 go build ./...`
   musi przechodzić; porównanie z libxml2 żyje w osobnym module `tools/compare` i nie jest importowane przez bibliotekę;
 - wzorcem są rekomendacje i oczekiwane wyniki zestawu W3C, nie zachowanie libxml2: gdy libxml2 różni się od
   rekomendacji, wygrywa rekomendacja, a różnicę wpisujemy do `docs/differences.md` (odbiorca musi wiedzieć, że plik
   dotąd przyjmowany teraz zostanie odrzucony, albo odwrotnie);
+- dane testowe (zestawy W3C, schematy i przykłady MF) pobiera `go -C tools/fetch run . -root ../..` albo
+  `python tools/fetch/fetch.py` według `testdata/sources.json`; nie trafiają do repozytorium (ADR 0003). Obie wersje
+  narzędzia zmieniamy razem;
 - **żadnych prawdziwych danych podatników ani klientów w korpusie**: tylko przykłady opublikowane przez MF i dokumenty
   syntetyczne (`testdata/README.md`);
 - nazwy plików, pakietów i identyfikatorów po angielsku; komentarze i dokumentacja po polsku; `README.md` po angielsku;

@@ -23,6 +23,14 @@ Nie czytamy, nie kopiujemy i nie przenosimy kodu walidatorów XSD ani parserów 
 ani ich portów. Dotyczy to też `../controls/goxsdval` poza jego publicznym API: to opakowanie libxml2, więc wolno go
 wywoływać, a jego plików `*_libxml2.go` nie przenosimy.
 
+Lista nie jest zamknięta: obejmuje też nowe walidatory XSD, w tym napisane w Go (`knroy/go-xml`, `jacoelho/xsd`,
+`cB-Sigma/xsd`, `moolekkari/validatexml-go`), oraz lokalną kopię `../go-xsd-validate` (opakowanie libxml2).
+
+Powodem zakazu nie jest licencja (libxml2 jest na MIT, Xerces na Apache-2.0), tylko trzy cele: kod w całości nasz
+i łatwy do wykazania, pakiet dowodów wiążący kod z regułami rekomendacji oraz rekomendacja, nie cudza implementacja,
+jako wzorzec. Zakaz obowiązuje w fazie budowy. Po spełnieniu K1 i K2 wolno czytać kod konkurencji na licencji
+liberalnej według reguł z `adr/0002-competitor-code-review.md` (rozdzielenie ról, dziennik, bez kopiowania).
+
 ## Co wolno
 
 - uruchamiać libxml2 (przez `goxsdval` albo `xmllint`) i inne walidatory jako czarną skrzynkę i porównywać werdykty

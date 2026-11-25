@@ -30,3 +30,19 @@ jobs:
         run: CGO_ENABLED=0 go build ./...
       - run: go vet ./...
       - run: go test ./...
+      - name: fetch tool
+        run: go -C tools/fetch vet ./... && go -C tools/fetch test ./...
+
+  # wersja narzędzia w Pythonie (tools/fetch/fetch.py) dla osób bez Go, m.in. na Windows
+  fetch-python:
+    strategy:
+      matrix:
+        python: ["3.9", "3.x"]
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m unittest discover -s tools/fetch -v
