@@ -14,10 +14,12 @@
    Własne kody są stabilne niezależnie od libxml2; tabela pozwala odbiorcy użyć istniejących tłumaczeń.
 5. **API schematu.** (2026-11-25: `Config` rozszerzony zgodnie wstecz o `Namespaces`, `MaxDocuments`, `MaxDepth`;
    `Compile` zwraca `*SchemaError`; ADR 0006. Etap 5: `SchemaLocationHints`, `MaxErrors`, `MaxIdentityEntries`,
-   `Set.ValidateDocument`, `ErrLimit`, `ErrTooManyErrors`, pola `Error.Name`, `Value`, `Facet`, `Expected`; ADR 0008.) Czy wystawiamy skompilowany model schematu (typy, deklaracje) do odczytu, np. dla edytorów
+   `Set.ValidateDocument`, `ErrLimit`, `ErrTooManyErrors`, pola `Error.Name`, `Value`, `Facet`, `Expected`; ADR 0008.
+   Etap 6: `OnValue`, `TypedValue`, `Codes`, `LookupCode`, `LibXML2Code`; ADR 0009.) Czy wystawiamy skompilowany model schematu (typy, deklaracje) do odczytu, np. dla edytorów
    z podpowiedziami i dla generatorów formularzy, czy tylko `Compile` i `Validate`? Rekomendacja na start: tylko
    walidacja, model po pierwszym konsumencie.
-6. **Wartości typowane w wyniku.** Czy walidator ma oddawać wartości po normalizacji (np. `xs:decimal` jako tekst
+6. ~~**Wartości typowane w wyniku.**~~ Rozstrzygnięte w ADR 0009 (2026-11-25): `Config.OnValue(TypedValue)` (ścieżka,
+   nazwa, typ, typ wbudowany, wartość kanoniczna); bez funkcji walidacja nie zwalnia. Pierwotny opis: Czy walidator ma oddawać wartości po normalizacji (np. `xs:decimal` jako tekst
    kanoniczny, `xs:date`), żeby odbiorca nie parsował drugi raz? Rekomendacja: punkt rozszerzenia (funkcja zwrotna dla
    elementu z typem prostym) w etapie 6, nie w API rdzenia.
 7. ~~**Wersja Unicode w zestawie W3C.**~~ Rozstrzygnięte w ADR 0005 (2026-11-25): kategorie znaków z biblioteki

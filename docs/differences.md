@@ -11,6 +11,34 @@ wpis: przypadek, oba wyniki, co mówi rekomendacja (rozdział i reguła), kto ma
 | MS-Regex: reJ11, reJ13, reJ19, reJ21, reJ23, reJ25, reJ29, reJ31, reJ33, reJ35, reJ61, reJ69, reJ75, reJ77, reS21, reS42, reT63, reT84 | kategorie znaków spoza BMP według Unicode 15 (np. U+1D7A8 to `Lu`, U+1D7FF to `Nd`) | — (porównanie w etapie 3) | zestaw zakłada Unicode 3.0, w którym znaki spoza BMP nie mają kategorii; ADR 0005, pytanie 7 | wzorce z `\p{Lu}`, `\d` itd. przyjmą znaki spoza BMP; w korpusie MF bez znaczenia |
 | MS-Regex: reZ006i | U+0346 poza `\c` | — | produkcja CombiningChar z XML 1.0 2e kończy pierwszy przedział na U+0345; zestaw oczekuje U+0346 w `\c` | bez znaczenia dla korpusu MF |
 
+## Rozbieżności werdyktu z libxml2 (kategorie, etap 6)
+
+Stan 2026-11-25, libxml2 2.15.4 przez `goxsdval`, zestaw W3C z commitu `7bc3365c`. Pełna lista 528 przypadków
+(452 testy schematów, 76 testów dokumentów), każdy z kategorią: `differences-libxml2.md` (generowany przez
+`tools/compare`). „Rację ma” według oczekiwanego werdyktu zestawu. Rację ma goxsdgo w 519 przypadkach, libxml2 w 9;
+te 9 to odstępstwa opisane niżej.
+
+| Kategoria | Przypadki | Rację ma goxsdgo / libxml2 | Skutek dla odbiorcy |
+|---|---|---|---|
+| libxml2 przyjmuje restrykcję typu złożonego niezgodną z 3.4.6 i 3.9.6 | 264 | 263 / 1 | schemat dotąd przyjmowany zostanie odrzucony |
+| libxml2 przyjmuje wzorzec spoza dodatku F | 43 | 43 / 0 | schemat dotąd przyjmowany zostanie odrzucony |
+| libxml2 odrzuca schemat, który goxsdgo przyjmuje | 34 | 34 / 0 | schemat dotąd odrzucany zostanie przyjęty |
+| libxml2 pozwala zmienić aspekt ustalony (`fixed`) | 26 | 26 / 0 | schemat dotąd przyjmowany zostanie odrzucony |
+| libxml2 nie sprawdza części ograniczeń spójności aspektów | 24 | 23 / 1 | schemat dotąd przyjmowany zostanie odrzucony |
+| libxml2 odrzuca dokument według reguły oceny, którą goxsdgo stosuje inaczej | 23 | 22 / 1 | dokument dotąd odrzucany zostanie przyjęty |
+| libxml2 uznaje dokument za źle uformowany, a goxsdgo nie | 18 | 17 / 1 | dokument dotąd odrzucany zostanie przyjęty |
+| libxml2 nie sprawdza innych ograniczeń komponentów | 15 | 15 / 0 | schemat dotąd przyjmowany zostanie odrzucony |
+| libxml2 przyjmuje niepoprawną redefinicję | 15 | 14 / 1 | schemat dotąd przyjmowany zostanie odrzucony |
+| libxml2 przyjmuje dokument niezgodny ze schematem dla schematów | 12 | 10 / 2 | schemat dotąd przyjmowany zostanie odrzucony |
+| libxml2 nie sprawdza IDREF (`cvc-id.1`) | 11 | 11 / 0 | dokument dotąd przyjmowany zostanie odrzucony |
+| libxml2 nie sprawdza EDC | 10 | 10 / 0 | schemat dotąd przyjmowany zostanie odrzucony |
+| goxsdgo odrzuca wartość, którą libxml2 przyjmuje | 10 | 8 / 2 | dokument dotąd przyjmowany zostanie odrzucony |
+| goxsdgo odrzuca dokument według reguły oceny, której libxml2 nie stosuje | 9 | 9 / 0 | dokument dotąd przyjmowany zostanie odrzucony |
+| libxml2 nie wykrywa części niejednoznaczności (UPA) | 9 | 9 / 0 | schemat dotąd przyjmowany zostanie odrzucony |
+| libxml2 odrzuca wartość, którą goxsdgo przyjmuje | 5 | 5 / 0 | dokument dotąd odrzucany zostanie przyjęty |
+
+Na korpusie MF (170 schematów, 15 dokumentów) werdykty obu walidatorów są takie same.
+
 ## Różnice względem oczekiwań zestawu W3C (testy schematów, etap 3)
 
 | Przypadek | `goxsdgo` | Oczekiwane | Uzasadnienie | Propozycja |
@@ -22,7 +50,7 @@ wpis: przypadek, oba wyniki, co mówi rekomendacja (rozdział i reguła), kto ma
 | MS elemZ026, elemZ027_c, particlesV020 (queried) | poprawny | błędny | restrykcja z grupami podstawienia według normalizacji 2.1 w 3.9.6; choice z grupy podstawienia nie wymaga zachowania kolejności członków (rekomendacja jej nie określa); ADR 0007 | zostawić jako różnicę |
 | MS ste110 (queried) | błąd `src-simple-type.4` | poprawny | unia z cyklem w definicji | zostawić jako różnicę |
 | MS schU1 (disputed-test) | według rekomendacji | sporny | status sporny w zestawie | zostawić jako różnicę |
-| MS anyURI_b006 (stable) | poprawny | błędny | ukośnik wsteczny przyjmujemy: część 2, 3.2.17 każe przed sprawdzeniem z RFC 2396 zamienić znaki według XLink §5.4, a ukośnik wsteczny staje się wtedy `%5C`, czyli poprawnym URI | do sprawdzenia w etapie 6 |
+| MS anyURI_b006 (stable) | poprawny | błędny | ukośnik wsteczny przyjmujemy: część 2, 3.2.17 każe przed sprawdzeniem z RFC 2396 zamienić znaki według XLink §5.4, a ukośnik wsteczny staje się wtedy `%5C`, czyli poprawnym URI | rozstrzygnięte w ADR 0009, punkt 7: zostaje |
 
 ## Różnice względem oczekiwań zestawu W3C (testy dokumentów, etap 5)
 
@@ -30,9 +58,9 @@ wpis: przypadek, oba wyniki, co mówi rekomendacja (rozdział i reguła), kto ma
 |---|---|---|---|---|
 | Saxonica XmlVersions xv002–xv100 | według znaków nazw XML 1.0 2e | według XML 1.0 5e albo XML 1.1 | typy nazw (`Name`, `NCName`, `NMTOKEN`) w XSD 1.0 2e opierają się na XML 1.0 2e | nazwy z nowszymi znakami odrzucane; w korpusie MF bez znaczenia |
 | MS gMonth002, gMonth004 | „--MM” | „--MM--” | wydanie drugie (część 2, 3.2.14, z erratą) podaje postać „--MM”; zestaw zakłada pierwsze wydanie | wartości „--MM--” odrzucane |
-| MS anyURI_a004 | według etapu 2 | inaczej | literał `anyURI`, jak `anyURI_b006` wyżej | do sprawdzenia w etapie 6 |
-| MS stZ073b | poprawny | błędny | restrykcja unii przyjmuje `xsi:type` wskazujący typ członka (ADR 0008, punkt 11) | do sprawdzenia w etapie 6 |
-| MS attP031 | błędny | poprawny | atrybut zabroniony (`use="prohibited"`) jest niedozwolony w dokumencie (ADR 0008, punkt 11) | do sprawdzenia w etapie 6 |
+| MS anyURI_a004 | według etapu 2 | inaczej | literał `anyURI`, jak `anyURI_b006` wyżej | rozstrzygnięte w ADR 0009, punkt 7: zostaje |
+| MS stZ073b | poprawny | błędny | restrykcja unii przyjmuje `xsi:type` wskazujący typ członka (ADR 0008, punkt 11) | rozstrzygnięte w ADR 0009, punkt 7: zostaje |
+| MS attP031 | błędny | poprawny | atrybut zabroniony (`use="prohibited"`) jest niedozwolony w dokumencie (ADR 0008, punkt 11) | rozstrzygnięte w ADR 0009, punkt 7: zostaje |
 | korzeń bez deklaracji globalnej | błąd `cvc-elt.1` | według zestawu | ocena korzenia jest ścisła; luźna ocena dotyczy tylko symboli wieloznacznych z `processContents="lax"` (ADR 0008) | dokument z nieznanym korzeniem jest odrzucany, jak w libxml2 |
 
 Pozostałe niezaliczone testy dokumentów (Missing, errF001, ste110, schU3–schU5, particlesZ001 i pokrewne) wynikają ze
