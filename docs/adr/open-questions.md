@@ -38,7 +38,8 @@
    nie podaje. Rekomendacja: zostawić koniec znacznika jako pozycję główną (zgodność z odbiorcą, K3) i dodać początek
    jako osobne pole, jeśli odbiorca o to poprosi. Do decyzji przy przepięciu odbiorcy (etap 8). Od etapu 6b API
    podaje też miejsce wstawienia brakującego elementu (`InsertLine`, `InsertColumn`); pozycja główna bez zmian.
-9. **Modele niejednoznaczne co do liczników.** Model zgodny z UPA, ale niejednoznaczny co do liczników, np.
+9. ~~**Modele niejednoznaczne co do liczników.**~~ Rozstrzygnięte 2026-11-25 (decyzja właściciela): zostaje `ErrLimit`.
+   Pierwotny opis: Model zgodny z UPA, ale niejednoznaczny co do liczników, np.
    `(a{2,3}){1,50000}`, na długim dokumencie przekracza `MaxConfigurations` i kończy się `ErrLimit` zamiast werdyktu
    (ADR 0011). Ścisłe łączenie zbiorów wartości liczników usunęłoby to ograniczenie kosztem złożoności. Rekomendacja:
    zostawić `ErrLimit` (w zestawie W3C i korpusie MF takich przypadków nie ma) i wrócić, jeśli trafi się u odbiorcy.
