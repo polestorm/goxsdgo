@@ -12,7 +12,8 @@
    w etapie 1.
 4. **Kody błędów.** Własna numeracja z tabelą `compat` do kodów libxml2 (rekomendacja), czy wprost kody libxml2?
    Własne kody są stabilne niezależnie od libxml2; tabela pozwala odbiorcy użyć istniejących tłumaczeń.
-5. **API schematu.** Czy wystawiamy skompilowany model schematu (typy, deklaracje) do odczytu, np. dla edytorów
+5. **API schematu.** (2026-11-25: `Config` rozszerzony zgodnie wstecz o `Namespaces`, `MaxDocuments`, `MaxDepth`;
+   `Compile` zwraca `*SchemaError`; ADR 0006.) Czy wystawiamy skompilowany model schematu (typy, deklaracje) do odczytu, np. dla edytorów
    z podpowiedziami i dla generatorów formularzy, czy tylko `Compile` i `Validate`? Rekomendacja na start: tylko
    walidacja, model po pierwszym konsumencie.
 6. **Wartości typowane w wyniku.** Czy walidator ma oddawać wartości po normalizacji (np. `xs:decimal` jako tekst

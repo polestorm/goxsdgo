@@ -11,7 +11,7 @@
 | korpus schematów | `testdata/schemas/mf/`, `TestSchemaCorpus` | każdy ze 170 schematów MF (JPK, KSeF, e-Sprawozdania) kompiluje się bez błędów; importy rozwiązuje katalog adresów z manifestu, bez sieci; zapadki `testdata/mf-schemas.ratchet`, `testdata/mf-instances.ratchet` |
 | korpus dokumentów | `testdata/instances/` + `expected.json`, `TestInstanceCorpus` | werdykt (później też kody i miejsca błędów) zgodny z oczekiwanym; zapadka jak wyżej |
 | korpus własny | `testdata/corpus/` | małe schematy i dokumenty dla każdego wymagania, w tym polskie znaki, duże liczności, typy z ograniczeniami |
-| różnicowe | `tools/compare` (osobny moduł, cgo) | ten sam zestaw W3C i korpus MF przez libxml2 (`goxsdval`); werdykty dla każdego przypadku w `out/compare/*.tsv`; od etapu 3 raport różnic względem `goxsdgo` i miejsca pierwszego błędu; każda różnica werdyktu w `differences.md` |
+| różnicowe | `tools/compare` (osobny moduł, cgo) | ten sam zestaw W3C i korpus MF przez libxml2 (`goxsdval`); werdykty dla każdego przypadku w `out/compare/*.tsv`, od etapu 3 także rozbieżności testów schematów goxsdgo i libxml2 (`out/compare/schemas-goxsdgo-libxml2.tsv`); od etapu 3 raport różnic względem `goxsdgo` i miejsca pierwszego błędu; każda różnica werdyktu w `differences.md` |
 | bezpieczeństwo | `TestSafeByDefault` | brak sieci i encji zewnętrznych, limity głębokości i rozmiaru, schemat spoza `fs.FS` odrzucony |
 | pamięć | `TestStreamingMemory` | syntetyczny JPK 1 GB (generator w teście, nie plik): szczyt pamięci < 64 MB |
 | powtarzalność | `TestDeterministic` | wielokrotna walidacja daje te same błędy w tej samej kolejności |
@@ -60,6 +60,7 @@ Wyniki zapisujemy tutaj z datą, wersją i sposobem pomiaru.
 
 | Data | Commit | W3C (zaliczone / w zakresie) | Korpus MF | Zgodność z libxml2 | Uwagi |
 |---|---|---|---|---|---|
+| 2026-11-25 | `0546663` | 14 048 / 39 461 (testy schematów 14 048 / 14 393: poprawne 11 024 / 11 044, błędne 3 024 / 3 349; testy dokumentów 0 / 25 068, etap 5) | schematy 170 / 170, dokumenty 0 / 8 | testy schematów: ten sam werdykt co libxml2 w 98,6% z 14 316 porównywalnych; z 196 rozbieżności rację ma goxsdgo w 158, libxml2 w 38 | etap 3; 324 z 325 niezaliczonych „błędnych” czeka na kontrole z etapu 4 (265 MS-Particles, 24 MS-ModelGroups, reszta UPA, EDC, redefinicje grup) |
 | 2026-11-25 | `892eade` | 0 / 39 461 | — | — | etap 2, pomiar pośredni (adapter, nie K1): NIST 22 678 / 22 678 odczytanych z 23 170 w zakresie (nieodczytane: 492 przypadki ID z typem złożonym), MS-Regex 2 772 / 2 789 z 3 998, MS-DataTypes 29 / 29 z 3 430; 17 rozbieżności opisanych w `differences.md`; `go test ./internal/datatypes -run W3CDatatypes -v` |
 | 2026-11-25 | `b502002` | 0 / 39 461 | — | — | etap 1: XML Conformance 1725 / 1727 (xmltest 299/299, sun 101/101, oasis 323/323, ibm 526/527, eduni 476/477); `encoding/xml` na tym samym zestawie 1146 / 1727; werdykt dobrej formy jak w libxml2 dla 42 018 plików `.xml` i `.xsd` z zestawu W3C XSD i korpusu MF poza 3; `go test ./internal/xmlreader -run XMLConformance -v` |
 | 2026-11-25 | `bb585b7` | 0 / 39 461 | schematy 0 / 170, dokumenty 0 / 8 | — | etap 0: infrastruktura bez implementacji; `go test ./xsd -run 'W3C\|Corpus' -v` |

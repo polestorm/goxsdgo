@@ -11,6 +11,18 @@ wpis: przypadek, oba wyniki, co mówi rekomendacja (rozdział i reguła), kto ma
 | MS-Regex: reJ11, reJ13, reJ19, reJ21, reJ23, reJ25, reJ29, reJ31, reJ33, reJ35, reJ61, reJ69, reJ75, reJ77, reS42, reT63 | kategorie znaków spoza BMP według Unicode 15 (np. U+1D7A8 to `Lu`, U+1D7FF to `Nd`) | — (porównanie w etapie 3) | zestaw zakłada Unicode 3.0, w którym znaki spoza BMP nie mają kategorii; ADR 0005, pytanie 7 | wzorce z `\p{Lu}`, `\d` itd. przyjmą znaki spoza BMP; w korpusie MF bez znaczenia |
 | MS-Regex: reZ006i | U+0346 poza `\c` | — | produkcja CombiningChar z XML 1.0 2e kończy pierwszy przedział na U+0345; zestaw oczekuje U+0346 w `\c` | bez znaczenia dla korpusu MF |
 
+## Różnice względem oczekiwań zestawu W3C (testy schematów, etap 3)
+
+| Przypadek | `goxsdgo` | Oczekiwane | Uzasadnienie | Propozycja |
+|---|---|---|---|---|
+| Saxonica Missing: missing001, missing002, missing003, missing006 | błąd `src-resolve` | poprawny | 43 przypadki Sun i Microsoft oczekują błędu dla nierozwiązanego odwołania; ADR 0006 | zostawić jako różnicę |
+| Saxonica VC: vc001, vc002, vc014, vc024-11; IBM s3_10_6ii01, s3_10_6ii02, s3_10_6ii04, s3_10_1ii08, s3_10_1ii09 | błąd | poprawny | konstrukcje XSD 1.1 (`vc:`, `xs:error`, `notQName`, `notNamespace`) bez żetonu wersji w metadanych; w XSD 1.0 schemat jest błędny | wyłączyć z powodem „XSD 1.1 bez żetonu” |
+| Saxonica XmlVersions: xv001, xv004 | błąd | poprawny | „Dĳkstra” (U+0133) nie jest NCName według znaków nazw XML 1.0 2e, z których korzysta XSD 1.0 2e | zostawić jako różnicę |
+| MS IDREFS_length006, NMTOKENS_length006 (stable), errF001 (queried) | błąd `length-minLength-maxLength` | poprawny | `length` i `minLength` w jednym kroku restrykcji są błędem według 4.3.1.4, punkty 1.2 i 2.2 | zostawić jako różnicę |
+| MS ste110 (queried) | błąd `src-simple-type.4` | poprawny | unia z cyklem w definicji | zostawić jako różnicę |
+| MS schU1 (disputed-test) | według rekomendacji | sporny | status sporny w zestawie | zostawić jako różnicę |
+| MS anyURI_b006 (stable) | poprawny | błędny | ukośnik wsteczny przyjmujemy: część 2, 3.2.17 każe przed sprawdzeniem z RFC 2396 zamienić znaki według XLink §5.4, a ukośnik wsteczny staje się wtedy `%5C`, czyli poprawnym URI | do sprawdzenia w etapie 6 |
+
 ## Wyłączenia z zestawu W3C
 
 | Grupa / przypadek | Powód |
