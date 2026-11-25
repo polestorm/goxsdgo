@@ -45,6 +45,40 @@ type Options struct {
 	Hints HintLoader
 	// Reader to limity czytnika.
 	Reader xmlreader.Limits
+	// OnValue, jeśli nie nil, dostaje każdą poprawną wartość typu prostego: treść elementu o typie prostym albo
+	// treści prostej i wartość atrybutu (pytanie 6, ADR 0009). Wywoływana synchronicznie, w kolejności dokumentu.
+	OnValue func(ValueEvent)
+}
+
+// ValueEvent to poprawna wartość typu prostego w dokumencie.
+type ValueEvent struct {
+	// Path to ścieżka elementu albo atrybutu (ADR 0008); Name to nazwa lokalna; Attribute: wartość atrybutu.
+	Path, Name string
+	Attribute  bool
+	// Type to nazwa typu ({przestrzeń}nazwa albo nazwa) albo "" dla typu anonimowego; Builtin to nazwa
+	// najbliższego typu wbudowanego, z którego typ jest wyprowadzony (np. "decimal", "date", "anySimpleType").
+	Type, Builtin string
+	// Canonical to wartość w postaci kanonicznej typu (XSD 2: postać kanoniczna; dla integer bez kropki).
+	Canonical string
+	// Line i Column to pozycja jak w błędach: koniec znacznika początkowego elementu albo atrybut.
+	Line, Column int
+}
+
+// emitValue przekazuje poprawną wartość do Options.OnValue.
+func (v *validator) emitValue(st *schema.SimpleType, val datatypes.Value, path, name string, attr bool, line, col int) {
+	ev := ValueEvent{Path: path, Name: name, Attribute: attr, Line: line, Column: col, Canonical: st.DT.Canonical(val)}
+	if st.Name.Local != "" {
+		ev.Type = st.Name.String()
+	}
+	for b := st; b != nil; {
+		if b.Builtin {
+			ev.Builtin = b.Name.Local
+			break
+		}
+		next, _ := b.Base.(*schema.SimpleType)
+		b = next
+	}
+	v.opts.OnValue(ev)
 }
 
 // Validate waliduje dokument z r według schematu sch. Pusta lista błędów oznacza dokument poprawny. Drugi wynik
@@ -148,6 +182,10 @@ type validator struct {
 	seenNS map[string]bool
 	// seenHints: wskazówki już przetworzone; powtórzenie tej samej wskazówki niczego nie dodaje do schematu.
 	seenHints map[Hint]bool
+	// rootNS: przestrzeń nazw elementu głównego. Komunikaty podają nazwy z tej przestrzeni bez niej
+	// („KodFormularza” zamiast „{http://crd.gov.pl/…}KodFormularza”), a nazwy z innych w postaci
+	// {przestrzeń}nazwa (ADR 0009). Pól Name i Expected to nie dotyczy.
+	rootNS string
 }
 
 type idref struct {
@@ -270,6 +308,9 @@ func (v *validator) report(e Error) {
 	if e.Message == "" {
 		e.Message = e.Code
 	}
+	if v.rootNS != "" {
+		e.Message = strings.ReplaceAll(e.Message, "{"+v.rootNS+"}", "")
+	}
 	v.errs = append(v.errs, e)
 	if v.opts.MaxErrors > 0 && len(v.errs) >= v.opts.MaxErrors {
 		panic(stop{ErrTooManyErrors})
@@ -325,6 +366,9 @@ func (v *validator) start(tok *xmlreader.Token) {
 	// Deklaracja z kontekstu (3.3.4, Schema-Validity Assessment (Element)).
 	var decl *schema.ElementDecl
 	process := schema.ProcessStrict
+	if parent == nil {
+		v.rootNS = name.Space
+	}
 	switch {
 	case parent == nil:
 		decl = v.sch.Elements[name]
@@ -396,9 +440,9 @@ func (v *validator) childDecl(parent *frame, fr *frame, name schema.QName) (*sch
 		exp := expectedNames(parent.matcher.Expected())
 		e := Error{Code: CodeComplexContent, Line: fr.line, Column: fr.col, Path: v.pathOf(fr), Name: name.Local, Expected: exp}
 		if len(exp) == 0 {
-			e.Message = fmt.Sprintf("element %s is not expected; no more child elements are allowed in %s", name, parent.name)
+			e.Message = fmt.Sprintf("unexpected element %s in %s; no more child elements are allowed here", name, parent.name)
 		} else {
-			e.Message = fmt.Sprintf("element %s is not expected; expected: %s", name, strings.Join(exp, ", "))
+			e.Message = fmt.Sprintf("unexpected element %s in %s; %s", name, parent.name, expectedPhrase(exp))
 		}
 		v.report(e)
 		parent.contentFailed = true
@@ -414,6 +458,14 @@ func (v *validator) childDecl(parent *frame, fr *frame, name schema.QName) (*sch
 		return v.sch.Elements[name], schema.ProcessStrict
 	}
 	return m.Element, schema.ProcessStrict
+}
+
+// expectedPhrase opisuje elementy dozwolone w miejscu błędu: „expected X” albo „expected one of: X, Y”.
+func expectedPhrase(exp []string) string {
+	if len(exp) == 1 {
+		return "expected " + exp[0]
+	}
+	return "expected one of: " + strings.Join(exp, ", ")
 }
 
 func expectedNames(list []schema.Expectation) []string {
@@ -725,6 +777,9 @@ func (v *validator) attribute(a *xmlreader.Attr, d *schema.AttributeDecl, u *sch
 			Message: fmt.Sprintf("attribute %s must have the fixed value %q", q, u.Value.Lexical)})
 	}
 	v.specialValues(d.Type, val, a.Line, a.Column, path, q.Local)
+	if v.opts.OnValue != nil {
+		v.emitValue(d.Type, val, path.String(), q.Local, true, a.Line, a.Column)
+	}
 }
 
 // lazyPath to ścieżka elementu albo jego atrybutu, liczona dopiero przy błędzie.
@@ -761,6 +816,7 @@ func dtError(err error, line, col int, path, name string) Error {
 			e.Code = inner.Code
 		}
 		e.Value = de.Value
+		e.Message = valueMessage(de, path, name)
 		if de.Facet != "" {
 			e.Facet = de.Facet
 			if de.Detail != "" {
@@ -943,7 +999,7 @@ func (v *validator) finishElement(fr *frame) {
 	if fr.matcher != nil && !fr.contentFailed && !fr.matcher.Accepting() {
 		exp := expectedNames(fr.matcher.Expected())
 		v.report(Error{Code: CodeComplexContent, Line: fr.line, Column: fr.col, Path: v.pathOf(fr), Name: fr.name.Local,
-			Expected: exp, Message: fmt.Sprintf("content of element %s is incomplete; expected: %s", fr.name, strings.Join(exp, ", "))})
+			Expected: exp, Message: fmt.Sprintf("element %s is incomplete; %s", fr.name, expectedPhrase(exp))})
 	}
 	decl := fr.decl
 	if fr.st != nil && !(fr.contentFailed && fr.hasElem) {
@@ -972,6 +1028,9 @@ func (v *validator) finishElement(fr *frame) {
 					Value: abbreviate(text), Message: fmt.Sprintf("element %s must have the fixed value %q", fr.name, decl.Value.Lexical)})
 			}
 			v.specialValues(fr.st, val, fr.line, fr.col, lazyPath{v: v, fr: fr}, fr.name.Local)
+			if v.opts.OnValue != nil {
+				v.emitValue(fr.st, val, v.pathOf(fr), fr.name.Local, false, fr.line, fr.col)
+			}
 		}
 	}
 	if decl != nil && decl.Value != nil && decl.Value.Fixed && fr.ct != nil && fr.ct.Content == schema.ContentMixed {

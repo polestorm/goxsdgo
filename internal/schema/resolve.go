@@ -81,11 +81,11 @@ func (l *loader) resolveName(n *node, attr, v string) (QName, bool) {
 		return QName{}, false
 	}
 	if !nsAllowed(n.doc, q.Space) {
-		clause := ".4.2"
+		code := CodeResolve4 + ".2"
 		if q.Space == "" {
-			clause = ".4.1"
+			code = CodeResolve4 + ".1"
 		}
-		l.errorf(CodeResolve+clause, n.attrPos(attr), "%s/@%s refers to namespace %q, which the schema document neither targets nor imports",
+		l.errorf(code, n.attrPos(attr), "%s/@%s refers to namespace %q, which the schema document neither targets nor imports",
 			n.name(), attr, q.Space)
 		return QName{}, false
 	}

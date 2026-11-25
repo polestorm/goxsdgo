@@ -175,16 +175,26 @@ const (
 	roleImport
 )
 
-func (r role) code() string {
+// notSchemaCode to kod błędu „wskazany dokument nie jest poprawnym dokumentem schematu”: src-include.1,
+// src-redefine.2 albo src-import.2 (4.2.1–4.2.3), a dla dokumentu podanego wprost sfs-not-schema.
+func (r role) notSchemaCode() string {
 	switch r {
 	case roleInclude:
-		return CodeInclude
+		return CodeInclude + ".1"
 	case roleRedefine:
-		return CodeRedefine
+		return CodeRedefine + ".2"
 	case roleImport:
-		return CodeImport
+		return CodeImport + ".2"
 	}
 	return CodeNotSchema
+}
+
+// namespaceCode to kod niezgodności targetNamespace dokumentu włączanego: src-include.2.1 albo src-redefine.3.1.
+func (r role) namespaceCode() string {
+	if r == roleRedefine {
+		return CodeRedefine + ".3.1"
+	}
+	return CodeInclude + ".2.1"
 }
 
 // loadDocument wczytuje dokument p. from to dokument zawierający include/import/redefine (nil dla dokumentów
@@ -239,7 +249,7 @@ func (l *loader) loadDocument(p, base string, r role, from *document, ref *node,
 			}
 			l.errs = append(l.errs, e)
 			if r != roleTop {
-				l.errorf(r.code()+".1", refPos, "%s does not resolve to a well-formed schema document", p)
+				l.errorf(r.notSchemaCode(), refPos, "%s does not resolve to a well-formed schema document", p)
 			}
 		}
 		return nil
@@ -249,7 +259,7 @@ func (l *loader) loadDocument(p, base string, r role, from *document, ref *node,
 		if root != nil && r == roleTop {
 			pos = Position{Document: p, Line: root.line, Column: root.col}
 		}
-		l.errorf(r.code()+".1", pos, "%s is not a schema document (root element is not xs:schema)", p)
+		l.errorf(r.notSchemaCode(), pos, "%s is not a schema document (root element is not xs:schema)", p)
 		return nil
 	}
 	tns, hasTNS := root.attr("targetNamespace")
@@ -388,11 +398,7 @@ func (l *loader) checkNamespaceMatch(d *document, r role, from *document, ref *n
 	// Porównujemy przestrzeń po zamianie kameleona: dokument włączony jako kameleon ma docelową przestrzeń
 	// włączającego, choć nie ma atrybutu targetNamespace.
 	if d.tns != from.tns {
-		clause := ".2.1"
-		if r == roleRedefine {
-			clause = ".3.1"
-		}
-		l.errorf(r.code()+clause, ref.pos(), "%s has targetNamespace %q, the including document %q", d.path, d.tns, from.tns)
+		l.errorf(r.namespaceCode(), ref.pos(), "%s has targetNamespace %q, the including document %q", d.path, d.tns, from.tns)
 	}
 }
 

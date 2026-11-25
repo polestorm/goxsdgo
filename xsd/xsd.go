@@ -48,6 +48,26 @@ type Config struct {
 	// MaxIdentityEntries ogranicza łączną liczbę wartości ID, IDREF i wpisów tabel ograniczeń tożsamości
 	// przechowywanych podczas walidacji jednego dokumentu. 0: 4 194 304.
 	MaxIdentityEntries int
+
+	// OnValue, jeśli nie nil, dostaje każdą poprawną wartość typu prostego z dokumentu: treść elementu o typie
+	// prostym albo treści prostej i wartość atrybutu, z typem i postacią kanoniczną (pytanie 6, ADR 0009).
+	// Wywołania są synchroniczne, w kolejności dokumentu, z goroutine wywołującej Validate. Bez funkcji walidacja
+	// nie liczy nic ponad to, co sama potrzebuje.
+	OnValue func(TypedValue)
+}
+
+// TypedValue to poprawna wartość typu prostego w dokumencie, przekazywana do Config.OnValue.
+type TypedValue struct {
+	// Path to ścieżka elementu albo atrybutu, jak w Error.Path; Name to nazwa lokalna; Attribute: wartość atrybutu.
+	Path, Name string
+	Attribute  bool
+	// Type to nazwa typu ("{przestrzeń}nazwa" albo "nazwa") albo "" dla typu anonimowego; Builtin to nazwa
+	// najbliższego typu wbudowanego, z którego typ jest wyprowadzony (np. "decimal", "date", "anySimpleType").
+	Type, Builtin string
+	// Canonical to wartość w postaci kanonicznej typu (część 2 rekomendacji), np. "12.5" dla " 012.50 ".
+	Canonical string
+	// Line i Column to pozycja jak w Error: koniec znacznika początkowego elementu albo atrybut.
+	Line, Column int
 }
 
 // Compile kompiluje schemat złożony z dokumentów names z fsys, z ustawieniami domyślnymi.
@@ -138,6 +158,12 @@ func (s *Set) Validate(r io.Reader) ([]Error, error) {
 // tylko komunikatom i może być puste.
 func (s *Set) ValidateDocument(r io.Reader, name string) ([]Error, error) {
 	opts := validate.Options{MaxErrors: s.cfg.MaxErrors, MaxIdentityEntries: s.cfg.MaxIdentityEntries}
+	if f := s.cfg.OnValue; f != nil {
+		opts.OnValue = func(ev validate.ValueEvent) {
+			f(TypedValue{Path: ev.Path, Name: ev.Name, Attribute: ev.Attribute, Type: ev.Type, Builtin: ev.Builtin,
+				Canonical: ev.Canonical, Line: ev.Line, Column: ev.Column})
+		}
+	}
 	if s.cfg.SchemaLocationHints {
 		opts.Hints = &hintLoader{set: s, dir: path.Dir(name), loaded: append([]string(nil), s.names...)}
 	}

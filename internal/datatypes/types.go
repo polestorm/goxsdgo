@@ -730,7 +730,7 @@ func (t *Type) checkValueFacets(v Value, lexical string, withBounds bool) *Error
 	}
 	bound := func(k FacetKind, b Value, ok func(Order) bool, code string) *Error {
 		if has(k) && !ok(Compare(v, b)) {
-			return errorf(code, lexical, k.String(), "%s %s", k, Canonical(b))
+			return errorf(code, lexical, k.String(), "%s %s", k, t.Canonical(b))
 		}
 		return nil
 	}

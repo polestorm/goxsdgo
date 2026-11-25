@@ -1,0 +1,120 @@
+# Kody libxml2, dla których odbiorca ma tłumaczenia (goxsdval/messages/messages.json, 117 kodów; stan 2026-11-25).
+# Kolumny: kod, angielski opis odbiorcy. Używa ich TestCompatTable (kryterium K8). Błędy schematu (XML_SCHEMAP_*)
+# odbiorca tłumaczy ogólnym komunikatem generic.schema, więc nie ma ich na liście.
+4	Document is empty
+5	Extra content at the end of the document
+6	CharRef: invalid hexadecimal value
+7	CharRef: invalid decimal value
+8	CharRef: invalid value
+9	Invalid character
+10	CharRef at end of document
+14	EntityRef at end of document
+26	Entity '%s' not defined
+32	Unsupported encoding
+33	String not started expecting ' or "
+34	String not closed expecting " or '
+41	Specification mandates value for attribute %s
+42	Attribute %s redefined
+43	SystemLiteral " or ' expected
+44	Unfinished System or Public ID " or ' expected
+45	Comment not terminated
+47	ParsePI: PI %s never end
+62	Sequence ']]>' not allowed in content
+63	CData section not finished
+64	Invalid PI name
+68	Name expected
+72	expected '<'
+73	expected '>'
+74	EndTag: '</' not found
+75	expected '='
+76	Opening and ending tag mismatch: %s line %d and %s
+77	Premature end of data in tag %s line %d
+84	Entity value required
+85	chunk is not well balanced
+86	extra content at the end of well balanced chunk
+110	Name too long
+200	xml namespace URI cannot be the default namespace / xml namespace prefix mapped to wrong URI
+201	Namespace prefix %s on %s is not defined
+202	Failed to parse QName '%s'
+203	Namespaced Attribute %s in '%s' redefined
+204	xmlns:%s: Empty XML namespace is not allowed
+205	colons are forbidden from PI names / notation names / entities names '%s'
+1801	Missing root element
+1802	Element is not declared in the schema
+1803	Element is not a top-level element
+1804	Required element or attribute is missing
+1805	Wrong element in this position
+1806	No type definition for element
+1807	Cannot roll back validation state
+1808	Type or element is abstract and cannot be used directly
+1809	Element must be empty
+1810	Element content does not match the content model
+1811	Element has both value and default
+1812	Element is not declared nillable
+1813	Element has extra unexpected content
+1814	Invalid attribute
+1815	Invalid element
+1816	Content model is not deterministic
+1817	Schema construction error
+1818	Internal schema validation error
+1819	Type is not a simple type
+1820	Unknown attribute
+1821	Attribute value is invalid
+1822	Invalid value
+1823	Facet validation failed
+1824	The value '%s' is not a valid value of the atomic type '%s'.
+1825	The value '%s' is not a valid value of the list type '%s'.
+1826	The value '%s' is not a valid value of the union type '%s'.
+1827	The attribute is not allowed for a simple type.
+1828	Element content is not allowed, because the type definition is simple
+1829	The value is not facet-valid.
+1830	The value has a length of '%s'; this differs from the allowed length of '%s'.
+1831	The value has a length of '%s'; this underruns the allowed minimum length of '%s'.
+1832	The value has a length of '%s'; this exceeds the allowed maximum length of '%s'.
+1833	The value '%s' is less than the minimum value allowed ('%s').
+1834	The value '%s' is greater than the maximum value allowed ('%s').
+1835	The value '%s' must be greater than '%s'.
+1836	The value '%s' must be less than '%s'.
+1837	The value '%s' has more digits than are allowed ('%s').
+1838	The value '%s' has more fractional digits than are allowed ('%s').
+1839	The value '%s' is not accepted by the pattern '%s'.
+1840	The value '%s' is not an element of the set {%s}.
+1841	Element content is not allowed, because the content type is empty
+1842	Element content is not allowed, because the content type is a simple type definition
+1843	Character content other than whitespace is not allowed because the content type is 'element-only'
+1844	Invalid content (sequence, choice or all)
+1845	No matching declaration available
+1846	The element declaration is abstract
+1847	The element is not 'nillable'
+1848	Neither character nor element content is allowed because the element is 'nilled'
+1849	The element cannot be 'nilled' because there is a fixed value constraint defined for it
+1850	The xsi:type attribute does not resolve to a type definition
+1851	The QName value '%s' of the xsi:type attribute does not resolve to a type definition
+1852	The type definition specified by xsi:type is blocked or not validly derived from the type definition of the element declaration
+1853	Value constraint conflict (5.1.1)
+1854	Value constraint conflict (5.1.2)
+1855	Element content invalid against type (5.2.1)
+1856	The content must not contain element nodes since there is a fixed value constraint
+1857	The initial value '%s' does not match the fixed value constraint '%s'
+1858	The actual value '%s' does not match the fixed value constraint '%s'
+1859	Element identity constraint violation (6)
+1860	Element validation finalization error (7)
+1861	Attribute value invalid against its type
+1862	The type definition is absent
+1863	Attribute value does not match its declared type (3)
+1864	Attribute value conflicts with fixed value constraint (4)
+1865	Attribute is not allowed
+1866	The attribute is prohibited
+1867	Attribute prohibited (wildcard mismatch)
+1868	The attribute '%s' is required but missing
+1869	Wildcard and attribute use conflict
+1870	More than one matching wildcard
+1871	Missing child element(s) / This element is not expected
+1872	The document has no document element
+1873	The type definition is absent
+1874	The value '%s' does not match the fixed value constraint '%s'
+1875	The type definition is absent
+1876	The type definition is abstract
+1877	Identity constraint violation (unique/key/keyref)
+1878	No matching global element declaration available, but demanded by the strict wildcard
+1879	Miscellaneous schema validation warning

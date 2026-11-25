@@ -65,7 +65,7 @@ func one(body string) map[string]string { return map[string]string{"main.xsd": d
 func TestDocuments(t *testing.T) {
 	run(t, []schemaCase{
 		{name: "not-well-formed", files: map[string]string{"main.xsd": `<xs:schema ` + xs + `><xs:element name="a">`}, want: CodeNotWellFormed},
-		{name: "not-schema", files: map[string]string{"main.xsd": `<schema/>`}, want: CodeNotSchema + ".1"},
+		{name: "not-schema", files: map[string]string{"main.xsd": `<schema/>`}, want: CodeNotSchema},
 		{name: "include-not-schema", files: map[string]string{"main.xsd": doc(`<xs:include schemaLocation="b.xml"/>`),
 			"b.xml": `<a/>`}, want: CodeInclude + ".1"},
 		{name: "minimal", files: one(``)},

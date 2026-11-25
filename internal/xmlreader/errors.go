@@ -29,7 +29,6 @@ const (
 	CodeEntityDeclared      = "wfc-entity-declared"
 	CodeParsedEntity        = "wfc-parsed-entity"
 	CodeNoRecursion         = "wfc-no-recursion"
-	CodeInDTD               = "wfc-in-dtd"
 	CodePEsInInternalSubset = "wfc-pes-in-internal-subset"
 	CodePrefixDeclared      = "nsc-prefix-declared"
 	CodeNoPrefixUndeclaring = "nsc-no-prefix-undeclaring"

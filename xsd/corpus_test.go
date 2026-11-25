@@ -109,6 +109,7 @@ func TestInstanceCorpus(t *testing.T) {
 	passed := map[string]bool{}
 	inScope := map[string]bool{}
 	checked := 0
+	obs := newCodeObserver()
 	for _, e := range expected {
 		if e.Schema == "" {
 			continue
@@ -131,6 +132,7 @@ func TestInstanceCorpus(t *testing.T) {
 		if err != nil {
 			continue
 		}
+		obs.add(KindDocument, errs)
 		if (len(errs) == 0) != e.Valid {
 			t.Logf("instance %s: valid=%v, want %v; first error: %v", e.Path, len(errs) == 0, e.Valid, errs[:min(1, len(errs))])
 			continue
@@ -149,6 +151,7 @@ func TestInstanceCorpus(t *testing.T) {
 			passed["instance:"+e.Path] = true
 		}
 	}
+	checkObservedCodes(t, obs)
 	t.Logf("MF and synthetic documents with the expected verdict and errors: %d/%d", len(passed), checked)
 	testkit.Ratchet(t, instancesRatchet, "MF documents with the expected verdict (TestInstanceCorpus, go test ./xsd -update).",
 		inScope, passed, *update)

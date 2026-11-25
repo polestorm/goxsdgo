@@ -34,8 +34,6 @@ const (
 	CodeComplexTypeRep    = "src-ct"
 	CodeSimpleTypeRep     = "src-simple-type"
 	CodeAttributeGroupRep = "src-attribute_group"
-	CodeModelGroupRep     = "src-model_group"
-	CodeIdentityRep       = "src-identity-constraint"
 
 	CodeAttributeProps      = "a-props-correct"
 	CodeNoXMLNS             = "no-xmlns"
@@ -51,7 +49,6 @@ const (
 	CodeAllLimited          = "cos-all-limited"
 	CodeParticleProps       = "p-props-correct"
 	CodeWildcardUnion       = "cos-aw-union"
-	CodeWildcardIntersect   = "cos-aw-intersect"
 	CodeIdentityProps       = "c-props-correct"
 	CodeSelectorXPath       = "c-selector-xpath"
 	CodeFieldsXPath         = "c-fields-xpaths"
@@ -62,7 +59,6 @@ const (
 	// Ograniczenia modeli zawartości (etap 4, ADR 0007).
 	CodeNonambig          = "cos-nonambig"
 	CodeElementConsistent = "cos-element-consistent"
-	CodeParticleRestrict  = "cos-particle-restrict"
 
 	// CodeLimit: przekroczony limit wczytywania (liczba dokumentów, głębokość włączeń); kod nasz (ADR 0006).
 	CodeLimit = "schema-limit"

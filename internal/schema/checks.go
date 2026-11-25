@@ -156,7 +156,7 @@ func (l *loader) checkAttributeGroup(df *def) {
 			orig = o
 		}
 		l.checkAttributeRestriction(ag.Uses, ag.Wildcard, orig.Uses, orig.Wildcard, false, df.node.pos(),
-			CodeRedefine+".7.2.2")
+			redefineAttrCodes)
 	}
 }
 
@@ -217,7 +217,7 @@ func (l *loader) checkRestriction(ct, base *ComplexType) {
 		l.errorf(CodeRestriction+".1", ct.Pos, "the base type %s has restriction in its final", typeLabel(base))
 	}
 	l.checkAttributeRestriction(ct.Attributes, ct.AttributeWildcard, base.Attributes, base.AttributeWildcard,
-		base == anyType, ct.Pos, CodeRestriction)
+		base == anyType, ct.Pos, restrictionAttrCodes)
 	if base == anyType {
 		return // 5.1
 	}
@@ -257,10 +257,39 @@ func contentName(k ContentKind) string {
 	return [...]string{"empty", "simple", "element-only", "mixed"}[k]
 }
 
+// attrRestrictionCodes to kody punktów 2–4 Derivation Valid (Restriction, Complex) (3.4.6) dla użyć atrybutów
+// i symbolu wieloznacznego. Te same punkty sprawdza redefinicja grupy atrybutów (src-redefine.7.2.2); jej kody to
+// src-redefine.7.2.2 z dopisanym punktem derivation-ok-restriction.
+type attrRestrictionCodes struct {
+	notAllowed, required, typeDerived, fixed, missing, wildNeeded, wildSubset, wildProcess string
+}
+
+var restrictionAttrCodes = attrRestrictionCodes{
+	notAllowed:  CodeRestriction + ".2.2",
+	required:    CodeRestriction + ".2.1.1",
+	typeDerived: CodeRestriction + ".2.1.2",
+	fixed:       CodeRestriction + ".2.1.3",
+	missing:     CodeRestriction + ".3",
+	wildNeeded:  CodeRestriction + ".4.1",
+	wildSubset:  CodeRestriction + ".4.2",
+	wildProcess: CodeRestriction + ".4.3",
+}
+
+var redefineAttrCodes = attrRestrictionCodes{
+	notAllowed:  CodeRedefine + ".7.2.2.2.2",
+	required:    CodeRedefine + ".7.2.2.2.1.1",
+	typeDerived: CodeRedefine + ".7.2.2.2.1.2",
+	fixed:       CodeRedefine + ".7.2.2.2.1.3",
+	missing:     CodeRedefine + ".7.2.2.3",
+	wildNeeded:  CodeRedefine + ".7.2.2.4.1",
+	wildSubset:  CodeRedefine + ".7.2.2.4.2",
+	wildProcess: CodeRedefine + ".7.2.2.4.3",
+}
+
 // checkAttributeRestriction sprawdza punkty 2, 3 i 4 z Derivation Valid (Restriction, Complex) dla użyć atrybutów
 // i symbolu wieloznacznego (także dla redefinicji grupy atrybutów).
 func (l *loader) checkAttributeRestriction(uses []*AttributeUse, wild *Wildcard, baseUses []*AttributeUse,
-	baseWild *Wildcard, baseIsAnyType bool, pos Position, code string) {
+	baseWild *Wildcard, baseIsAnyType bool, pos Position, code attrRestrictionCodes) {
 	byName := map[QName]*AttributeUse{}
 	for _, b := range baseUses {
 		byName[b.Decl.Name] = b
@@ -271,7 +300,7 @@ func (l *loader) checkAttributeRestriction(uses []*AttributeUse, wild *Wildcard,
 		b := byName[r.Decl.Name]
 		if b == nil {
 			if baseWild == nil || !baseWild.Namespaces.Allows(r.Decl.Name.Space) {
-				l.errorf(code+".2.2", r.Pos, "attribute %s is not allowed by the base type", r.Decl.Name)
+				l.errorf(code.notAllowed, r.Pos, "attribute %s is not allowed by the base type", r.Decl.Name)
 			}
 			continue
 		}
@@ -279,33 +308,33 @@ func (l *loader) checkAttributeRestriction(uses []*AttributeUse, wild *Wildcard,
 			continue
 		}
 		if b.Required && !r.Required {
-			l.errorf(code+".2.1.1", r.Pos, "attribute %s is required in the base and must stay required", r.Decl.Name)
+			l.errorf(code.required, r.Pos, "attribute %s is required in the base and must stay required", r.Decl.Name)
 		}
 		if !derivedOK(r.Decl.Type, b.Decl.Type, 0) {
-			l.errorf(code+".2.1.2", r.Pos, "the type of attribute %s is not derived from its type in the base", r.Decl.Name)
+			l.errorf(code.typeDerived, r.Pos, "the type of attribute %s is not derived from its type in the base", r.Decl.Name)
 		}
 		if bv := b.EffectiveValue(); bv != nil && bv.Fixed {
 			rv := r.EffectiveValue()
 			if rv == nil || !rv.Fixed || !sameValue(rv, bv, r.Decl.Type, b.Decl.Type) {
-				l.errorf(code+".2.1.3", r.Pos, "attribute %s is fixed to %q in the base and must keep that value", r.Decl.Name, bv.Lexical)
+				l.errorf(code.fixed, r.Pos, "attribute %s is fixed to %q in the base and must keep that value", r.Decl.Name, bv.Lexical)
 			}
 		}
 	}
 	for _, b := range baseUses {
 		if b.Required && (mine[b.Decl.Name] == nil || !mine[b.Decl.Name].Required) {
-			l.errorf(code+".3", pos, "required attribute %s of the base is missing or optional", b.Decl.Name)
+			l.errorf(code.missing, pos, "required attribute %s of the base is missing or optional", b.Decl.Name)
 		}
 	}
 	if wild != nil {
 		switch {
 		case baseWild == nil:
-			l.errorf(code+".4.1", wild.Pos, "an attribute wildcard needs one in the base")
+			l.errorf(code.wildNeeded, wild.Pos, "an attribute wildcard needs one in the base")
 		case !wildcardSubset(wild.Namespaces, baseWild.Namespaces):
-			l.errorf(code+".4.2", wild.Pos, "the attribute wildcard is not a subset of the base wildcard")
+			l.errorf(code.wildSubset, wild.Pos, "the attribute wildcard is not a subset of the base wildcard")
 		case !baseIsAnyType && wild.Process < baseWild.Process:
 			// ProcessStrict < ProcessLax < ProcessSkip: mniejsza wartość to silniejsza.
 		case !baseIsAnyType && wild.Process > baseWild.Process:
-			l.errorf(code+".4.3", wild.Pos, "the attribute wildcard must process contents at least as strictly as the base")
+			l.errorf(code.wildProcess, wild.Pos, "the attribute wildcard must process contents at least as strictly as the base")
 		}
 	}
 }

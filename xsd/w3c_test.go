@@ -54,17 +54,24 @@ func TestW3CSuite(t *testing.T) {
 		}
 	}
 	failures := os.Getenv("GOXSDGO_W3C_FAILURES") != ""
+	obs := newCodeObserver()
 	for _, c := range cases {
 		if !c.InScope() {
 			continue
 		}
-		got := runW3CCase(cfg, fsys, c, schemas, schemaExpected)
+		got := runW3CCase(cfg, fsys, c, schemas, schemaExpected, obs)
 		if got != "" && c.Matches(got) {
 			passed[c.ID] = true
 		} else if failures && c.Kind == w3c.InstanceTest {
 			t.Logf("fail %s: got %q, want %s (%s)", c.ID, got, c.Expected, c.Instance)
 		}
 	}
+	if p := os.Getenv("GOXSDGO_CODE_DUMP"); p != "" {
+		if err := obs.dump(p); err != nil {
+			t.Fatal(err)
+		}
+	}
+	checkObservedCodes(t, obs)
 	report := w3cReport(cases, passed)
 	t.Log("\n" + report)
 
@@ -85,7 +92,8 @@ type compiled struct {
 
 // runW3CCase zwraca werdykt goxsdgo dla przypadku, albo "" gdy goxsdgo nie umie jeszcze go wydać (np. część
 // rekomendacji bez implementacji): taki przypadek nigdy nie jest zaliczony.
-func runW3CCase(cfg Config, fsys fs.FS, c *w3c.Case, schemas map[string]compiled, schemaExpected map[string]w3c.Validity) w3c.Validity {
+func runW3CCase(cfg Config, fsys fs.FS, c *w3c.Case, schemas map[string]compiled, schemaExpected map[string]w3c.Validity,
+	obs *codeObserver) w3c.Validity {
 	// Dokumenty zestawu wskazują schematy (także dodatkowe przestrzenie) przez xsi:schemaLocation, a grupy bez
 	// schematu w metadanych tylko tak (ADR 0008). W teście zestawu wskazówki są więc włączone; domyślnie nie są.
 	cfg.SchemaLocationHints = true
@@ -94,6 +102,7 @@ func runW3CCase(cfg Config, fsys fs.FS, c *w3c.Case, schemas map[string]compiled
 	if !ok {
 		s.set, s.err = cfg.Compile(fsys, c.SchemaDocs...)
 		schemas[key] = s
+		obs.schemaErr(s.err)
 	}
 	if errors.Is(s.err, errors.ErrUnsupported) {
 		return ""
@@ -118,6 +127,7 @@ func runW3CCase(cfg Config, fsys fs.FS, c *w3c.Case, schemas map[string]compiled
 	}
 	defer f.Close()
 	errs, err := s.set.ValidateDocument(f, c.Instance)
+	obs.add(KindDocument, errs)
 	switch {
 	case errors.Is(err, ErrTooManyErrors):
 		return w3c.Invalid
