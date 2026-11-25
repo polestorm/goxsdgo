@@ -1,9 +1,9 @@
-// Package xsd kompiluje schematy XSD 1.0 i waliduje według nich dokumenty XML.
+// Package xsd compiles XML Schema 1.0 schemas and validates XML documents against them.
 //
-//	cfg := xsd.Config{Locations: urls} // adresy importów → pliki w fsys; bez sieci
+//	cfg := xsd.Config{Locations: urls} // import addresses → files in fsys; no network access
 //	set, err := cfg.Compile(fsys, "jpk_v7m_3.xsd")
-//	errs, err := set.Validate(r) // strumieniowo, pamięć ograniczona; Set jest bezpieczny dla wielu goroutines
+//	errs, err := set.Validate(r) // streaming, bounded memory; a Set is safe for concurrent use
 //
-// Każdy błąd ma stały kod nazwany według reguły rekomendacji, wiersz, kolumnę i ścieżkę elementu
-// (ADR 0006 dla schematu, ADR 0008 dla dokumentu). Kształt API jest wstępny (pytanie 5).
+// Every error has a stable code named after the rule of the recommendation, a line, a column and an element path
+// (ADR 0006 for schemas, ADR 0008 for documents). The shape of the API is provisional (open question 5).
 package xsd

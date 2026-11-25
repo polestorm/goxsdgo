@@ -8,41 +8,41 @@ import "sort"
 // ten sam zbiór kodów, a testy zgodności, że każdy zaobserwowany kod ma wpis z właściwym rodzajem i parametrami.
 // Z katalogu powstaje docs/errors.md (go test ./xsd -run TestErrorsDoc -update).
 
-// Rodzaje kodów w katalogu.
+// Kinds of codes in the catalogue.
 const (
-	// KindSchema: błąd schematu, w SchemaError.Errors.
+	// KindSchema: a schema error, in SchemaError.Errors.
 	KindSchema = "schema"
-	// KindDocument: błąd dokumentu, w wyniku Validate.
+	// KindDocument: a document error, in the result of Validate.
 	KindDocument = "document"
-	// KindLimit: limit biblioteki albo konstrukcja nieobsługiwana. Kod trafia tylko do treści błędu zwracanego
-	// drugim wynikiem (ErrLimit, errors.ErrUnsupported), nigdy do Error.Code.
+	// KindLimit: a library limit or an unsupported construct. The code appears only in the text of the error
+	// returned as the second result (ErrLimit, errors.ErrUnsupported), never in Error.Code.
 	KindLimit = "limit"
 )
 
-// CodeInfo opisuje jeden kod błędu.
+// CodeInfo describes one error code.
 type CodeInfo struct {
-	// Code to kod, jak w Error.Code.
+	// Code is the code, as in Error.Code.
 	Code string
-	// Kind to KindSchema, KindDocument albo KindLimit.
+	// Kind is KindSchema, KindDocument or KindLimit.
 	Kind string
-	// Spec to rekomendacja, z której pochodzi reguła: "XSD 1", "XSD 2", "XML 1.0", "Namespaces 1.0"; pusta dla
-	// limitów biblioteki.
+	// Spec is the recommendation the rule comes from: "XSD 1", "XSD 2", "XML 1.0", "Namespaces 1.0"; empty for
+	// library limits.
 	Spec string
-	// Section to rozdział rekomendacji, a URL odnośnik do reguły (kotwica w tekście rekomendacji).
+	// Section is the section of the recommendation, URL a link to the rule (an anchor in its text).
 	Section, URL string
-	// Own: kod nadany przez goxsdgo, bo rekomendacja nie nazywa tej reguły (np. sfs-*, facet-value, limity).
+	// Own: a code chosen by goxsdgo, because the recommendation does not name the rule (sfs-*, facet-value, limits).
 	Own bool
-	// Params to pola Error, które błąd z tym kodem może ustawić poza Code, Line, Column i Message.
+	// Params are the fields of Error that an error with this code may set besides Code, Line, Column and Message.
 	Params []string
-	// Summary to krótki opis po angielsku.
+	// Summary is a short description in English.
 	Summary string
-	// LibXML2 to odpowiadający kod libxml2 (XML_ERR_*, XML_SCHEMAV_*, XML_SCHEMAP_*) z tabeli compat albo 0;
-	// LibXML2Basis mówi, skąd pochodzi przypisanie (kryterium K8, ADR 0009).
+	// LibXML2 is the matching libxml2 code (XML_ERR_*, XML_SCHEMAV_*, XML_SCHEMAP_*) from the compat table, or 0;
+	// LibXML2Basis says where the mapping comes from (criterion K8, ADR 0009).
 	LibXML2      int
 	LibXML2Basis string
 }
 
-// Codes zwraca katalog kodów, posortowany według kodu. Wynik jest kopią.
+// Codes returns the catalogue of codes, sorted by code. The result is a copy.
 func Codes() []CodeInfo {
 	out := make([]CodeInfo, len(catalog))
 	for i, c := range catalog {
@@ -55,7 +55,7 @@ func Codes() []CodeInfo {
 	return out
 }
 
-// LookupCode zwraca wpis katalogu dla kodu.
+// LookupCode returns the catalogue entry for a code.
 func LookupCode(code string) (CodeInfo, bool) {
 	i := sort.Search(len(catalog), func(i int) bool { return catalog[i].Code >= code })
 	if i == len(catalog) || catalog[i].Code != code {
@@ -69,8 +69,8 @@ func LookupCode(code string) (CodeInfo, bool) {
 	return c, true
 }
 
-// LibXML2Code zwraca kod libxml2 odpowiadający kodowi goxsdgo (tabela compat, kryterium K8). Pozwala użyć
-// tłumaczeń przygotowanych dla kodów libxml2. Kodom limitów i konstrukcji nieobsługiwanych nie odpowiada nic.
+// LibXML2Code returns the libxml2 code that matches a goxsdgo code (the compat table, criterion K8), so that
+// translations made for libxml2 codes can be reused. Codes of limits and unsupported constructs have no match.
 func LibXML2Code(code string) (int, bool) {
 	m, ok := compat[code]
 	return m.code, ok

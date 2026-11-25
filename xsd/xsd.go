@@ -16,20 +16,20 @@ import (
 	"github.com/polestorm/goxsdgo/internal/xmlreader"
 )
 
-// DocumentLimits to limity czytania walidowanego dokumentu (Config.Document). Chronią przed dokumentami
-// złośliwymi: każdy limit ogranicza pamięć albo czas niezależnie od schematu (ADR 0004, ADR 0011).
+// DocumentLimits are the limits for reading a validated document (Config.Document). They guard against hostile
+// documents: each limit bounds memory or time regardless of the schema (ADR 0004, ADR 0011).
 type DocumentLimits struct {
-	MaxDepth           int // głębokość zagnieżdżenia elementów
-	MaxNameLength      int // długość nazwy elementu albo atrybutu w bajtach UTF-8
-	MaxAttributes      int // atrybuty jednego elementu, łącznie z deklaracjami przestrzeni nazw
-	MaxTextSize        int // tekst jednego elementu albo atrybutu, komentarza, PI, w bajtach
-	MaxEntityExpansion int // łączna długość tekstu z rozwiniętych encji wewnętrznych w dokumencie, w bajtach
-	MaxEntityDepth     int // zagnieżdżenie odwołań do encji
-	MaxDTDSize         int // długość deklaracji DOCTYPE z podzbiorem wewnętrznym, w bajtach
+	MaxDepth           int // nesting depth of elements
+	MaxNameLength      int // length of an element or attribute name, in UTF-8 bytes
+	MaxAttributes      int // attributes of one element, namespace declarations included
+	MaxTextSize        int // text of one element, attribute, comment or PI, in bytes
+	MaxEntityExpansion int // total text produced by expanding internal entities in a document, in bytes
+	MaxEntityDepth     int // nesting of entity references
+	MaxDTDSize         int // length of the DOCTYPE declaration with its internal subset, in bytes
 }
 
-// DefaultDocumentLimits zwraca domyślne limity czytania dokumentu: głębokość 512, nazwa 16 KiB, 4096 atrybutów,
-// tekst 16 MiB, rozwinięcia encji 4 MiB, zagnieżdżenie encji 32, DOCTYPE 1 MiB.
+// DefaultDocumentLimits returns the default document limits: depth 512, name 16 KiB, 4096 attributes,
+// text 16 MiB, entity expansion 4 MiB, entity nesting 32, DOCTYPE 1 MiB.
 func DefaultDocumentLimits() DocumentLimits {
 	l := xmlreader.DefaultLimits()
 	return DocumentLimits{MaxDepth: l.MaxDepth, MaxNameLength: l.MaxNameLength, MaxAttributes: l.MaxAttributes,
@@ -37,68 +37,68 @@ func DefaultDocumentLimits() DocumentLimits {
 		MaxDTDSize: l.MaxDTDSize}
 }
 
-// ErrLimit oznacza przekroczenie limitu biblioteki podczas walidacji (głębokość, rozmiar tekstu, liczba wpisów
-// ID i ograniczeń tożsamości, złożoność dopasowania modelu zawartości). To nie jest werdykt o dokumencie.
+// ErrLimit reports that validation exceeded a library limit (depth, text size, number of ID and identity-constraint
+// entries, complexity of matching a content model). It is not a verdict on the document.
 var ErrLimit = validate.ErrLimit
 
-// ErrTooManyErrors oznacza, że walidację przerwano po Config.MaxErrors błędach. Validate zwraca go razem
-// z zebranymi błędami; dokument jest wtedy na pewno błędny.
+// ErrTooManyErrors reports that validation stopped after Config.MaxErrors errors. Validate returns it together
+// with the errors collected so far; the document is then certainly invalid.
 var ErrTooManyErrors = validate.ErrTooManyErrors
 
-// Config ustawia kompilację schematu i walidację. Wartość zerowa to ustawienia domyślne: bez sieci, schematy tylko
-// z fsys, wskazówki xsi:schemaLocation wyłączone.
+// Config configures schema compilation and validation. The zero value is the default: no network access, schema
+// documents only from fsys, xsi:schemaLocation hints off.
 //
-// Kształt API jest wstępny (pytanie 5 w docs/adr/open-questions.md); ustalą go testy kolejnych etapów.
+// The shape of the API is provisional (question 5 in docs/adr/open-questions.md).
 type Config struct {
-	// Locations przypisuje adresom ze schemaLocation (w include, import i redefine) ścieżki w fsys: adresowi
-	// dosłownie jak w dokumencie albo po rozwiązaniu względem adresu dokumentu, który go zawiera. Schematy MF
-	// importują pliki pod adresami http://crd.gov.pl/..., a biblioteka nigdy nie sięga do sieci. Adres względny
-	// bez wpisu jest rozwiązywany względem ścieżki dokumentu w fsys.
+	// Locations maps schemaLocation addresses (in include, import and redefine) to paths in fsys: the address as
+	// written in the document, or resolved against the address of the document that contains it. MF schemas
+	// import files from http://crd.gov.pl/..., and the library never goes to the network. A relative address
+	// without an entry is resolved against the path of the document in fsys.
 	Locations map[string]string
-	// Namespaces przypisuje przestrzeniom nazw ścieżki dokumentów schematu w fsys; używa ich import bez
-	// schemaLocation albo z adresem, którego nie da się rozwiązać (ADR 0006).
+	// Namespaces maps namespaces to paths of schema documents in fsys; an import without schemaLocation, or with
+	// an address that cannot be resolved, uses them (ADR 0006).
 	Namespaces map[string]string
-	// MaxDocuments i MaxDepth ograniczają liczbę wczytanych dokumentów schematu (domyślnie 1000) i zagnieżdżenie
-	// include, import i redefine (domyślnie 64). Zero oznacza wartość domyślną.
+	// MaxDocuments and MaxDepth limit the number of schema documents read (default 1000) and the nesting of
+	// include, import and redefine (default 64). Zero means the default.
 	MaxDocuments, MaxDepth int
 
-	// SchemaLocationHints włącza wskazówki xsi:schemaLocation i xsi:noNamespaceSchemaLocation w dokumentach
-	// (4.3.2). Wskazane dokumenty schematu są czytane wyłącznie z fsys: przez Locations albo jako ścieżka
-	// względna wobec nazwy dokumentu podanej w ValidateDocument. Domyślnie wyłączone (ADR 0001, ADR 0008).
+	// SchemaLocationHints turns on xsi:schemaLocation and xsi:noNamespaceSchemaLocation hints in documents
+	// (4.3.2). The schema documents they name are read only from fsys: through Locations, or as a path relative
+	// to the document name given to ValidateDocument. Off by default (ADR 0001, ADR 0008).
 	SchemaLocationHints bool
-	// MaxErrors przerywa walidację dokumentu po tylu błędach (ErrTooManyErrors). 0: 1000; ujemna: bez limitu.
+	// MaxErrors stops validating a document after this many errors (ErrTooManyErrors). 0: 1000; negative: no limit.
 	MaxErrors int
-	// MaxIdentityEntries ogranicza łączną liczbę wartości ID, IDREF i wpisów tabel ograniczeń tożsamości
-	// przechowywanych podczas walidacji jednego dokumentu. 0: 4 194 304.
+	// MaxIdentityEntries limits the total number of ID and IDREF values and identity-constraint table entries
+	// kept while validating one document. 0: 4,194,304.
 	MaxIdentityEntries int
 
-	// OnValue, jeśli nie nil, dostaje każdą poprawną wartość typu prostego z dokumentu: treść elementu o typie
-	// prostym albo treści prostej i wartość atrybutu, z typem i postacią kanoniczną (pytanie 6, ADR 0009).
-	// Wywołania są synchroniczne, w kolejności dokumentu, z goroutine wywołującej Validate. Bez funkcji walidacja
-	// nie liczy nic ponad to, co sama potrzebuje.
+	// OnValue, if not nil, receives every valid simple-type value of the document: the content of an element with
+	// a simple type or simple content, and attribute values, with the type and the canonical form (ADR 0009).
+	// Calls are synchronous, in document order, on the goroutine that called Validate. Without a function,
+	// validation computes nothing beyond what it needs itself.
 	OnValue func(TypedValue)
 
-	// Document to limity czytania walidowanego dokumentu (głębokość, nazwy, atrybuty, tekst, encje, DOCTYPE).
-	// Wartość zerowa pola oznacza wartość domyślną z DefaultDocumentLimits, ujemna brak limitu. Przekroczenie
-	// limitu kończy walidację błędem ErrLimit, nie błędem dokumentu (ADR 0011).
+	// Document holds the limits for reading the validated document (depth, names, attributes, text, entities,
+	// DOCTYPE). A zero field means the default from DefaultDocumentLimits, a negative one no limit. Exceeding a
+	// limit ends validation with ErrLimit, not with a document error (ADR 0011).
 	Document DocumentLimits
 
-	// NameRules wybiera reguły znaków nazw dla typów Name, NCName, NMTOKEN(S), ID, IDREF(S), ENTITY(IES), QName
-	// i NOTATION oraz dla klas \i, \c (i \I, \C) we wzorcach: w schemacie i w walidowanym dokumencie. Wartość
-	// zerowa NamesXML10Edition2 to dosłowny odsyłacz XSD 1.0 2e; NamesXML10Edition5 to reguły, według których
-	// czytnik czyta nazwy elementów i atrybutów (ADR 0012).
+	// NameRules selects the name-character rules for the types Name, NCName, NMTOKEN(S), ID, IDREF(S), ENTITY(IES),
+	// QName and NOTATION and for the classes \i, \c (and \I, \C) in patterns, in the schema and in the validated
+	// document. The zero value NamesXML10Edition2 follows the reference in XSD 1.0 2e literally; NamesXML10Edition5
+	// is the rule set by which the reader reads element and attribute names (ADR 0012).
 	NameRules NameRules
 }
 
-// NameRules to reguły znaków nazw (ADR 0012).
+// NameRules are the rules for name characters (ADR 0012).
 type NameRules uint8
 
 const (
-	// NamesXML10Edition2: XML 1.0 Second Edition, dodatek B (domyślnie). Tak samo jak libxml2 dla wartości typów
-	// nazw.
+	// NamesXML10Edition2: XML 1.0 Second Edition, Appendix B (the default). The same as libxml2 for values of the
+	// name types.
 	NamesXML10Edition2 NameRules = iota
-	// NamesXML10Edition5: XML 1.0 Fifth Edition, produkcje [4] i [4a]; szerszy zbiór znaków, jak w nazwach
-	// elementów i atrybutów dokumentu i w XSD 1.1.
+	// NamesXML10Edition5: XML 1.0 Fifth Edition, productions [4] and [4a]; a wider set of characters, as for the
+	// element and attribute names of a document and in XSD 1.1.
 	NamesXML10Edition5
 )
 
@@ -109,29 +109,29 @@ func (n NameRules) edition() xmlchars.Edition {
 	return xmlchars.Edition2
 }
 
-// TypedValue to poprawna wartość typu prostego w dokumencie, przekazywana do Config.OnValue.
+// TypedValue is a valid simple-type value of a document, passed to Config.OnValue.
 type TypedValue struct {
-	// Path to ścieżka elementu albo atrybutu, jak w Error.Path; Name to nazwa lokalna; Attribute: wartość atrybutu.
+	// Path is the path of the element or attribute, as in Error.Path; Name the local name; Attribute: an attribute.
 	Path, Name string
 	Attribute  bool
-	// Type to nazwa typu ("{przestrzeń}nazwa" albo "nazwa") albo "" dla typu anonimowego; Builtin to nazwa
-	// najbliższego typu wbudowanego, z którego typ jest wyprowadzony (np. "decimal", "date", "anySimpleType").
+	// Type is the type name ("{namespace}name" or "name"), or "" for an anonymous type; Builtin is the name of the
+	// nearest built-in type it is derived from (for example "decimal", "date", "anySimpleType").
 	Type, Builtin string
-	// Canonical to wartość w postaci kanonicznej typu (część 2 rekomendacji), np. "12.5" dla " 012.50 ".
+	// Canonical is the value in the canonical form of its type (Part 2), for example "12.5" for " 012.50 ".
 	Canonical string
-	// Line i Column to pozycja jak w Error: koniec znacznika początkowego elementu albo atrybut.
+	// Line and Column are the position as in Error: the end of the element's start tag, or the attribute.
 	Line, Column int
 }
 
-// Compile kompiluje schemat złożony z dokumentów names z fsys, z ustawieniami domyślnymi.
+// Compile compiles the schema made of the documents names in fsys, with the default settings.
 func Compile(fsys fs.FS, names ...string) (*Set, error) {
 	return Config{}.Compile(fsys, names...)
 }
 
-// Compile kompiluje schemat złożony z dokumentów names z fsys. Gdy schemat nie jest poprawny (rozdziały 3 i 4
-// części 1 rekomendacji), zwraca *SchemaError z listą błędów. Błąd opakowujący errors.ErrUnsupported oznacza
-// konstrukcję, której biblioteka jeszcze nie obsługuje; nie mówi nic o poprawności schematu. Z włączonymi
-// wskazówkami (SchemaLocationHints) names może być puste: schemat wskażą dopiero dokumenty.
+// Compile compiles the schema made of the documents names in fsys. When the schema is not valid (chapters 3 and
+// 4 of Part 1), it returns a *SchemaError with the list of errors. An error wrapping errors.ErrUnsupported means
+// a construct the library does not support yet; it says nothing about the validity of the schema. With hints
+// on (SchemaLocationHints) names may be empty: the documents will name the schema.
 func (c Config) Compile(fsys fs.FS, names ...string) (*Set, error) {
 	s := &Set{cfg: c, fsys: fsys, names: append([]string(nil), names...)}
 	if len(names) == 0 && c.SchemaLocationHints {
@@ -164,7 +164,7 @@ func schemaError(err error) error {
 	return se
 }
 
-// SchemaError to błąd kompilacji: schemat nie jest poprawny. Errors są w powtarzalnej kolejności.
+// SchemaError is a compilation error: the schema is not valid. Errors come in a deterministic order.
 type SchemaError struct {
 	Errors []Error
 }
@@ -182,7 +182,7 @@ func (e *SchemaError) Error() string {
 	return b.String()
 }
 
-// Set to skompilowany schemat, gotowy do walidacji wielu dokumentów, także równocześnie.
+// Set is a compiled schema, ready to validate many documents, also concurrently.
 type Set struct {
 	schema *schema.Schema
 	cfg    Config
@@ -199,16 +199,16 @@ type hintedSchema struct {
 	err error
 }
 
-// Validate waliduje dokument z r strumieniowo. Pusta lista błędów oznacza dokument poprawny. Błąd zwracany jako
-// drugi wynik dotyczy wejścia albo ograniczeń biblioteki (ErrLimit, errors.ErrUnsupported), nie treści dokumentu;
-// wyjątkiem jest ErrTooManyErrors, zwracany razem z błędami dokumentu.
+// Validate validates the document read from r, as a stream. An empty list of errors means a valid document. The
+// second result is about the input or the library's limits (ErrLimit, errors.ErrUnsupported), not the content of
+// the document; the exception is ErrTooManyErrors, which comes together with the document's errors.
 func (s *Set) Validate(r io.Reader) ([]Error, error) {
 	return s.ValidateDocument(r, "")
 }
 
-// ValidateDocument działa jak Validate; name to ścieżka dokumentu w fsys schematu, względem której są
-// rozwiązywane względne wskazówki xsi:schemaLocation (gdy Config.SchemaLocationHints). Bez wskazówek name służy
-// tylko komunikatom i może być puste.
+// ValidateDocument works like Validate; name is the path of the document in the schema's fsys, against which
+// relative xsi:schemaLocation hints are resolved (with Config.SchemaLocationHints). Without hints name is used
+// only in messages and may be empty.
 func (s *Set) ValidateDocument(r io.Reader, name string) ([]Error, error) {
 	d := s.cfg.Document
 	opts := validate.Options{MaxErrors: s.cfg.MaxErrors, MaxIdentityEntries: s.cfg.MaxIdentityEntries,
@@ -307,48 +307,48 @@ func (s *Set) schemaFor(names []string) (*schema.Schema, error) {
 	return sch, err
 }
 
-// Error to jeden błąd walidacji dokumentu albo schematu.
+// Error is one validation error of a document or a schema.
 type Error struct {
-	// Code to stały kod błędu, nazwany według reguły rekomendacji (np. "cvc-complex-type.2.4", "src-resolve").
+	// Code is the stable error code, named after the rule of the recommendation ("cvc-complex-type.2.4").
 	Code string
-	// Document to ścieżka dokumentu schematu w fsys dla błędów schematu; pusta dla błędów dokumentu.
+	// Document is the path of the schema document in fsys for schema errors; empty for document errors.
 	Document string
-	// Line i Column to pozycja w dokumencie, liczone od 1; kolumna w znakach.
+	// Line and Column are the position in the document, counted from 1; the column counts characters.
 	Line, Column int
-	// Path to ścieżka elementu, np. "/JPK/Ewidencja/SprzedazWiersz[3]": nazwy lokalne bez prefiksów, [n] od
-	// drugiego wystąpienia nazwy wśród rodzeństwa, "/@nazwa" dla atrybutu (ADR 0008).
+	// Path is the element path, for example "/JPK/Ewidencja/SprzedazWiersz[3]": local names without prefixes, [n]
+	// from the second occurrence of a name among siblings, "/@name" for an attribute (ADR 0008).
 	Path string
-	// Name to nazwa lokalna elementu albo atrybutu, którego dotyczy błąd.
+	// Name is the local name of the element or attribute the error is about.
 	Name string
-	// Value to wartość, której dotyczy błąd (np. tekst niezgodny z typem, zdublowany klucz).
+	// Value is the value the error is about (for example text that does not match its type, a duplicate key).
 	Value string
-	// Facet to naruszony aspekt i jego wartość, np. "maxLength 5"; puste, gdy błąd nie dotyczy aspektu.
+	// Facet is the violated facet and its value, for example "maxLength 5"; empty when no facet is involved.
 	Facet string
-	// Expected to elementy dozwolone w miejscu błędu cvc-complex-type.2.4: "nazwa" albo "{przestrzeń}nazwa",
-	// symbol wieloznaczny jako "*" albo "{przestrzeń}*".
+	// Expected lists the elements allowed at the place of a cvc-complex-type.2.4 error: "name" or
+	// "{namespace}name", a wildcard as "*" or "{namespace}*".
 	Expected []string
-	// Message to komunikat po angielsku; do tłumaczenia służy Code (z parametrami z pól powyżej i niżej).
+	// Message is the message in English; translations key on Code, with the parameters in the other fields.
 	Message string
 
-	// Namespace to przestrzeń nazw elementu albo atrybutu Name; pusta dla nazwy bez przestrzeni (ADR 0010).
+	// Namespace is the namespace of the element or attribute Name; empty for a name in no namespace (ADR 0010).
 	Namespace string
-	// Reason rozróżnia błędy cvc-complex-type.2.4: ReasonMissing (brak wymaganego elementu), ReasonUnexpected
-	// (element niedozwolony w tym miejscu), ReasonWrongNamespace (nazwa lokalna oczekiwanego elementu w innej
-	// przestrzeni nazw). Dla innych kodów pusty; kod reguły jest zawsze ten sam.
+	// Reason tells cvc-complex-type.2.4 errors apart: ReasonMissing (a required element is missing),
+	// ReasonUnexpected (an element not allowed at this place), ReasonWrongNamespace (the local name of an expected
+	// element, in another namespace). Empty for other codes; the rule code is always the same.
 	Reason string
-	// ExpectedNamespace to przestrzeń nazw, w której schemat oczekuje elementu (tylko ReasonWrongNamespace).
+	// ExpectedNamespace is the namespace in which the schema expects the element (ReasonWrongNamespace only).
 	ExpectedNamespace string
-	// Type i TypeNamespace to typ ze schematu, któremu nie odpowiada wartość (błędy typów prostych, np. "TData");
-	// Type jest pusty dla typu anonimowego. Builtin to najbliższy typ wbudowany, z którego typ pochodzi
-	// (np. "date", "decimal").
+	// Type and TypeNamespace are the schema type the value does not match (simple-type errors, e.g. "TData");
+	// Type is empty for an anonymous type. Builtin is the nearest built-in type it is derived from
+	// (for example "date", "decimal").
 	Type, TypeNamespace, Builtin string
-	// InsertLine i InsertColumn (cvc-complex-type.2.4) wskazują, gdzie powinien zacząć się oczekiwany element:
-	// przed niedozwolonym elementem (początek jego znacznika) albo przed znacznikiem końcowym rodzica; dla rodzica
-	// zapisanego jako <x/> koniec tego znacznika. Pozycja główna (Line, Column) się nie zmienia (ADR 0008).
+	// InsertLine and InsertColumn (cvc-complex-type.2.4) show where the expected element should start: before the
+	// element that is not allowed (the start of its tag), or before the parent's end tag; for a parent written as
+	// <x/>, the end of that tag. The main position (Line, Column) is unchanged (ADR 0008).
 	InsertLine, InsertColumn int
 }
 
-// Wartości Error.Reason dla cvc-complex-type.2.4 (ADR 0010).
+// Values of Error.Reason for cvc-complex-type.2.4 (ADR 0010).
 const (
 	ReasonMissing        = validate.ReasonMissing
 	ReasonUnexpected     = validate.ReasonUnexpected
