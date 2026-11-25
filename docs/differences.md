@@ -61,6 +61,7 @@ Na korpusie MF (170 schematów, 15 dokumentów) werdykty obu walidatorów są ta
 | MS anyURI_a004 | według etapu 2 | inaczej | literał `anyURI`, jak `anyURI_b006` wyżej | rozstrzygnięte w ADR 0009, punkt 7: zostaje |
 | MS stZ073b | poprawny | błędny | restrykcja unii przyjmuje `xsi:type` wskazujący typ członka (ADR 0008, punkt 11) | rozstrzygnięte w ADR 0009, punkt 7: zostaje |
 | MS attP031 | błędny | poprawny | atrybut zabroniony (`use="prohibited"`) jest niedozwolony w dokumencie (ADR 0008, punkt 11) | rozstrzygnięte w ADR 0009, punkt 7: zostaje |
+| MS particlesZ035_a, particlesZ036_b1, particlesZ036_b2, particlesZ036_c (dokumenty) | brak werdyktu: `ErrLimit` („content model … needs more than 1024 configurations”) | niepoprawny (Z035_a), poprawny (pozostałe) | modele zgodne z UPA, ale niejednoznaczne co do liczników (`maxOccurs` od 6 000 do 100 000 000 000 zagnieżdżone w powtórzeniach); dopasowanie przekracza `MaxConfigurations` (ADR 0007, ADR 0011); decyzja właściciela z 2026-11-25: zostaje `ErrLimit` (pytanie 9) | taki dokument kończy się błędem limitu biblioteki, nie werdyktem; w korpusie MF takich modeli nie ma |
 | korzeń bez deklaracji globalnej | błąd `cvc-elt.1` | według zestawu | ocena korzenia jest ścisła; luźna ocena dotyczy tylko symboli wieloznacznych z `processContents="lax"` (ADR 0008) | dokument z nieznanym korzeniem jest odrzucany, jak w libxml2 |
 
 Pozostałe niezaliczone testy dokumentów (Missing, errF001, ste110, schU3–schU5, particlesZ001 i pokrewne) wynikają ze
