@@ -44,11 +44,19 @@ func TestW3CSuite(t *testing.T) {
 	cfg := Config{Locations: testkit.PrefixLocations(src.Locations("w3c-schemas"), extra)}
 	passed := map[string]bool{}
 	schemas := map[string]compiled{}
+	// Oczekiwany werdykt testu schematu każdej grupy: dokument grupy z odrzuconym schematem zaliczamy jako
+	// „błędny” tylko wtedy, gdy zestaw też uważa schemat za błędny.
+	schemaExpected := map[string]w3c.Validity{}
+	for _, c := range cases {
+		if c.Kind == w3c.SchemaTest {
+			schemaExpected[c.Set+"/"+c.Group] = c.Expected
+		}
+	}
 	for _, c := range cases {
 		if !c.InScope() {
 			continue
 		}
-		if got := runW3CCase(cfg, fsys, c, schemas); got != "" && c.Matches(got) {
+		if got := runW3CCase(cfg, fsys, c, schemas, schemaExpected); got != "" && c.Matches(got) {
 			passed[c.ID] = true
 		}
 	}
@@ -72,7 +80,7 @@ type compiled struct {
 
 // runW3CCase zwraca werdykt goxsdgo dla przypadku, albo "" gdy goxsdgo nie umie jeszcze go wydać (np. część
 // rekomendacji bez implementacji): taki przypadek nigdy nie jest zaliczony.
-func runW3CCase(cfg Config, fsys fs.FS, c *w3c.Case, schemas map[string]compiled) w3c.Validity {
+func runW3CCase(cfg Config, fsys fs.FS, c *w3c.Case, schemas map[string]compiled, schemaExpected map[string]w3c.Validity) w3c.Validity {
 	if len(c.SchemaDocs) == 0 {
 		// Dokument wskazuje schemat przez xsi:schemaLocation; obsługa wskazówek przyjdzie w etapie 5.
 		return ""
@@ -86,11 +94,19 @@ func runW3CCase(cfg Config, fsys fs.FS, c *w3c.Case, schemas map[string]compiled
 	if errors.Is(s.err, errors.ErrUnsupported) {
 		return ""
 	}
-	if c.Kind == w3c.SchemaTest || s.err != nil {
+	if c.Kind == w3c.SchemaTest {
 		if s.err != nil {
 			return w3c.Invalid
 		}
 		return w3c.Valid
+	}
+	if s.err != nil {
+		// Schemat odrzucony: dokument nie może być poprawny, ale jako werdykt liczy się to tylko wtedy, gdy schemat
+		// rzeczywiście jest błędny. Inaczej odrzucenie poprawnego schematu dawałoby fałszywe zaliczenia.
+		if schemaExpected[c.Set+"/"+c.Group] == w3c.Invalid {
+			return w3c.Invalid
+		}
+		return ""
 	}
 	f, err := fsys.Open(c.Instance)
 	if err != nil {

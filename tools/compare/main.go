@@ -22,6 +22,7 @@ import (
 
 	"github.com/polestorm/goxsdgo/internal/testkit"
 	"github.com/polestorm/goxsdgo/internal/w3c"
+	"github.com/polestorm/goxsdgo/xsd"
 	"github.com/polestorm/goxsdval"
 )
 
@@ -178,6 +179,77 @@ func runW3C(root, out string) error {
 		}
 		fmt.Printf("%-10s %6d / %6d / %6d  (%.1f%% of comparable)\n", n, r.agree, r.comparable, r.in,
 			100*float64(r.agree)/float64(max(r.comparable, 1)))
+	}
+	return compareSchemaTests(root, out, cases, results)
+}
+
+// compareSchemaTests porównuje werdykty testów schematów: goxsdgo (xsd.Compile) i libxml2 z oczekiwanymi i ze
+// sobą (kryterium K3 dla schematów, od etapu 3). Rozbieżności goxsdgo z libxml2 trafiają do pliku.
+func compareSchemaTests(root, out string, cases []*w3c.Case, libxml2 map[string]verdict) error {
+	src, err := testkit.LoadSources(root)
+	if err != nil {
+		return err
+	}
+	const extra = "_w3c-schemas"
+	suite := filepath.Join(root, "testdata", "w3c", "xsdtests")
+	fsys := testkit.Overlay(os.DirFS(suite), extra, os.DirFS(filepath.Join(root, "testdata", "w3c", "schemas")))
+	cfg := xsd.Config{Locations: testkit.PrefixLocations(src.Locations("w3c-schemas"), extra)}
+	type row struct{ n, goOK, libOK, same int }
+	rows := map[string]*row{}
+	var diffs []string
+	for _, c := range cases {
+		lv := libxml2[c.ID]
+		if c.Kind != w3c.SchemaTest || !comparable(lv) {
+			continue
+		}
+		_, err := cfg.Compile(fsys, c.SchemaDocs...)
+		gv, code := valid, ""
+		switch {
+		case errors.Is(err, errors.ErrUnsupported):
+			continue
+		case err != nil:
+			gv = invalid
+			var se *xsd.SchemaError
+			if errors.As(err, &se) && len(se.Errors) > 0 {
+				code = se.Errors[0].Code
+			}
+		}
+		r := rows[c.Contributor]
+		if r == nil {
+			r = &row{}
+			rows[c.Contributor] = r
+		}
+		r.n++
+		if c.Matches(w3c.Validity(gv)) {
+			r.goOK++
+		}
+		if c.Matches(w3c.Validity(lv)) {
+			r.libOK++
+		}
+		if gv == lv {
+			r.same++
+		} else {
+			diffs = append(diffs, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s", c.ID, c.Expected, c.Status, gv, lv, code))
+		}
+	}
+	if err := writeLines(filepath.Join(out, "schemas-goxsdgo-libxml2.tsv"), "id\texpected\tstatus\tgoxsdgo\tlibxml2\tgoxsdgo-code", diffs); err != nil {
+		return err
+	}
+	fmt.Println("\nW3C schema tests, comparable: goxsdgo correct / libxml2 correct / same verdict / cases")
+	names := make([]string, 0, len(rows))
+	for n := range rows {
+		names = append(names, n)
+	}
+	sort.Strings(names)
+	total := row{}
+	for _, n := range append(names, "all") {
+		r := total
+		if n != "all" {
+			r = *rows[n]
+			total.n, total.goOK, total.libOK, total.same = total.n+r.n, total.goOK+r.goOK, total.libOK+r.libOK, total.same+r.same
+		}
+		fmt.Printf("%-10s %6d / %6d / %6d / %6d  (same verdict %.1f%%)\n", n, r.goOK, r.libOK, r.same, r.n,
+			100*float64(r.same)/float64(max(r.n, 1)))
 	}
 	return nil
 }

@@ -226,6 +226,28 @@ func (r *Reader) LookupNamespace(prefix string) (string, bool) {
 	return "", false
 }
 
+// Binding to deklaracja przestrzeni nazw: prefiks (pusty dla przestrzeni domyślnej) i jej nazwa (pusta, gdy
+// deklaracja xmlns="" znosi przestrzeń domyślną).
+type Binding struct{ Prefix, URI string }
+
+// DeclaredNamespaces zwraca deklaracje przestrzeni nazw z bieżącego elementu (po KindStartElement), w kolejności
+// z dokumentu. Wynik jest kopią. Wczytanie schematu potrzebuje go, żeby zachować [in-scope namespaces] każdego
+// elementu dokumentu schematu dla wartości typu QName (XSD część 1, 3.15.3).
+func (r *Reader) DeclaredNamespaces() []Binding {
+	if len(r.stack) == 0 {
+		return nil
+	}
+	top := r.stack[len(r.stack)-1]
+	if top.nsMark >= len(r.ns) {
+		return nil
+	}
+	out := make([]Binding, 0, len(r.ns)-top.nsMark)
+	for _, b := range r.ns[top.nsMark:] {
+		out = append(out, Binding{Prefix: b.prefix, URI: b.uri})
+	}
+	return out
+}
+
 // Notations zwraca notacje zadeklarowane w podzbiorze wewnętrznym, w kolejności deklaracji.
 func (r *Reader) Notations() []Notation { return r.dtd.notations }
 
@@ -625,12 +647,19 @@ func (r *Reader) charData(ws *bool) error {
 		if i > 0 {
 			r.text = append(r.text, buf[:i]...)
 			r.advance(i)
+			if len(r.text) > r.lim.MaxTextSize {
+				return r.errorf(CodeLimitTextSize, "text longer than the limit")
+			}
 		}
 		if !r.fill(1) {
 			return nil
 		}
 		b := r.cur.buf[r.cur.pos]
 		switch {
+		case textByte[b]:
+			// Bufor skończył się w środku tekstu; po doczytaniu wracamy do szybkiej pętli. Bez tego biały znak
+			// za granicą bufora trafiał do gałęzi default i kasował flagę Whitespace.
+			continue
 		case b == '<' || b == '&':
 			return nil
 		case b == ']':
