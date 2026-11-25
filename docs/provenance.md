@@ -1,45 +1,46 @@
-# Rodowód kodu
+# Code provenance
 
-`goxsdgo` powstaje od zera, z rekomendacji W3C. Ten plik mówi, z czego wolno korzystać, a z czego nie.
+`goxsdgo` is written from scratch, from the W3C recommendations. This file says what we may use and what we may not.
 
-## Źródła, z których piszemy
+## Sources we write from
 
-- W3C XML Schema Part 1: Structures Second Edition i Part 2: Datatypes Second Edition (2004-10-28), z erratą;
-- Extensible Markup Language (XML) 1.0 Fifth Edition i Namespaces in XML 1.0 Third Edition;
-- normy, do których rekomendacje odsyłają: Unicode (kategorie i bloki znaków dla wyrażeń regularnych), ISO 8601
-  w zakresie opisanym w części 2, RFC 3986 (`xs:anyURI`), IEEE 754 (`xs:float`, `xs:double`).
+- W3C XML Schema Part 1: Structures Second Edition and Part 2: Datatypes Second Edition (2004-10-28), with errata;
+- Extensible Markup Language (XML) 1.0 Fifth Edition and Namespaces in XML 1.0 Third Edition;
+- the standards the recommendations refer to: Unicode (character categories and blocks for regular expressions),
+  ISO 8601 as far as Part 2 describes it, RFC 3986 (`xs:anyURI`), IEEE 754 (`xs:float`, `xs:double`).
 
-Rekomendacje opisują ograniczenia poprawności i reguły oceny (Validation Rules, Schema Component Constraints). To jest
-część specyfikacji i wolno je stosować wprost, łącznie z algorytmami podanymi w tekście (np. sprawdzenie poprawnego
-ograniczenia cząstek).
+The recommendations state the validation rules and the schema component constraints. They are part of the
+specification and may be applied directly, including the algorithms given in the text (for example the check that a
+particle is a valid restriction).
 
-Wolno korzystać z ogólnej wiedzy o automatach (konstrukcja automatu z wyrażenia, automaty z licznikami), opisanej
-w publikacjach naukowych, z podaniem źródła w komentarzu.
+General knowledge about automata (building an automaton from an expression, automata with counters), as described in
+scientific publications, may be used, with the source cited in a comment.
 
-## Czego nie robimy
+## What we do not do
 
-Nie czytamy, nie kopiujemy i nie przenosimy kodu walidatorów XSD ani parserów XML z walidacją: libxml2 (także
-`xmlschemas.c`, `xmlregexp.c`), Xerces (C i Java), Saxon, xmlschema (Python), lxml, go-libxml2, helium, xsd-validator
-ani ich portów. Dotyczy to też `../controls/goxsdval` poza jego publicznym API: to opakowanie libxml2, więc wolno go
-wywoływać, a jego plików `*_libxml2.go` nie przenosimy.
+We do not read, copy or port the code of XSD validators or of validating XML parsers: libxml2 (including
+`xmlschemas.c` and `xmlregexp.c`), Xerces (C and Java), Saxon, xmlschema (Python), lxml, go-libxml2, helium,
+xsd-validator, or their ports. This also covers [goxsdval](https://github.com/polestorm/goxsdval) beyond its public
+API: it wraps libxml2, so it may be called, but its `*_libxml2.go` files are not ported.
 
-Lista nie jest zamknięta: obejmuje też nowe walidatory XSD, w tym napisane w Go (`knroy/go-xml`, `jacoelho/xsd`,
-`cB-Sigma/xsd`, `moolekkari/validatexml-go`), oraz lokalną kopię `../go-xsd-validate` (opakowanie libxml2).
+The list is not closed: it also covers newer XSD validators, including those written in Go (`knroy/go-xml`,
+`jacoelho/xsd`, `cB-Sigma/xsd`, `moolekkari/validatexml-go`), and local copies of libxml2 wrappers.
 
-Powodem zakazu nie jest licencja (libxml2 jest na MIT, Xerces na Apache-2.0), tylko trzy cele: kod w całości nasz
-i łatwy do wykazania, pakiet dowodów wiążący kod z regułami rekomendacji oraz rekomendacja, nie cudza implementacja,
-jako wzorzec. Zakaz obowiązuje w fazie budowy. Po spełnieniu K1 i K2 wolno czytać kod konkurencji na licencji
-liberalnej według reguł z `adr/0002-competitor-code-review.md` (rozdzielenie ról, dziennik, bez kopiowania).
+The reason is not the licence (libxml2 is MIT, Xerces Apache-2.0) but three goals: code that is entirely ours and
+easy to show to be so, an evidence package that ties the code to the rules of the recommendation, and the
+recommendation, not someone else's implementation, as the reference. The rule holds while the library is being
+built. Once criteria K1 and K2 are met, competitors' code under a permissive licence may be read under the rules of
+[ADR 0002](adr/0002-competitor-code-review.md): separate roles, a review log, no copying.
 
-## Co wolno
+## What we may do
 
-- uruchamiać libxml2 (przez `goxsdval` albo `xmllint`) i inne walidatory jako czarną skrzynkę i porównywać werdykty
-  oraz miejsca błędów (`tools/compare`);
-- czytać publiczną dokumentację użytkową walidatorów (opisy opcji, listy znanych odstępstw);
-- czytać `encoding/xml` i `regexp` z biblioteki standardowej Go (BSD, ta sama licencja co reszta zależności programu),
-  ale biblioteka używa ich tylko przez publiczne API.
+- run libxml2 (through `goxsdval` or `xmllint`) and other validators as black boxes and compare verdicts and error
+  locations (`tools/compare`, `tools/bench`; the comparison is in [comparison.md](comparison.md));
+- read the user documentation of validators (descriptions of options, lists of known deviations);
+- read `encoding/xml` and `regexp` from the Go standard library (BSD, the same licence as the rest of a program's
+  dependencies); the library uses them only through their public API.
 
-## Dane testowe
+## Test data
 
-Zestaw W3C, schematy MF i przykłady są danymi testowymi, nie kodem. Źródła, licencje i sumy kontrolne:
-`../testdata/README.md`.
+The W3C test suite, the MF schemas and the samples are test data, not code. Sources, licences and checksums:
+[`../testdata/README.md`](../testdata/README.md).

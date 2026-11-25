@@ -69,7 +69,11 @@ Zasady:
   `go test ./xsd ./internal/datatypes ./internal/xmlreader -update` (flagę `-update` mają tylko pakiety z zapadkami); walidator odniesienia: `tools/compare` (polecenia w `docs/testing.md`);
 - **żadnych prawdziwych danych podatników ani klientów w korpusie**: tylko przykłady opublikowane przez MF i dokumenty
   syntetyczne (`testdata/README.md`);
-- nazwy plików, pakietów i identyfikatorów po angielsku; komentarze i dokumentacja po polsku; `README.md` po angielsku;
+- nazwy plików, pakietów i identyfikatorów po angielsku; komentarze i dokumentacja po polsku; po angielsku: `README.md`,
+  `docs/comparison.md` i `docs/provenance.md` (strony publiczne) oraz komentarze dokumentacyjne publicznego API
+  (opis pakietu, eksportowane typy, funkcje, metody, stałe, zmienne i pola struktur w `xsd/` i `messages/`), bo
+  pokazuje je pkg.go.dev (decyzja właściciela z 2026-11-25, jak w gomdgo); komentarze wewnętrzne i pakiety
+  `internal/` zostają po polsku;
   komunikaty błędów biblioteki po angielsku, ze stałym kodem do tłumaczenia przez wywołującego;
 - każdy obsługiwany element rekomendacji ma wymaganie w `requirements/` i test, który je wskazuje;
 - każda decyzja = plik w `docs/adr/`; pytania bez decyzji w `docs/adr/open-questions.md`;

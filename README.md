@@ -61,8 +61,6 @@ All of them were run as programs through their public API, on the same cases and
 | W3C XSD 1.0 test suite[^w3c] | 99.82% | 98.03% | 99.87% 🥇 | 99.10% | 99.72% |
 | — without contested cases[^contested] | 99.97% 🥇 | 98.18% | 99.94% | 99.26% | 99.88% |
 | Dependencies | 0 | C, cgo | 1 | 0 | 0 |
-| Minimum Go | 1.22 🥇 | — | 1.25 | 1.27 | 1.24 |
-| Lines of Go code | 15,119 | (C) | 203,186 | 55,395 | 8,679 🥇 |
 | Added to a program | 1.7 MB | 1.0 MB shared library | 6.4 MB | 3.2 MB | 1.6 MB 🥇 |
 | Time, 200 MB JPK[^perf] | 3.96 s | 3.85 s | —[^tree] | 3.79 s 🥇 | —[^tree] |
 | Memory, 200 MB JPK | 26 MB | 5 MB 🥇 | — | 22 MB | — |
@@ -109,8 +107,8 @@ criteria of [ADR 0001](docs/adr/0001-scope-and-acceptance.md), from the evidence
 - [`docs/comparison.md`](docs/comparison.md): the full comparison with other validators.
 - [`docs/errors.md`](docs/errors.md): every error code, its rule and its fields.
 - [`docs/consumer-migration.md`](docs/consumer-migration.md): moving a libxml2-based consumer to goxsdgo.
-- In Polish: [`docs/provenance.md`](docs/provenance.md) (sources and clean-room rules),
-  [`docs/testing.md`](docs/testing.md) (tests, measurements), [`docs/differences.md`](docs/differences.md)
+- [`docs/provenance.md`](docs/provenance.md): sources and clean-room rules.
+- In Polish: [`docs/testing.md`](docs/testing.md) (tests, measurements), [`docs/differences.md`](docs/differences.md)
   (differences from the test suite and from libxml2), [`docs/differences-libxml2.md`](docs/differences-libxml2.md)
   (every case), [`docs/evidence.md`](docs/evidence.md) (evidence package), [`docs/fuzzing.md`](docs/fuzzing.md),
   [`requirements/`](requirements/) (numbered requirements), [`docs/adr/`](docs/adr/) (decisions),
