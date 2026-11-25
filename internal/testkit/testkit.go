@@ -2,7 +2,7 @@
 //
 // Zapadka (ratchet) to plik, z którego wynika, które przypadki już przechodzą. Test zgodności kończy się błędem, gdy
 // któryś z nich przestaje przechodzić, a z flagą -update zapisuje plik od nowa. Liczba zaliczonych
-// przypadków nie spada więc między commitami bez widocznej zmiany tego pliku (CLAUDE.md, „Jak pracujemy”).
+// przypadków nie spada więc między commitami bez widocznej zmiany tego pliku (.claude/CLAUDE.md, „Jak pracujemy”).
 //
 // Pakiet służy tylko testom; biblioteka go nie importuje.
 package testkit

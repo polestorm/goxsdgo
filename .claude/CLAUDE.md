@@ -74,4 +74,9 @@ Zasady:
 - każdy obsługiwany element rekomendacji ma wymaganie w `requirements/` i test, który je wskazuje;
 - każda decyzja = plik w `docs/adr/`; pytania bez decyzji w `docs/adr/open-questions.md`;
 - liczby (zaliczone przypadki, zgodność z odniesieniem) są datowane i podpisane sposobem pomiaru;
-- opisy commitów po angielsku; przed commitem muszą przechodzić `gofmt`, `go vet ./...` i `go test ./...`.
+- opisy commitów po angielsku; przed commitem muszą przechodzić `gofmt`, `go vet ./...` i `go test ./...`;
+- opis commita kończy się jedną linią `Made with the help of Claude Code` (po pustym wierszu); nie dopisuj
+  `Co-Authored-By` ani `Claude-Session` (decyzja właściciela z 2026-11-25, jak w gomdgo, gopdfgo i gomermaidgo;
+  tego dnia przepisano opisy wszystkich commitów, więc ich identyfikatory się zmieniły);
+- w katalogu głównym trzymamy tylko `README.md`, `LICENSE`, `NOTICE`, `go.mod` (i `.gitignore`); ten plik leży
+  w `.claude/CLAUDE.md`.
