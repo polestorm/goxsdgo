@@ -15,6 +15,8 @@ import (
 	"sync"
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/polestorm/goxsdgo/internal/xmlchars"
 )
 
 // CodeSyntax to kod błędu wyrażenia, które nie jest poprawnym wyrażeniem regularnym XSD (część 2, 4.3.4.2:
@@ -49,11 +51,15 @@ func (e *Error) Error() string {
 type Regexp struct {
 	src string
 	re  *regexp.Regexp
+	// re5 to wariant z klasami \i i \c według XML 1.0 Fifth Edition; nil, gdy wyrażenie ich nie używa
+	// (wtedy oba warianty są tym samym językiem). ADR 0012.
+	re5 *regexp.Regexp
 }
 
-// Compile kompiluje wyrażenie XSD.
+// Compile kompiluje wyrażenie XSD. Klasy \i i \c (oraz \I, \C) mają domyślnie znaczenie z XML 1.0 Second
+// Edition (dodatek F); wariant według Fifth Edition wybiera MatchStringNames.
 func Compile(pattern string) (*Regexp, error) {
-	re2, err := Translate(pattern)
+	re2, usesNames, err := translate(pattern, false)
 	if err != nil {
 		return nil, err
 	}
@@ -61,37 +67,73 @@ func Compile(pattern string) (*Regexp, error) {
 	if err != nil {
 		return nil, &Error{Code: CodeTooLarge, Pattern: pattern, Message: err.Error()}
 	}
-	return &Regexp{src: pattern, re: re}, nil
+	r := &Regexp{src: pattern, re: re}
+	if usesNames {
+		re25, _, err := translate(pattern, true)
+		if err != nil {
+			return nil, err
+		}
+		if r.re5, err = regexp.Compile(re25); err != nil {
+			return nil, &Error{Code: CodeTooLarge, Pattern: pattern, Message: err.Error()}
+		}
+	}
+	return r, nil
 }
 
-// MatchString mówi, czy cały napis s należy do języka wyrażenia.
+// MatchString mówi, czy cały napis s należy do języka wyrażenia (klasy nazw według XML 1.0 Second Edition).
 func (r *Regexp) MatchString(s string) bool { return r.re.MatchString(s) }
+
+// MatchStringNames jest jak MatchString, z klasami \i i \c według wydania ed.
+func (r *Regexp) MatchStringNames(s string, ed xmlchars.Edition) bool {
+	if ed == xmlchars.Edition5 && r.re5 != nil {
+		return r.re5.MatchString(s)
+	}
+	return r.re.MatchString(s)
+}
 
 // String zwraca wyrażenie XSD, z którego powstał r.
 func (r *Regexp) String() string { return r.src }
 
 // Translate zwraca wyrażenie RE2 równoważne wyrażeniu XSD, kotwiczone na początku i końcu napisu.
 func Translate(pattern string) (string, error) {
-	p := &parser{src: pattern}
+	re2, _, err := translate(pattern, false)
+	return re2, err
+}
+
+// translate tłumaczy wyrażenie; names5 wybiera klasy \i i \c według XML 1.0 Fifth Edition. Zwraca też, czy
+// wyrażenie używa tych klas.
+func translate(pattern string, names5 bool) (string, bool, error) {
+	p := &parser{src: pattern, names5: names5}
 	var b strings.Builder
 	b.WriteString(`\A(?:`)
 	if _, err := p.regExp(&b); err != nil {
-		return "", err
+		return "", false, err
 	}
 	if p.pos < len(p.src) {
-		return "", p.fail("unexpected %q", p.peek())
+		return "", false, p.fail("unexpected %q", p.peek())
 	}
 	if b.Len() > maxExpansion {
-		return "", &Error{Code: CodeTooLarge, Pattern: pattern, Message: "expression too large after expanding quantifiers"}
+		return "", false, &Error{Code: CodeTooLarge, Pattern: pattern, Message: "expression too large after expanding quantifiers"}
 	}
 	b.WriteString(`)\z`)
-	return b.String(), nil
+	return b.String(), p.usesNames, nil
 }
 
 type parser struct {
 	src   string
 	pos   int
 	depth int
+	// names5: klasy \i i \c według XML 1.0 Fifth Edition; usesNames: wyrażenie ich używa.
+	names5, usesNames bool
+}
+
+// nameSets zwraca zbiory \i i \c dla wydania wybranego w parserze i zapamiętuje, że wyrażenie ich używa.
+func (p *parser) nameSets() (start, char rangeSet) {
+	p.usesNames = true
+	if p.names5 {
+		return xmlNameStart5, xmlNameChar5
+	}
+	return xmlNameStart, xmlNameChar
 }
 
 func (p *parser) fail(format string, args ...any) error {
@@ -393,13 +435,17 @@ func (p *parser) escape() (rangeSet, rune, error) {
 	case 'S':
 		return spaceSet.complement(), -1, nil
 	case 'i':
-		return xmlNameStart, -1, nil
+		start, _ := p.nameSets()
+		return start, -1, nil
 	case 'I':
-		return xmlNameStart.complement(), -1, nil
+		start, _ := p.nameSets()
+		return start.complement(), -1, nil
 	case 'c':
-		return xmlNameChar, -1, nil
+		_, char := p.nameSets()
+		return char, -1, nil
 	case 'C':
-		return xmlNameChar.complement(), -1, nil
+		_, char := p.nameSets()
+		return char.complement(), -1, nil
 	case 'd':
 		return category("Nd"), -1, nil
 	case 'D':

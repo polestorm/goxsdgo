@@ -133,7 +133,7 @@ func (l *loader) buildSimpleContent(sc *node, ct *ComplexType) {
 		if specs := facetSpecs(der); len(specs) > 0 {
 			if start == anySimple {
 				l.errorf(CodeSimpleRestricts+".1.1", der.pos(), "anySimpleType cannot be the base of a restriction")
-			} else if dt, err := datatypes.Restrict(start.DT, specs, &datatypes.Context{Namespaces: der}); err != nil {
+			} else if dt, err := datatypes.Restrict(start.DT, specs, &datatypes.Context{Namespaces: der, Names: der.doc.names}); err != nil {
 				l.datatypeError(err, der)
 			} else {
 				st := &SimpleType{DT: dt, Base: start, Item: start.Item, Members: start.Members, Pos: der.pos()}

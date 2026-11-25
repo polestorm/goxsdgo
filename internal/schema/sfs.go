@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/polestorm/goxsdgo/internal/datatypes"
+	"github.com/polestorm/goxsdgo/internal/xmlchars"
 )
 
 // Kontrola dokumentu schematu według schematu dla schematów (część 1, dodatek A; część 2, dodatek A). Każdy element
@@ -296,7 +297,7 @@ func (l *loader) checkSFS(n *node, ids map[string]bool) {
 				l.errorf(CodeAttribute, pos, "attribute %s is not allowed on %s", a.local, n.name())
 				continue
 			}
-			if msg := checkAttrValue(kind, a.value); msg != "" {
+			if msg := checkAttrValue(kind, a.value, n.doc.names); msg != "" {
 				l.errorf(CodeAttributeValue, pos, "attribute %s of %s: %s", a.local, n.name(), msg)
 				continue
 			}
@@ -328,7 +329,7 @@ func (l *loader) checkSFS(n *node, ids map[string]bool) {
 			case "id":
 				kind = akID
 			}
-			if msg := checkAttrValue(kind, a.value); msg != "" {
+			if msg := checkAttrValue(kind, a.value, n.doc.names); msg != "" {
 				l.errorf(CodeAttributeValue, pos, "attribute xml:%s: %s", a.local, msg)
 			}
 		}
@@ -374,9 +375,9 @@ func describeContent(model string, n *node) string {
 func collapse(s string) string { return strings.Join(strings.Fields(s), " ") }
 
 // checkAttrValue sprawdza wartość atrybutu według jego typu i zwraca opis błędu albo "".
-func checkAttrValue(kind attrKind, v string) string {
+func checkAttrValue(kind attrKind, v string, ed xmlchars.Edition) string {
 	builtin := func(name string) string {
-		if _, err := datatypes.Builtin(name).Validate(v, nil); err != nil {
+		if _, err := datatypes.Builtin(name).Validate(v, &datatypes.Context{Names: ed}); err != nil {
 			return fmt.Sprintf("%q is not a valid %s", v, name)
 		}
 		return ""
@@ -412,12 +413,12 @@ func checkAttrValue(kind attrKind, v string) string {
 	case akNCName:
 		return builtin("NCName")
 	case akQName:
-		if !validQNameLexical(collapse(v)) {
+		if !validQNameLexical(collapse(v), ed) {
 			return fmt.Sprintf("%q is not a valid QName", v)
 		}
 	case akQNameList:
 		for _, f := range strings.Fields(v) {
-			if !validQNameLexical(f) {
+			if !validQNameLexical(f, ed) {
 				return fmt.Sprintf("%q is not a valid QName", f)
 			}
 		}
@@ -496,18 +497,18 @@ func checkAttrValue(kind attrKind, v string) string {
 }
 
 // validQNameLexical sprawdza postać leksykalną QName ([7] QName z Namespaces in XML).
-func validQNameLexical(s string) bool {
+func validQNameLexical(s string, ed xmlchars.Edition) bool {
 	prefix, local, ok := strings.Cut(s, ":")
 	if !ok {
-		return validNCName(s)
+		return validNCName(s, ed)
 	}
-	return validNCName(prefix) && validNCName(local)
+	return validNCName(prefix, ed) && validNCName(local, ed)
 }
 
-func validNCName(s string) bool {
+func validNCName(s string, ed xmlchars.Edition) bool {
 	if s == "" || strings.Contains(s, ":") {
 		return false
 	}
-	_, err := datatypes.Builtin("NCName").Validate(s, nil)
+	_, err := datatypes.Builtin("NCName").Validate(s, &datatypes.Context{Names: ed})
 	return err == nil && !strings.ContainsAny(s, " \t\r\n")
 }

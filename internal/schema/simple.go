@@ -84,7 +84,7 @@ func (l *loader) buildSimpleRestriction(k *node, st *SimpleType) {
 	if base.Final.Has(DerivationRestriction) {
 		l.errorf(CodeSimpleTypeProps+".3", k.attrPos("base"), "the base type %s has restriction in its final", typeLabel(base))
 	}
-	dt, err := datatypes.Restrict(base.DT, facetSpecs(k), &datatypes.Context{Namespaces: k})
+	dt, err := datatypes.Restrict(base.DT, facetSpecs(k), &datatypes.Context{Namespaces: k, Names: k.doc.names})
 	if err != nil {
 		l.datatypeError(err, k)
 		return

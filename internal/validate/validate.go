@@ -17,6 +17,7 @@ import (
 
 	"github.com/polestorm/goxsdgo/internal/datatypes"
 	"github.com/polestorm/goxsdgo/internal/schema"
+	"github.com/polestorm/goxsdgo/internal/xmlchars"
 	"github.com/polestorm/goxsdgo/internal/xmlreader"
 )
 
@@ -48,6 +49,8 @@ type Options struct {
 	// OnValue, jeśli nie nil, dostaje każdą poprawną wartość typu prostego: treść elementu o typie prostym albo
 	// treści prostej i wartość atrybutu (pytanie 6, ADR 0009). Wywoływana synchronicznie, w kolejności dokumentu.
 	OnValue func(ValueEvent)
+	// Names to reguły znaków nazw dla wartości typów nazw i wzorców z \i, \c (ADR 0012).
+	Names xmlchars.Edition
 }
 
 // ValueEvent to poprawna wartość typu prostego w dokumencie.
@@ -98,6 +101,7 @@ func Validate(sch *schema.Schema, r io.Reader, opts Options) ([]Error, error) {
 		uses: map[*schema.ComplexType]map[schema.QName]int{}, ids: map[string]bool{},
 		special: map[*schema.SimpleType]specialKind{}}
 	v.ctx.Namespaces = v
+	v.ctx.Names = opts.Names
 	err := v.run()
 	return v.errs, err
 }

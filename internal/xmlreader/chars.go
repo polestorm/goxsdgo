@@ -1,5 +1,7 @@
 package xmlreader
 
+import "github.com/polestorm/goxsdgo/internal/xmlchars"
+
 // Klasy znaków z XML 1.0 Fifth Edition, rozdział 2.2 (Char, [2]) i 2.3 (S [3], NameStartChar [4], NameChar [4a]).
 
 // isChar odpowiada produkcji [2] Char.
@@ -38,19 +40,13 @@ var asciiName = func() (t [128]uint8) {
 	return t
 }()
 
-// isNameStart odpowiada produkcji [4] NameStartChar.
+// isNameStart odpowiada produkcji [4] NameStartChar; tablica poza ASCII jest wspólna z typami i wzorcami
+// (internal/xmlchars, ADR 0012).
 func isNameStart(r rune) bool {
 	if r < 0x80 {
 		return asciiName[r]&1 != 0
 	}
-	switch {
-	case 0xC0 <= r && r <= 0xD6, 0xD8 <= r && r <= 0xF6, 0xF8 <= r && r <= 0x2FF,
-		0x370 <= r && r <= 0x37D, 0x37F <= r && r <= 0x1FFF, 0x200C <= r && r <= 0x200D,
-		0x2070 <= r && r <= 0x218F, 0x2C00 <= r && r <= 0x2FEF, 0x3001 <= r && r <= 0xD7FF,
-		0xF900 <= r && r <= 0xFDCF, 0xFDF0 <= r && r <= 0xFFFD, 0x10000 <= r && r <= 0xEFFFF:
-		return true
-	}
-	return false
+	return xmlchars.IsNameStart5(r)
 }
 
 // isNameChar odpowiada produkcji [4a] NameChar.
@@ -58,7 +54,7 @@ func isNameChar(r rune) bool {
 	if r < 0x80 {
 		return asciiName[r]&2 != 0
 	}
-	return isNameStart(r) || r == 0xB7 || (0x300 <= r && r <= 0x36F) || (0x203F <= r && r <= 0x2040)
+	return xmlchars.IsNameChar5(r)
 }
 
 // isPubidChar odpowiada produkcji [13] PubidChar.

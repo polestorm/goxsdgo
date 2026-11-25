@@ -14,6 +14,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/polestorm/goxsdgo/internal/regex"
+	"github.com/polestorm/goxsdgo/internal/xmlchars"
 )
 
 // Variety to odmiana typu prostego (2.5.1).
@@ -274,7 +275,7 @@ func Restrict(base *Type, specs []FacetSpec, ctx *Context) (*Type, error) {
 				return nil, err
 			}
 		case FacetMinInclusive, FacetMinExclusive, FacetMaxInclusive, FacetMaxExclusive:
-			v, err := boundValue(base, s)
+			v, err := boundValue(base, s, namesOf(ctx))
 			if err != nil {
 				return nil, err
 			}
@@ -425,7 +426,7 @@ func (f *facets) bound(k FacetKind) *Value {
 
 // boundValue czyta wartość aspektu granicznego: musi należeć do przestrzeni wartości typu bazowego, a dla
 // maxExclusive i minExclusive może też równać się tej samej granicy typu bazowego (4.3.8, 4.3.9).
-func boundValue(base *Type, s FacetSpec) (Value, *Error) {
+func boundValue(base *Type, s FacetSpec, ed xmlchars.Edition) (Value, *Error) {
 	lexical := normalize(s.Value, base.f.whiteSpace)
 	v, ok := parsePrimitive(base.primitive, lexical, nil)
 	if !ok {
@@ -438,7 +439,7 @@ func boundValue(base *Type, s FacetSpec) (Value, *Error) {
 	}
 	// Pozostałe granice typu bazowego sprawdzają reguły *-valid-restriction w checkBounds; tu tylko wzorce,
 	// wyliczenie i cyfry.
-	if err := base.checkPatterns(lexical); err != nil {
+	if err := base.checkPatterns(lexical, ed); err != nil {
 		return nil, errorf(boundRestrictionCode(s.Kind), s.Value, s.Kind.String(), "not in the value space of the base type")
 	}
 	if err := base.checkValueFacets(v, lexical, false); err != nil {
@@ -603,7 +604,7 @@ func (t *Type) validate(s string, ctx *Context) (Value, string, *Error) {
 	switch t.variety {
 	case List:
 		n := collapse(s)
-		if err := t.checkPatterns(n); err != nil {
+		if err := t.checkPatterns(n, namesOf(ctx)); err != nil {
 			return nil, n, err
 		}
 		var items []string
@@ -628,7 +629,7 @@ func (t *Type) validate(s string, ctx *Context) (Value, string, *Error) {
 			if err != nil {
 				continue
 			}
-			if err := t.checkPatterns(n); err != nil {
+			if err := t.checkPatterns(n, namesOf(ctx)); err != nil {
 				return nil, n, err
 			}
 			if err := t.checkValueFacets(v, n, true); err != nil {
@@ -639,7 +640,7 @@ func (t *Type) validate(s string, ctx *Context) (Value, string, *Error) {
 		return nil, s, &Error{Code: CodeDatatypeUnion, Value: s, Detail: "matches no member type"}
 	}
 	n := normalize(s, t.f.whiteSpace)
-	if err := t.checkPatterns(n); err != nil {
+	if err := t.checkPatterns(n, namesOf(ctx)); err != nil {
 		return nil, n, err
 	}
 	v, ok := parsePrimitive(t.primitive, n, ctx)
@@ -661,11 +662,11 @@ func (t *Type) describe() string {
 	return t.primitive.String()
 }
 
-func (t *Type) checkPatterns(n string) *Error {
+func (t *Type) checkPatterns(n string, ed xmlchars.Edition) *Error {
 	for gi, group := range t.f.patterns {
 		ok := false
 		for _, re := range group {
-			if re.MatchString(n) {
+			if re.MatchStringNames(n, ed) {
 				ok = true
 				break
 			}

@@ -124,12 +124,12 @@ func parseXPath(src string, field bool, n *node, l *loader) (*XPath, string) {
 		}
 		prefix, local, has := strings.Cut(t, ":")
 		if !has {
-			if !validNCName(t) {
+			if !validNCName(t, n.doc.names) {
 				return NameTest{}, t + " is not a valid name"
 			}
 			return NameTest{Local: t}, ""
 		}
-		if !validNCName(prefix) {
+		if !validNCName(prefix, n.doc.names) {
 			return NameTest{}, t + " is not a valid name test"
 		}
 		ns, ok := n.lookupPrefix(prefix)
@@ -139,7 +139,7 @@ func parseXPath(src string, field bool, n *node, l *loader) (*XPath, string) {
 		if local == "*" {
 			return NameTest{AnyLocal: true, Space: ns}, ""
 		}
-		if !validNCName(local) {
+		if !validNCName(local, n.doc.names) {
 			return NameTest{}, t + " is not a valid name"
 		}
 		return NameTest{Space: ns, Local: local}, ""

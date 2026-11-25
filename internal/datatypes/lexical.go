@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/polestorm/goxsdgo/internal/regex"
+	"github.com/polestorm/goxsdgo/internal/xmlchars"
 )
 
 // NamespaceResolver rozwiązuje prefiks przestrzeni nazw w miejscu, w którym stoi wartość QName albo NOTATION
@@ -20,6 +21,17 @@ type NamespaceResolver interface {
 // Context to otoczenie walidacji tekstu, potrzebne tylko niektórym typom.
 type Context struct {
 	Namespaces NamespaceResolver
+	// Names wybiera reguły znaków nazw dla typów nazw (Name, NCName, NMTOKEN, ID, QName…) i klas \i, \c we
+	// wzorcach: domyślnie XML 1.0 Second Edition (ADR 0012).
+	Names xmlchars.Edition
+}
+
+// namesOf zwraca reguły znaków nazw z kontekstu (domyślne dla nil).
+func namesOf(ctx *Context) xmlchars.Edition {
+	if ctx == nil {
+		return xmlchars.Edition2
+	}
+	return ctx.Names
 }
 
 // parsePrimitive odwzorowuje literał (po normalizacji białych znaków) na wartość typu pierwotnego kind.
@@ -81,7 +93,7 @@ func parsePrimitive(kind Kind, s string, ctx *Context) (Value, bool) {
 		}
 		return BinaryValue{kind: KindBase64Binary, Bytes: b}, true
 	case KindQName, KindNOTATION:
-		prefix, local, ok := splitQName(s)
+		prefix, local, ok := splitQName(s, namesOf(ctx))
 		if !ok {
 			return nil, false
 		}
@@ -179,12 +191,12 @@ func hexString(b []byte) string { return hex.EncodeToString(b) }
 func base64String(b []byte) string { return base64.StdEncoding.EncodeToString(b) }
 
 // splitQName dzieli literał według produkcji QName z Namespaces in XML: (NCName ':')? NCName.
-func splitQName(s string) (prefix, local string, ok bool) {
+func splitQName(s string, ed xmlchars.Edition) (prefix, local string, ok bool) {
 	prefix, local, found := strings.Cut(s, ":")
 	if !found {
 		prefix, local = "", s
 	}
-	if (found && !isNCName(prefix)) || !isNCName(local) {
+	if (found && !isNCName(prefix, ed)) || !isNCName(local, ed) {
 		return "", "", false
 	}
 	return prefix, local, true
@@ -192,7 +204,9 @@ func splitQName(s string) (prefix, local string, ok bool) {
 
 var ncNamePattern = mustRegex(`[\i-[:]][\c-[:]]*`)
 
-func isNCName(s string) bool { return s != "" && ncNamePattern.MatchString(s) }
+func isNCName(s string, ed xmlchars.Edition) bool {
+	return s != "" && ncNamePattern.MatchStringNames(s, ed)
+}
 
 func mustRegex(p string) *regex.Regexp {
 	re, err := regex.Compile(p)

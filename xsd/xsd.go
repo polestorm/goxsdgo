@@ -12,6 +12,7 @@ import (
 
 	"github.com/polestorm/goxsdgo/internal/schema"
 	"github.com/polestorm/goxsdgo/internal/validate"
+	"github.com/polestorm/goxsdgo/internal/xmlchars"
 	"github.com/polestorm/goxsdgo/internal/xmlreader"
 )
 
@@ -81,6 +82,31 @@ type Config struct {
 	// Wartość zerowa pola oznacza wartość domyślną z DefaultDocumentLimits, ujemna brak limitu. Przekroczenie
 	// limitu kończy walidację błędem ErrLimit, nie błędem dokumentu (ADR 0011).
 	Document DocumentLimits
+
+	// NameRules wybiera reguły znaków nazw dla typów Name, NCName, NMTOKEN(S), ID, IDREF(S), ENTITY(IES), QName
+	// i NOTATION oraz dla klas \i, \c (i \I, \C) we wzorcach: w schemacie i w walidowanym dokumencie. Wartość
+	// zerowa NamesXML10Edition2 to dosłowny odsyłacz XSD 1.0 2e; NamesXML10Edition5 to reguły, według których
+	// czytnik czyta nazwy elementów i atrybutów (ADR 0012).
+	NameRules NameRules
+}
+
+// NameRules to reguły znaków nazw (ADR 0012).
+type NameRules uint8
+
+const (
+	// NamesXML10Edition2: XML 1.0 Second Edition, dodatek B (domyślnie). Tak samo jak libxml2 dla wartości typów
+	// nazw.
+	NamesXML10Edition2 NameRules = iota
+	// NamesXML10Edition5: XML 1.0 Fifth Edition, produkcje [4] i [4a]; szerszy zbiór znaków, jak w nazwach
+	// elementów i atrybutów dokumentu i w XSD 1.1.
+	NamesXML10Edition5
+)
+
+func (n NameRules) edition() xmlchars.Edition {
+	if n == NamesXML10Edition5 {
+		return xmlchars.Edition5
+	}
+	return xmlchars.Edition2
 }
 
 // TypedValue to poprawna wartość typu prostego w dokumencie, przekazywana do Config.OnValue.
@@ -122,7 +148,7 @@ func (c Config) Compile(fsys fs.FS, names ...string) (*Set, error) {
 
 func (c Config) schemaConfig() schema.Config {
 	return schema.Config{Locations: c.Locations, Namespaces: c.Namespaces, MaxDocuments: c.MaxDocuments,
-		MaxDepth: c.MaxDepth}
+		MaxDepth: c.MaxDepth, NameRules: c.NameRules.edition()}
 }
 
 func schemaError(err error) error {
@@ -188,7 +214,7 @@ func (s *Set) ValidateDocument(r io.Reader, name string) ([]Error, error) {
 	opts := validate.Options{MaxErrors: s.cfg.MaxErrors, MaxIdentityEntries: s.cfg.MaxIdentityEntries,
 		MaxTextSize: d.MaxTextSize, Reader: xmlreader.Limits{MaxDepth: d.MaxDepth, MaxNameLength: d.MaxNameLength,
 			MaxAttributes: d.MaxAttributes, MaxTextSize: d.MaxTextSize, MaxEntityExpansion: d.MaxEntityExpansion,
-			MaxEntityDepth: d.MaxEntityDepth, MaxDTDSize: d.MaxDTDSize}}
+			MaxEntityDepth: d.MaxEntityDepth, MaxDTDSize: d.MaxDTDSize}, Names: s.cfg.NameRules.edition()}
 	if f := s.cfg.OnValue; f != nil {
 		opts.OnValue = func(ev validate.ValueEvent) {
 			f(TypedValue{Path: ev.Path, Name: ev.Name, Attribute: ev.Attribute, Type: ev.Type, Builtin: ev.Builtin,

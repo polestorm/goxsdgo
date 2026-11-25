@@ -9,7 +9,7 @@ wpis: przypadek, oba wyniki, co mówi rekomendacja (rozdział i reguła), kto ma
 | dokumenty z odwołaniem do encji zewnętrznej, z deklaracjami potrzebnymi z podzbioru zewnętrznego albo z sekcjami warunkowymi w encjach parametrycznych | odrzuca (`unsupported-*`, ADR 0004) | czyta encje zewnętrzne, jeśli są dostępne | rekomendacja pozwala procesorowi bez walidacji DTD nie czytać encji zewnętrznych (XML 1.0, §5.1), ale wtedy treść jest niepełna | plik dotąd przyjmowany zostanie odrzucony; w korpusie MF takich nie ma |
 
 | MS-Regex: reJ11, reJ13, reJ19, reJ21, reJ23, reJ25, reJ29, reJ31, reJ33, reJ35, reJ61, reJ69, reJ75, reJ77, reS21, reS42, reT63, reT84 | kategorie znaków spoza BMP według Unicode 15 (np. U+1D7A8 to `Lu`, U+1D7FF to `Nd`) | — (porównanie w etapie 3) | zestaw zakłada Unicode 3.0, w którym znaki spoza BMP nie mają kategorii; ADR 0005, pytanie 7 | wzorce z `\p{Lu}`, `\d` itd. przyjmą znaki spoza BMP; w korpusie MF bez znaczenia |
-| MS-Regex: reZ006i | U+0346 poza `\c` | — | produkcja CombiningChar z XML 1.0 2e kończy pierwszy przedział na U+0345; zestaw oczekuje U+0346 w `\c` | bez znaczenia dla korpusu MF |
+| MS-Regex: reZ006i | U+0346 poza `\c` (domyślnie) | — | produkcja CombiningChar z XML 1.0 2e kończy pierwszy przedział na U+0345; zestaw oczekuje U+0346 w `\c`. Z opcją `NameRules: NamesXML10Edition5` przypadek przechodzi (ADR 0012) | bez znaczenia dla korpusu MF |
 
 ## Rozbieżności werdyktu z libxml2 (kategorie, etap 6)
 
@@ -43,8 +43,8 @@ Na korpusie MF (170 schematów, 15 dokumentów) werdykty obu walidatorów są ta
 
 | Przypadek | `goxsdgo` | Oczekiwane | Uzasadnienie | Propozycja |
 |---|---|---|---|---|
-| Saxonica Missing: missing001, missing002, missing003, missing006 | błąd `src-resolve` | poprawny | 43 przypadki Sun i Microsoft oczekują błędu dla nierozwiązanego odwołania; ADR 0006 | zostawić jako różnicę |
-| Saxonica XmlVersions: xv001, xv004 | błąd | poprawny | „Dĳkstra” (U+0133) nie jest NCName według znaków nazw XML 1.0 2e, z których korzysta XSD 1.0 2e | zostawić jako różnicę |
+| Saxonica Missing: missing001, missing002, missing003, missing006 | błąd `src-resolve` | poprawny | §4.2.3 i §5.3 części 1 dopuszczają nierozwiązane odwołania do czasu oceny, ale zestaw zawiera wprost sprzeczne oczekiwania dla tej samej konstrukcji: `elemM002` (Microsoft, `<xsd:element name="myElem" type="foo"/>` bez przestrzeni docelowej, nieużywany) oczekuje błędu, `missing001` (`<xs:element name="bad" type="absent"/>`, ta sama sytuacja) — poprawnego schematu; tak samo `xsd015`, `xsd016`, `idB005` (`element/@type`) wobec `missing001`, `missing003`. Zasady, która godzi obie grupy, tekst nie daje; zostaje `src-resolve` jak w 43 przypadkach Sun i Microsoft (ADR 0006, ADR 0012) | zostawić jako różnicę |
+| Saxonica XmlVersions: xv001, xv004 | błąd (domyślnie) | poprawny | „Dĳkstra” (U+0133) nie jest NCName według znaków nazw XML 1.0 2e, z których korzysta XSD 1.0 2e; z opcją `NameRules: NamesXML10Edition5` oba przechodzą (ADR 0012) | zostawić jako różnicę w ustawieniu domyślnym |
 | MS IDREFS_length006, NMTOKENS_length006 (stable), errF001 (queried) | błąd `length-minLength-maxLength` | poprawny | `length` i `minLength` w jednym kroku restrykcji są błędem według 4.3.1.4, punkty 1.2 i 2.2 | zostawić jako różnicę |
 | MS particlesZ001 | błąd `cos-particle-restrict` | poprawny | RecurseAsIfGroup stosowany dosłownie (3.9.6), czego wymagają particlesHa161 i particlesK006; ADR 0007 | zostawić jako różnicę |
 | MS elemZ026, elemZ027_c, particlesV020 (queried) | poprawny | błędny | restrykcja z grupami podstawienia według normalizacji 2.1 w 3.9.6; choice z grupy podstawienia nie wymaga zachowania kolejności członków (rekomendacja jej nie określa); ADR 0007 | zostawić jako różnicę |
@@ -56,7 +56,7 @@ Na korpusie MF (170 schematów, 15 dokumentów) werdykty obu walidatorów są ta
 
 | Przypadek | `goxsdgo` | Oczekiwane | Uzasadnienie | Skutek dla odbiorcy |
 |---|---|---|---|---|
-| Saxonica XmlVersions xv002–xv100 | według znaków nazw XML 1.0 2e | według XML 1.0 5e albo XML 1.1 | typy nazw (`Name`, `NCName`, `NMTOKEN`) w XSD 1.0 2e opierają się na XML 1.0 2e | nazwy z nowszymi znakami odrzucane; w korpusie MF bez znaczenia |
+| Saxonica XmlVersions xv002–xv100 | według znaków nazw XML 1.0 2e (domyślnie) | według XML 1.0 5e albo XML 1.1 | typy nazw (`Name`, `NCName`, `NMTOKEN`) w XSD 1.0 2e opierają się na XML 1.0 2e. Z opcją `NameRules: NamesXML10Edition5` przechodzi 16 przypadków więcej (wszystkie zależne od znaków nazw), bez utraty żadnego; zostają `xv003.v01`, `xv006.v01`, `xv008.v01`: odwołania do znaków dozwolonych tylko w XML 1.1, dokument nie jest dobrze uformowany według XML 1.0 (`wfc-legal-character`) | w ustawieniu domyślnym nazwy z nowszymi znakami odrzucane; w korpusie MF bez znaczenia |
 | MS gMonth002, gMonth004 | „--MM” | „--MM--” | wydanie drugie (część 2, 3.2.14, z erratą) podaje postać „--MM”; zestaw zakłada pierwsze wydanie | wartości „--MM--” odrzucane |
 | MS anyURI_a004 | według etapu 2 | inaczej | literał `anyURI`, jak `anyURI_b006` wyżej | rozstrzygnięte w ADR 0009, punkt 7: zostaje |
 | MS stZ073b | poprawny | błędny | restrykcja unii przyjmuje `xsi:type` wskazujący typ członka (ADR 0008, punkt 11) | rozstrzygnięte w ADR 0009, punkt 7: zostaje |

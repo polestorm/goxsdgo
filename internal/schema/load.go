@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"path"
 	"strings"
+
+	"github.com/polestorm/goxsdgo/internal/xmlchars"
 )
 
 // Config ustawia wczytywanie schematu. Wartość zerowa to ustawienia domyślne: bez sieci, dokumenty tylko z fs.FS.
@@ -19,6 +21,9 @@ type Config struct {
 	// MaxDocuments ogranicza liczbę wczytanych dokumentów schematu (domyślnie 1000), MaxDepth zagnieżdżenie
 	// include/import/redefine (domyślnie 64). Zero oznacza wartość domyślną.
 	MaxDocuments, MaxDepth int
+	// NameRules wybiera reguły znaków nazw dla typów nazw i klas \i, \c we wzorcach (ADR 0012): domyślnie
+	// XML 1.0 Second Edition.
+	NameRules xmlchars.Edition
 }
 
 // defKind to przestrzeń symboli komponentu globalnego (2.5, 3.15.3).
@@ -60,6 +65,8 @@ const (
 // document to wczytany dokument schematu.
 type document struct {
 	path string
+	// names to reguły znaków nazw z Config.NameRules (wspólne dla wszystkich dokumentów jednego schematu).
+	names xmlchars.Edition
 	// base to bezwzględny adres dokumentu, gdy wczytano go przez Config.Locations; służy do rozwiązywania
 	// względnych schemaLocation.
 	base string
@@ -277,7 +284,8 @@ func (l *loader) loadDocument(p, base string, r role, from *document, ref *node,
 	if d, ok := l.loaded[key]; ok {
 		return d
 	}
-	d := &document{path: p, base: base, root: root, imports: map[string]bool{}, hasTNS: hasTNS, tns: effective(tns)}
+	d := &document{path: p, base: base, root: root, imports: map[string]bool{}, hasTNS: hasTNS, tns: effective(tns),
+		names: l.cfg.NameRules}
 	setDoc(root, d)
 	l.loaded[key] = d
 	l.docs = append(l.docs, d)

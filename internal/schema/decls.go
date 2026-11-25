@@ -402,6 +402,7 @@ func valueOf(vc *ValueConstraint, st *SimpleType) error {
 	ctx := &datatypes.Context{}
 	if vc.ctx != nil {
 		ctx.Namespaces = vc.ctx
+		ctx.Names = vc.ctx.doc.names
 	}
 	v, err := st.DT.Validate(vc.Lexical, ctx)
 	if err != nil {
