@@ -19,7 +19,7 @@ zebrane w jednym miejscu i pomiary względem libxml2, także na prywatnym korpus
    czasy). `tools/fuzz -pack` buduje paczkę dla serwera bez Go (Synology): binarki testów z `go test -c` dla
    linux/amd64 i linux/arm64, wejścia regresji i dane wejść startowych w układzie repozytorium, skrypt `run.sh` w czystym
    sh (BusyBox) z dziennikiem `journal.tsv`; `tools/fuzz -import` dopisuje dziennik serwera do `docs/fuzzing.md`.
-   Pierwsza kampania lokalna na `2e813e9` została przerwana po 15 min (`FuzzDecimal`, 107,8 mln wykonań, bez błędów).
+   Pierwsza kampania lokalna na `59d6910` została przerwana po 15 min (`FuzzDecimal`, 107,8 mln wykonań, bez błędów).
 2. **Wejścia startowe z pobranych danych.** Fuzzery dostają próbkę schematów i przykładów MF, przypadków W3C,
    dokumentów XML Conformance i wzorców ze schematów MF (`testkit.SampleFiles`), czytaną w czasie testu. Danych nie
    commitujemy (ADR 0003), a bez nich fuzzery startują z wejść wpisanych w kod. Danych prywatnych nie używamy.
@@ -91,5 +91,5 @@ zebrane w jednym miejscu i pomiary względem libxml2, także na prywatnym korpus
 + K6 i K7 spełnione z zapasem także na prawdziwych dużych plikach; K3 na korpusie prywatnym 100% werdyktów;
 + limity opisane w jednym miejscu i dostępne przez API;
 + każda optymalizacja ma dowód, że nie zmienia wyników;
-− do K5 brakuje 23 h 45 min kampanii na kandydacie `2e813e9` (stan w `docs/fuzzing.md`);
+− do K5 brakuje 23 h 45 min kampanii na kandydacie `59d6910` (stan w `docs/fuzzing.md`);
 − indeks scalony zwiększa pamięć używanego modelu o rozmiar sumy indeksów krawędzi (najwyżej 256 dzieci na krawędź).

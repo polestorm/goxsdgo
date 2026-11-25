@@ -70,23 +70,33 @@ go -C tools/fuzz run . -root ../.. -import /ścieżka/do/journal.tsv   # wynik z
 
 | Data | Commit | Pakiet | Fuzzer | Czas | Wykonania | Wynik |
 |---|---|---|---|---|---|---|
-| 2026-11-25 15:59 | `2e813e9` | ./internal/datatypes | `FuzzDecimal` | 15m3s | 107809772 | ok; przebieg przerwany po 15 min (decyzja właściciela), kampania przeniesiona na Synology |
-| 2026-11-25 15:59 | `2e813e9` | ./internal/datatypes | `FuzzLexical` | — | — | nieuruchomiony (kampania przerwana) |
-| 2026-11-25 15:59 | `2e813e9` | ./internal/regex | `FuzzRegexTranslate` | — | — | nieuruchomiony (kampania przerwana) |
-| 2026-11-25 15:59 | `2e813e9` | ./internal/schema | `FuzzContentModel` | — | — | nieuruchomiony (kampania przerwana) |
-| 2026-11-25 15:59 | `2e813e9` | ./internal/xmlreader | `FuzzReader` | — | — | nieuruchomiony (kampania przerwana) |
-| 2026-11-25 15:59 | `2e813e9` | ./xsd | `FuzzCompile` | — | — | nieuruchomiony (kampania przerwana) |
-| 2026-11-25 15:59 | `2e813e9` | ./xsd | `FuzzValidate` | — | — | nieuruchomiony (kampania przerwana) |
+| 2026-11-25 15:59 | `59d6910` | ./internal/datatypes | `FuzzDecimal` | 15m3s | 107809772 | ok; przebieg przerwany po 15 min (decyzja właściciela), kampania przeniesiona na Synology |
+| 2026-11-25 15:59 | `59d6910` | ./internal/datatypes | `FuzzLexical` | — | — | nieuruchomiony (kampania przerwana) |
+| 2026-11-25 15:59 | `59d6910` | ./internal/regex | `FuzzRegexTranslate` | — | — | nieuruchomiony (kampania przerwana) |
+| 2026-11-25 15:59 | `59d6910` | ./internal/schema | `FuzzContentModel` | — | — | nieuruchomiony (kampania przerwana) |
+| 2026-11-25 15:59 | `59d6910` | ./internal/xmlreader | `FuzzReader` | — | — | nieuruchomiony (kampania przerwana) |
+| 2026-11-25 15:59 | `59d6910` | ./xsd | `FuzzCompile` | — | — | nieuruchomiony (kampania przerwana) |
+| 2026-11-25 15:59 | `59d6910` | ./xsd | `FuzzValidate` | — | — | nieuruchomiony (kampania przerwana) |
 
-Stan K5 (2026-11-25): na kandydacie `2e813e9` zaliczone 15 min (`FuzzDecimal`, bez błędów); do 24 h brakuje
+Stan K5 (2026-11-25): na kandydacie `59d6910` zaliczone 15 min (`FuzzDecimal`, bez błędów); do 24 h brakuje
 23 h 45 min. Wcześniejsze przebiegi z etapów 1–5 (łącznie ok. 30 min, na innych commitach, poza dziennikiem) i 90 s `FuzzDecimal` na kodzie
 przed commitem nie liczą się do K5.
 
 ## Zlecenie na Synology (2026-11-25)
 
-Paczka z `7aa29c4` (kod biblioteki jak w kandydacie `2e813e9`) wgrana do `~/fuzz/goxsdgo/7aa29c4/` na Synology
+Paczka z `4106d3f` (kod biblioteki jak w kandydacie `59d6910`) wgrana do `~/fuzz/goxsdgo/4106d3f/` na Synology
 „StormSyn” (DS224+, x86_64, 4 rdzenie Celeron J4125) i ustawiona 2026-11-25 16:22 we wspólnej kolejce `~/fuzz/queue.sh`:
 1425 min (23 h 45 min brakujące do K5), 3 workery, `nice -n 19`. Ziarna wszystkich 7 fuzzerów przechodzą na serwerze.
 Kampania ruszy po zakończeniu trwającego fuzzingu `gomdgo`. Po zakończeniu: skopiować
-`~/fuzz/goxsdgo/7aa29c4/fuzzpack/work/journal.tsv` i dopisać `go -C tools/fuzz run . -root ../.. -import journal.tsv`;
+`~/fuzz/goxsdgo/4106d3f/fuzzpack/work/journal.tsv` i dopisać `go -C tools/fuzz run . -root ../.. -import journal.tsv`;
 wejścia łamiące niezmiennik leżą w `fuzzpack/tree/<pakiet>/testdata/fuzz/`.
+
+## Identyfikatory po przepisaniu historii (2026-11-25)
+
+Tego dnia przepisano opisy wszystkich commitów (jedna linia `Made with the help of Claude Code`), więc ich
+identyfikatory się zmieniły; zawartość plików bez zmian. Kandydat K5 `2e813e9` to teraz `59d6910`, a paczka
+`7aa29c4` to teraz `4106d3f`. Paczka na Synology ma wpisane stare identyfikatory (katalog `~/fuzz/goxsdgo/7aa29c4/`,
+kolumna commit w `journal.tsv`): przed `-import` zamień w dzienniku `7aa29c4` na `4106d3f`
+(`sed -i '' 's/\t7aa29c4\t/\t4106d3f\t/' journal.tsv`), żeby pakiet dowodów zaliczył godziny do kandydata.
+Stara historia: kopia lustrzana `../goxsdgo-backup-2026-11-25.git`.
+
