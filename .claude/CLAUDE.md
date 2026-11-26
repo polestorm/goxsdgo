@@ -49,7 +49,7 @@ kolumnę „Stan” w `docs/roadmap.md`.
 - wymagania piszemy razem z etapem, w plikach według prefiksów z `requirements/README.md`;
 - najpierw test (przypadek W3C albo plik korpusu), potem kod; liczba zaliczonych przypadków W3C nie spada między
   commitami bez wpisu, dlaczego;
-- repozytorium `github.com/polestorm/goxsdgo` (prywatne); commit i push tylko na prośbę właściciela.
+- repozytorium `github.com/polestorm/goxsdgo` (publiczne od 2026-11-26, wydanie v0.1.0); commit i push tylko na prośbę właściciela.
 
 Zasady:
 - **czysty rodowód** (`docs/provenance.md`): piszemy z rekomendacji W3C. Nie czytaj, nie kopiuj i nie przenoś kodu
