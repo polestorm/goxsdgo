@@ -16,7 +16,6 @@ Z Pythonem 3.9+ (bez Go, np. na Windows; z katalogu głównego repozytorium):
 ```bat
 py tools\fetch\fetch.py            :: pobiera brakujące pliki
 py tools\fetch\fetch.py --verify   :: sprawdza pobrane pliki bez sieci
-py tools\fetch\fetch.py --from ..\xml.pro\internal\importing\schemas   :: także jpk_kr_pd_1.xsd z lokalnej kopii
 ```
 
 Obie wersje dają te same pliki. Na Windows repozytorium nie powinno leżeć głębiej niż ok. 120 znaków od dysku, bo
@@ -42,11 +41,14 @@ testy i `tools/compare` rozwiązują przez nią `schemaLocation` bez sieci.
 
 ## Uwagi o źródłach (stan 2026-11-25)
 
-- **169 ze 170 schematów** pobierają się spod adresów MF z oczekiwaną sumą.
-- **`jpk_kr_pd_1.xsd`** nie ma znanego adresu pliku u MF (w katalogu xml.pro zapisano adres przestrzeni nazw).
-  W manifeście ma znacznik `local_only`: narzędzie bierze go tylko z lokalnej kopii
-  (`-from ../xml.pro/internal/importing/schemas`) i sprawdza sumę, a bez niej pomija go z komunikatem. Testy korpusu
-  też go wtedy pomijają. Do uzupełnienia, gdy znajdziemy adres.
+- **Wszystkie 170 schematów** pobierają się spod adresów MF i KAS z oczekiwaną sumą. `jpk_kr_pd_1.xsd` od 2026-11-26
+  pochodzi ze strony KAS „Struktury JPK w podatkach dochodowych” (`Schemat_JPK_KR_PD(1)_v1-1.xsd`); wcześniejsza kopia
+  z xml.pro różniła się tylko końcami wierszy.
+- **Lustro**: każdy plik z `w3c/schemas/`, `schemas/mf/` i `instances/mf/` ma drugi adres w publicznym repozytorium
+  [`polestorm/goxsdgo-testdata`](https://github.com/polestorm/goxsdgo-testdata), przypiętym do commita `d690c72`.
+  Narzędzie próbuje najpierw adresu oryginalnego, potem lustra; suma kontrolna musi się zgadzać w obu przypadkach.
+  Powód: serwery MF (`crd.gov.pl` przekierowuje na `epuap.gov.pl`) bywają nieosiągalne spoza Polski, np. z maszyn
+  GitHub Actions. Nowy plik w manifeście trzeba dodać też do lustra (nowy commit lustra i nowe adresy).
 - **Nazwy plików pomocniczych się powtarzają**: np. `StrukturyDanych_v6-0E.xsd` z gov.pl i z CRD z 2020 r. mają inną
   treść. Plik dodany później, którego nazwa jest już zajęta, trafia do `auxiliary/<data z adresu>/`.
 - **Kopie w xml.pro różnią się od oryginałów MF** w 7 schematach JPK w wersji 1 (EWP, FA, KR, MAG, PKPIR, VAT, WB).

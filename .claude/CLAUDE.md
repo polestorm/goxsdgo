@@ -62,6 +62,8 @@ Zasady:
 - wzorcem są rekomendacje i oczekiwane wyniki zestawu W3C, nie zachowanie libxml2: gdy libxml2 różni się od
   rekomendacji, wygrywa rekomendacja, a różnicę wpisujemy do `docs/differences.md` (odbiorca musi wiedzieć, że plik
   dotąd przyjmowany teraz zostanie odrzucony, albo odwrotnie);
+- nowy plik danych z serwera MF albo w3.org dodajemy też do publicznego lustra `polestorm/goxsdgo-testdata` (`../goxsdgo-testdata`,
+  commit lustra i drugi adres w `sources.json`), żeby pomiary dało się powtórzyć spoza Polski;
 - dane testowe (zestawy W3C, schematy i przykłady MF) pobiera `go -C tools/fetch run . -root ../..` albo
   `python tools/fetch/fetch.py` według `testdata/sources.json`; nie trafiają do repozytorium (ADR 0003). Obie wersje
   narzędzia zmieniamy razem;

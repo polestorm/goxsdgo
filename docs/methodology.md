@@ -8,7 +8,10 @@ each row is computed, where the raw results are, and how to run it all again.
 
 All inputs are fetched by `tools/fetch` (Go, or `python tools/fetch/fetch.py`) according to
 [`testdata/sources.json`](../testdata/sources.json), which pins every source to a commit or a published file and a
-SHA-256 checksum of the extracted tree; nothing is downloaded during a measurement.
+SHA-256 checksum of the extracted tree; nothing is downloaded during a measurement. Every file that comes from a
+government server (the MF schemas and samples) or from w3.org also has a second address in the public mirror
+[polestorm/goxsdgo-testdata](https://github.com/polestorm/goxsdgo-testdata), pinned to a commit; `tools/fetch` tries
+the original address first, and the checksum must match either way.
 
 | Input | Source | Used for |
 |---|---|---|
@@ -29,7 +32,7 @@ is not part of the comparison.
 | Candidate | Version | How it is run |
 |---|---|---|
 | goxsdgo | this repository | `xsd.Config` with a location catalogue for imports; `SchemaLocationHints` on for cases that name their schema only in the document; a second run with `NameRules: NamesXML10Edition5` |
-| libxml2 | 2.15.4 (Homebrew on macOS, `libxml2-dev` on Linux) | through its C API from `tools/compare` (cgo, schema compiled from one file, no hints) and as `xmllint --stream --nonet` with an XML catalogue for time and memory |
+| libxml2 | 2.15.4 (see below) | through its C API from `tools/compare` (cgo, schema compiled from one file, no hints) and as `xmllint --stream --nonet` with an XML catalogue for time and memory |
 | knroy/go-xml | v2.3.1 | XSD 1.0 mode; a resolver serving local files; DOCTYPE allowed in suite documents (its default refuses it) |
 | jacoelho/xsd | v0.6.15 | default options; for the 200 MB file the input limit (`MaxInstanceBytes`, 64 MiB by default) is raised |
 | cB-Sigma/xsd | v1.0.0 | a fetch function serving local files; `LoadHinted` for hint-only cases |
@@ -88,7 +91,20 @@ go -C tools/bench run . -root ../.. publish                # copy the raw result
 GOXSDGO_STREAM_MB=1024 go test ./xsd -run TestStreamingMemory -v   # 1 GB document
 ```
 
-On macOS with Homebrew, `tools/compare` needs `PKG_CONFIG_PATH=/opt/homebrew/opt/libxml2/lib/pkgconfig`; `xmllint`
+libxml2 is pinned to release 2.15.4: the official source archive is
+`https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.4.tar.xz`, SHA-256
+`98087fd181d9070724f3fbc65c7377db03038eb92bd882374daff44940138821` (the published run used the Homebrew build of the
+same release). A package of another version can give different libxml2 numbers. To build it:
+
+```sh
+curl -LO https://download.gnome.org/sources/libxml2/2.15/libxml2-2.15.4.tar.xz
+shasum -a 256 libxml2-2.15.4.tar.xz   # 98087fd1…40138821
+tar xf libxml2-2.15.4.tar.xz && cd libxml2-2.15.4
+./configure --prefix="$HOME/libxml2-2.15.4" --without-python && make && make install
+export PKG_CONFIG_PATH="$HOME/libxml2-2.15.4/lib/pkgconfig" XMLLINT="$HOME/libxml2-2.15.4/bin/xmllint"
+```
+
+On macOS with Homebrew (while it still ships 2.15.4), `tools/compare` needs `PKG_CONFIG_PATH=/opt/homebrew/opt/libxml2/lib/pkgconfig`; `xmllint`
 is taken from `PATH` or given with `-xmllint`. Give it explicitly: macOS ships an older `/usr/bin/xmllint`
 (libxml2 2.9.13), which is noticeably faster on these files and is not the version compared here; with Homebrew
 `XMLLINT=/opt/homebrew/opt/libxml2/bin/xmllint`. `environment-perf.json` records the version that was used. `tools/bench` builds with Go 1.27 because jacoelho/xsd requires it.
