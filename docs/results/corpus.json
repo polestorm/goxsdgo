@@ -1,0 +1,39 @@
+[
+  {
+    "candidate": "goxsdgo",
+    "schemas": 170,
+    "schemas_ok": 170,
+    "documents": 15,
+    "documents_ok": 15,
+    "schema_failures": 0
+  },
+  {
+    "candidate": "knroy/go-xml",
+    "schemas": 170,
+    "schemas_ok": 170,
+    "documents": 15,
+    "documents_ok": 15,
+    "schema_failures": 0
+  },
+  {
+    "candidate": "jacoelho/xsd",
+    "schemas": 170,
+    "schemas_ok": 168,
+    "documents": 15,
+    "documents_ok": 15,
+    "first_failure": "ksef_fa_2.xsd: schema.limit at 2358:7 <root>/testdata/schemas/mf/ksef_fa_2.xsd: content model DFA state limit exceeded",
+    "schema_failures": 2,
+    "failed": [
+      "ksef_fa_2.xsd",
+      "ksef_fa_3.xsd"
+    ]
+  },
+  {
+    "candidate": "cB-Sigma/xsd",
+    "schemas": 170,
+    "schemas_ok": 170,
+    "documents": 15,
+    "documents_ok": 15,
+    "schema_failures": 0
+  }
+]

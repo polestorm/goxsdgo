@@ -32,77 +32,77 @@ var goRejects = []struct {
 	cat   category
 }{
 	{[]string{"derivation-ok-restriction", "cos-particle-restrict"}, category{"G-restriction",
-		"libxml2 przyjmuje restrykcję typu złożonego niezgodną z Derivation Valid (Restriction, Complex)",
+		"libxml2 accepts a complex type restriction that violates Derivation Valid (Restriction, Complex)",
 		"XSD 1, 3.4.6 (derivation-ok-restriction), 3.9.6 (Particle Valid (Restriction))",
-		"schemat dotąd przyjmowany zostanie odrzucony"}},
+		"a schema accepted so far will be rejected"}},
 	{[]string{"cos-nonambig"}, category{"G-upa",
-		"libxml2 nie wykrywa części niejednoznacznych modeli zawartości",
-		"XSD 1, 3.8.6 (cos-nonambig, Unique Particle Attribution), dodatek H",
-		"schemat dotąd przyjmowany zostanie odrzucony"}},
+		"libxml2 misses some ambiguous content models",
+		"XSD 1, 3.8.6 (cos-nonambig, Unique Particle Attribution), appendix H",
+		"a schema accepted so far will be rejected"}},
 	{[]string{"cos-element-consistent"}, category{"G-edc",
-		"libxml2 nie sprawdza Element Declarations Consistent",
+		"libxml2 does not check Element Declarations Consistent",
 		"XSD 1, 3.8.6 (cos-element-consistent)",
-		"schemat dotąd przyjmowany zostanie odrzucony"}},
+		"a schema accepted so far will be rejected"}},
 	{[]string{"regex-syntax"}, category{"G-regex",
-		"libxml2 przyjmuje wzorzec, który nie jest wyrażeniem regularnym XSD",
-		"XSD 2, dodatek F, 4.3.4 (pattern)",
-		"schemat dotąd przyjmowany zostanie odrzucony"}},
+		"libxml2 accepts a pattern that is not an XSD regular expression",
+		"XSD 2, appendix F, 4.3.4 (pattern)",
+		"a schema accepted so far will be rejected"}},
 	{[]string{"facet-fixed"}, category{"G-facet-fixed",
-		"libxml2 pozwala zmienić aspekt ustalony (fixed=\"true\") w typie bazowym",
-		"XSD 2, 4.3 (składnik {fixed} każdego aspektu)",
-		"schemat dotąd przyjmowany zostanie odrzucony"}},
+		"libxml2 lets a restriction change a facet fixed (fixed=\"true\") in the base type",
+		"XSD 2, 4.3 (the {fixed} property of every facet)",
+		"a schema accepted so far will be rejected"}},
 	{[]string{"minLength-less-than-equal-to-maxLength", "minLength-valid-restriction", "minInclusive-less-than-maxExclusive",
 		"whiteSpace-valid-restriction", "length-minLength-maxLength", "maxLength-valid-restriction", "length-valid-restriction",
 		"minInclusive-less-than-equal-to-maxInclusive", "minExclusive-less-than-equal-to-maxExclusive",
 		"minExclusive-less-than-maxInclusive", "totalDigits-valid-restriction", "fractionDigits-valid-restriction",
 		"fractionDigits-totalDigits", "enumeration-valid-restriction", "src-single-facet-value", "enumeration-required-notation"},
-		category{"G-facets", "libxml2 nie sprawdza części ograniczeń spójności aspektów przy restrykcji",
-			"XSD 2, 4.3.x.4 (ograniczenia komponentów aspektów)", "schemat dotąd przyjmowany zostanie odrzucony"}},
+		category{"G-facets", "libxml2 does not check some facet consistency constraints of a restriction",
+			"XSD 2, 4.3.x.4 (facet component constraints)", "a schema accepted so far will be rejected"}},
 	{[]string{"src-redefine"}, category{"G-redefine",
-		"libxml2 przyjmuje niepoprawną redefinicję",
+		"libxml2 accepts an invalid redefinition",
 		"XSD 1, 4.2.2 (src-redefine)",
-		"schemat dotąd przyjmowany zostanie odrzucony"}},
+		"a schema accepted so far will be rejected"}},
 	{[]string{"sfs-attribute", "sfs-attribute-value", "sfs-attribute-required", "sfs-content", "sfs-text", "sfs-duplicate-id"}, category{"G-sfs",
-		"libxml2 przyjmuje dokument schematu niezgodny ze schematem dla schematów",
-		"XSD 1, dodatek A; XSD 2, dodatek A",
-		"schemat dotąd przyjmowany zostanie odrzucony"}},
+		"libxml2 accepts a schema document that violates the schema for schemas",
+		"XSD 1, appendix A; XSD 2, appendix A",
+		"a schema accepted so far will be rejected"}},
 	{[]string{"sch-props-correct", "e-props-correct", "a-props-correct", "au-props-correct", "n-props-correct", "src-import",
 		"src-include", "ct-props-correct", "st-props-correct", "cos-ct-extends", "src-resolve", "src-ct", "src-element",
 		"src-attribute", "p-props-correct", "cos-valid-default", "mg-props-correct", "ag-props-correct", "cos-st-restricts"},
-		category{"G-components", "libxml2 nie sprawdza innych ograniczeń komponentów schematu",
-			"XSD 1, rozdział 3 i 4 (Schema Component Constraints, Schema Representation Constraints)",
-			"schemat dotąd przyjmowany zostanie odrzucony"}},
+		category{"G-components", "libxml2 does not check other schema component constraints",
+			"XSD 1, chapters 3 and 4 (Schema Component Constraints, Schema Representation Constraints)",
+			"a schema accepted so far will be rejected"}},
 	{[]string{"cvc-id"}, category{"G-idref",
-		"libxml2 nie sprawdza, czy wartość IDREF wskazuje ID w dokumencie",
+		"libxml2 does not check that an IDREF value points to an ID in the document",
 		"XSD 1, 3.15.5 (cvc-id.1)",
-		"dokument dotąd przyjmowany zostanie odrzucony"}},
+		"a document accepted so far will be rejected"}},
 	{[]string{"cvc-pattern-valid", "cvc-datatype-valid", "cvc-enumeration-valid", "cvc-length-valid", "cvc-minLength-valid",
 		"cvc-maxLength-valid", "cvc-minInclusive-valid", "cvc-maxInclusive-valid", "cvc-minExclusive-valid",
 		"cvc-maxExclusive-valid", "cvc-totalDigits-valid", "cvc-fractionDigits-valid"}, category{"G-values",
-		"goxsdgo odrzuca wartość typu prostego, którą libxml2 przyjmuje",
-		"XSD 2, 4.1.4 (cvc-datatype-valid) i reguły aspektów 4.3.x.3",
-		"dokument dotąd przyjmowany zostanie odrzucony"}},
+		"goxsdgo rejects a simple-type value that libxml2 accepts",
+		"XSD 2, 4.1.4 (cvc-datatype-valid) and the facet rules 4.3.x.3",
+		"a document accepted so far will be rejected"}},
 	{[]string{"cvc-elt", "cvc-identity-constraint", "cvc-au", "cvc-complex-type", "cvc-attribute", "cvc-type"}, category{"G-assessment",
-		"goxsdgo odrzuca dokument według reguły oceny, której libxml2 nie stosuje albo stosuje inaczej",
-		"XSD 1, reguły cvc-* (3.3.4, 3.4.4, 3.5.4, 3.11.4)",
-		"dokument dotąd przyjmowany zostanie odrzucony"}},
+		"goxsdgo rejects a document by an assessment rule that libxml2 does not apply or applies differently",
+		"XSD 1, cvc-* rules (3.3.4, 3.4.4, 3.5.4, 3.11.4)",
+		"a document accepted so far will be rejected"}},
 }
 
 // Kategorie, gdy libxml2 odrzuca, a goxsdgo przyjmuje: według kodu libxml2.
 func libRejects(kind w3c.Kind, code int) category {
 	switch {
 	case kind == w3c.SchemaTest:
-		return category{"L-schema", "libxml2 odrzuca schemat, który goxsdgo przyjmuje",
-			"zależnie od przypadku (lista niżej)", "schemat dotąd odrzucany zostanie przyjęty"}
+		return category{"L-schema", "libxml2 rejects a schema that goxsdgo accepts",
+			"depends on the case (list below)", "a schema rejected so far will be accepted"}
 	case code >= 1824 && code <= 1840:
-		return category{"L-values", "libxml2 odrzuca wartość typu prostego, którą goxsdgo przyjmuje",
-			"XSD 2, 4.1.4 i reguły aspektów", "dokument dotąd odrzucany zostanie przyjęty"}
+		return category{"L-values", "libxml2 rejects a simple-type value that goxsdgo accepts",
+			"XSD 2, 4.1.4 and the facet rules", "a document rejected so far will be accepted"}
 	case code < 1000 || code >= 2000:
-		return category{"L-wellformed", "libxml2 uznaje dokument za źle uformowany, a goxsdgo nie",
-			"XML 1.0, Namespaces 1.0", "dokument dotąd odrzucany zostanie przyjęty"}
+		return category{"L-wellformed", "libxml2 finds a document not well-formed, goxsdgo does not",
+			"XML 1.0, Namespaces 1.0", "a document rejected so far will be accepted"}
 	}
-	return category{"L-assessment", "libxml2 odrzuca dokument według reguły oceny, którą goxsdgo stosuje inaczej",
-		"XSD 1, reguły cvc-*", "dokument dotąd odrzucany zostanie przyjęty"}
+	return category{"L-assessment", "libxml2 rejects a document by an assessment rule that goxsdgo applies differently",
+		"XSD 1, cvc-* rules", "a document rejected so far will be accepted"}
 }
 
 var clauseSuffix = regexp.MustCompile(`(\.[0-9]+)+$`)
@@ -130,7 +130,7 @@ func whoIsRight(d difference) string {
 	case d.c.Matches(w3c.Validity(d.libxml2)):
 		return "libxml2"
 	}
-	return "żaden"
+	return "neither"
 }
 
 func libxml2Version() string {
@@ -185,24 +185,25 @@ func writeDifferences(root, out string, docs bool, schema, instance []difference
 		return keys[i] < keys[j]
 	})
 	var b strings.Builder
-	fmt.Fprintf(&b, "# Rozbieżności werdyktu goxsdgo i libxml2 na zestawie W3C\n\n")
-	fmt.Fprintf(&b, "Plik generowany przez `tools/compare` (`go run -tags libxml2 . -docs w3c`); nie edytuj go ręcznie.\n")
-	fmt.Fprintf(&b, "Stan: %s, libxml2 %s przez `tools/compare`, zestaw W3C z commitu `7bc3365c`. Kategorie i decyzje: `differences.md`.\n\n",
+	fmt.Fprintf(&b, "# Verdict differences between goxsdgo and libxml2 on the W3C suite\n\n")
+	fmt.Fprintf(&b, "Generated by `tools/compare` (`go run -tags libxml2 . -docs w3c`); do not edit by hand.\n")
+	fmt.Fprintf(&b, "As of %s, libxml2 %s through `tools/compare`, W3C suite at commit `7bc3365c`. Categories and decisions:\n"+
+		"[differences.md](differences.md) (in Polish); method: [methodology.md](methodology.md).\n\n",
 		time.Now().Format("2006-01-02"), libxml2Version())
-	fmt.Fprintf(&b, "Rozbieżności: %d (testy schematów %d, testy dokumentów %d); bez kategorii: %d. „Rację ma” według oczekiwanego\n"+
-		"werdyktu zestawu W3C.\n\n", len(all), len(schema), len(instance), len(uncategorized))
-	b.WriteString("| Kategoria | Przypadki | Rację ma goxsdgo | Rację ma libxml2 | Żaden | Reguła | Skutek dla odbiorcy |\n|---|---|---|---|---|---|---|\n")
+	fmt.Fprintf(&b, "Differences: %d (schema tests %d, instance tests %d); uncategorised: %d. \"Right\" means the verdict the W3C\n"+
+		"suite expects.\n\n", len(all), len(schema), len(instance), len(uncategorized))
+	b.WriteString("| Category | Cases | goxsdgo right | libxml2 right | Neither | Rule | Effect for a consumer moving from libxml2 |\n|---|---|---|---|---|---|---|\n")
 	for _, k := range keys {
 		a := byCat[k]
 		fmt.Fprintf(&b, "| %s: %s | %d | %d | %d | %d | %s | %s |\n", k, a.cat.title, a.n, a.go_, a.lib, a.x, a.cat.rule, a.cat.effect)
 	}
 	if len(uncategorized) > 0 {
-		b.WriteString("\n## Bez kategorii\n\n")
+		b.WriteString("\n## Uncategorised\n\n")
 		for _, d := range uncategorized {
 			fmt.Fprintf(&b, "- `%s`: goxsdgo %s (%s), libxml2 %s (%d)\n", d.c.ID, d.goxsdgo, d.goCode, d.libxml2, d.libCode)
 		}
 	}
-	b.WriteString("\n## Wszystkie przypadki\n\n| Przypadek | Status | Oczekiwane | goxsdgo | libxml2 | Kategoria | Rację ma |\n|---|---|---|---|---|---|---|\n")
+	b.WriteString("\n## Every case\n\n| Case | Status | Expected | goxsdgo | libxml2 | Category | Right |\n|---|---|---|---|---|---|---|\n")
 	sort.Slice(all, func(i, j int) bool { return all[i].c.ID < all[j].c.ID })
 	for _, d := range all {
 		g := string(d.goxsdgo)

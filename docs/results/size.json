@@ -1,0 +1,30 @@
+[
+  {
+    "candidate": "goxsdgo",
+    "bytes": 3295954,
+    "added_bytes": 1708192,
+    "lines": 15293,
+    "modules": 0
+  },
+  {
+    "candidate": "knroy/go-xml",
+    "bytes": 8021858,
+    "added_bytes": 6434096,
+    "lines": 203186,
+    "modules": 1
+  },
+  {
+    "candidate": "jacoelho/xsd",
+    "bytes": 4754754,
+    "added_bytes": 3166992,
+    "lines": 55395,
+    "modules": 0
+  },
+  {
+    "candidate": "cB-Sigma/xsd",
+    "bytes": 3161394,
+    "added_bytes": 1573632,
+    "lines": 8679,
+    "modules": 0
+  }
+]

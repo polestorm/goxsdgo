@@ -1,0 +1,81 @@
+## network: import from http://127.0.0.1 (requests seen)
+goxsdgo             0.8 ms  schema error: xsd: invalid schema: s.xsd:1:169: src-resolve: type definition {urn:n}t referenced by xs:element/@type is not defined  [http requests: 0]
+knroy/go-xml        0.8 ms  invalid: /r: src-resolve: element declaration {}r refers to "n:t", which no definition matches  [http requests: 0]
+jacoelho/xsd        0.8 ms  invalid: validation.element at 1:1 /r: element type (anonymous) is unavailable because its schema declaration was not loaded  [http requests: 0]
+cB-Sigma/xsd        0.2 ms  schema error: xsd: s.xsd line 1: type {urn:n}t is not defined (not read: namespace "urn:n" from http://127.0.0.1:60387/n.xsd)  [http requests: 0]
+libxml2             6.1 ms  invalid: I/O warning : failed to load "http://127.0.0.1:60387/n.xsd": No such file or directory  [http requests: 0]
+## external entity (file:)
+goxsdgo             0.2 ms  error: xsd: unsupported operation: 1:141: unsupported-external-entity: reference to external entity &s; (external entities are never read)
+knroy/go-xml        0.3 ms  parse error: parse XML: DOCTYPE declaration rejected (set AllowDOCTYPE to permit its internal declarations; reading external entities additionally requires ExternalEntities)
+jacoelho/xsd        0.2 ms  error: unsupported.dtd at 1:22 /: DTD declarations are not supported
+cB-Sigma/xsd        0.2 ms  invalid: xsd: schema validation: not well-formed XML: XML syntax error on line 1: invalid character entity &s;
+libxml2             6.4 ms  valid
+## billion laughs (10^9 bytes)
+goxsdgo            11.4 ms  error: xsd: validation limit exceeded: 1:436: limit-entity-expansion: entity expansion larger than the limit
+knroy/go-xml        0.7 ms  parse error: parse XML: DOCTYPE declaration rejected (set AllowDOCTYPE to permit its internal declarations; reading external entities additionally requires ExternalEntities)
+jacoelho/xsd        0.3 ms  error: unsupported.dtd at 1:22 /: DTD declarations are not supported
+cB-Sigma/xsd        0.1 ms  invalid: xsd: schema validation: not well-formed XML: XML syntax error on line 1: invalid character entity &i;
+libxml2             6.8 ms  invalid: Entity: line 1: parser error : Maximum entity amplification factor exceeded, see xmlCtxtSetMaxAmplification.
+## depth 100000
+goxsdgo             0.6 ms  error: xsd: validation limit exceeded: 1:1537: limit-depth: elements nested deeper than the limit
+knroy/go-xml        0.3 ms  parse error: parse XML: nesting exceeds 1000 levels: processor resource limit exceeded
+jacoelho/xsd        0.2 ms  error: validation.limit at 1:769 /e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e/e…
+cB-Sigma/xsd        0.2 ms  invalid: xsd: schema validation: line 1: document refused: elements are nested deeper than 256 (the limit)
+libxml2             6.0 ms  invalid: <tmp>/goxsdgo-probe-3063110012/d.xml:1: parser error : Excessive depth in document: 256, use XML_PARSE_HUGE option
+## pattern (a|aa)*b, 20000 chars
+goxsdgo             1.3 ms  invalid: 1:4: cvc-pattern-valid: element r: value "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa…
+knroy/go-xml        0.6 ms  invalid: /r: cvc-datatype-valid.1: pattern facet of an anonymous type: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..." does not match pattern "(a|aa)*b"
+jacoelho/xsd        0.4 ms  invalid: validation.facet at 1:20004 /r: invalid simple content: value "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa…
+cB-Sigma/xsd        0.5 ms  invalid: xsd: schema validation: line 1: /r: value "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..." does not match the pattern (a|aa)*b
+libxml2           275.9 ms  invalid: <tmp>/goxsdgo-probe-4252595277/d.xml:1: Schemas validity error : Internal error: xmlSchemaValidateFacets, validating …
+## pattern (a|aa)*b, 40000 chars
+goxsdgo             1.5 ms  invalid: 1:4: cvc-pattern-valid: element r: value "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa…
+knroy/go-xml        1.4 ms  invalid: /r: cvc-datatype-valid.1: pattern facet of an anonymous type: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..." does not match pattern "(a|aa)*b"
+jacoelho/xsd        0.6 ms  invalid: validation.facet at 1:40004 /r: invalid simple content: value "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa…
+cB-Sigma/xsd        1.4 ms  invalid: xsd: schema validation: line 1: /r: value "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..." does not match the pattern (a|aa)*b
+libxml2           258.0 ms  invalid: <tmp>/goxsdgo-probe-150106095/d.xml:1: Schemas validity error : Internal error: xmlSchemaValidateFacets, validating a…
+## XSD 1.1 xs:assert in a schema
+goxsdgo             0.1 ms  schema error: xsd: invalid schema: s.xsd:1:77: sfs-content: content of xs:complexType does not match (annotation?(simpleContent|complexContent|((group|all|choice|sequence)?(a…
+knroy/go-xml        1.3 ms  schema error: <xs:assert> requires XSD 1.1
+jacoelho/xsd        0.1 ms  schema error: unsupported.xsd_1_1 at 1:107 <tmp>/goxsdgo-probe-2078767735/s.xsd: XSD 1.1 feature assert is not supported
+cB-Sigma/xsd        0.1 ms  schema error: xsd: s.xsd line 1: the children of xs:complexType (sequence assert) are not allowed in that order or number
+libxml2             6.4 ms  invalid: <tmp>/goxsdgo-probe-2078767735/s.xsd:1: element assert: Schemas parser error : Element '{http://www.w3.org/2001/XMLSc…
+## xs:redefine (doc invalid: 3 > maxInclusive 2)
+goxsdgo             0.2 ms  invalid: 1:4: cvc-maxInclusive-valid: element r: value "3" is greater than the maximum 2
+knroy/go-xml        0.3 ms  invalid: /r: cvc-datatype-valid.1: maxInclusive facet of t: 3 is greater than 2
+jacoelho/xsd        0.1 ms  schema error: unsupported.xs_redefine at 1:56 <tmp>/goxsdgo-probe-15426114/s.xsd: xs:redefine is not supported
+cB-Sigma/xsd        0.1 ms  invalid: xsd: schema validation: line 1: /r: value "3" must be at most 2
+libxml2             5.3 ms  invalid: <tmp>/goxsdgo-probe-15426114/d.xml:1: Schemas validity error : Element 'r': [facet 'maxInclusive'] The value '3' is g…
+## keyref to a missing key (doc invalid)
+goxsdgo             0.2 ms  invalid: 1:17: cvc-identity-constraint.4.3: keyref R: no K matches the value (b)
+knroy/go-xml        0.2 ms  invalid: /r: cvc-identity-constraint.4.3: keyref "R": no matching K for "string/b"
+jacoelho/xsd        0.2 ms  invalid: validation.identity at 1:12 /r/ref: keyref value does not match any value of referenced identity constraint "K"
+cB-Sigma/xsd        0.1 ms  invalid: xsd: schema validation: line 1: /r/ref: ref refers to b which is not defined (R)
+libxml2             5.2 ms  invalid: <tmp>/goxsdgo-probe-2520082361/d.xml:1: Schemas validity error : Element 'ref': No match found for key-sequence ['b']…
+## xsi:type of a derived type (doc valid)
+goxsdgo             0.1 ms  valid
+knroy/go-xml        0.2 ms  valid
+jacoelho/xsd        0.2 ms  valid
+cB-Sigma/xsd        0.1 ms  valid
+libxml2             5.3 ms  valid
+## substitution group member (doc valid)
+goxsdgo             0.2 ms  valid
+knroy/go-xml        0.3 ms  valid
+jacoelho/xsd        0.1 ms  valid
+cB-Sigma/xsd        0.1 ms  valid
+libxml2             5.3 ms  valid
+## error details: missing child, bad value
+goxsdgo             0.1 ms  invalid: 2:6: cvc-datatype-valid.1.2.1: element a: value "x" is not a valid int
+knroy/go-xml        0.2 ms  invalid: 2 validation errors: /r/a: cvc-datatype-valid.1: cvc-datatype-valid.1.2.1: "x" is not a valid xs:decimal /r: cvc-complex-type.2.4.b: element content is incomple…
+jacoelho/xsd        0.1 ms  invalid: 2 validation errors: validation.facet at 2:7 /r/a: invalid simple content: value "x" is not valid for xs:int: invalid integer
+cB-Sigma/xsd        0.1 ms  invalid: xsd: schema validation: line 1: /r: r needs at least 1 b; line 2: /r/a: value "x" is not an integer
+libxml2             5.0 ms  invalid: <tmp>/goxsdgo-probe-1925046275/d.xml:2: Schemas validity error : Element 'a': 'x' is not a valid value of the atomic …
+## error details (structured fields)
+goxsdgo        code=cvc-datatype-valid.1.2.1 line=2 col=6 path=/r/a expected=[]
+goxsdgo        code=cvc-complex-type.2.4 line=1 col=4 path=/r expected=[b]
+jacoelho/xsd   code=validation.facet line=2 col=7 path=/r/a msg=invalid simple content: value "x" is not valid for xs:int: invalid integer
+jacoelho/xsd   code=validation.content line=3 col=1 path=/r msg=content is incomplete; expected next child ["b"]
+cB-Sigma/xsd   line=1 path=/r kind=2 msg=r needs at least 1 b
+cB-Sigma/xsd   line=2 path=/r/a kind=5 msg=value "x" is not an integer
+knroy/go-xml   *xsd.ValidationErrors: 2 validation errors: 2:3: /r/a: cvc-datatype-valid.1: cvc-datatype-valid.1.2.1: "x" is not a valid xs:decimal 1:1: /r: cvc-complex-type.2.4.b: element content i…
+libxml2        <tmp>/goxsdgo-probe-3109717280/d.xml:2: Schemas validity error : Element 'a': 'x' is not a valid value of the atomic …

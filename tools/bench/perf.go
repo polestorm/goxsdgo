@@ -6,9 +6,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
+	"runtime"
+	"sort"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -57,12 +59,68 @@ type perfResult struct {
 	Note      string  `json:"note,omitempty"`
 }
 
-var rssRe = regexp.MustCompile(`(\d+)\s+maximum resident set size`)
+// perfSummary: mediana i rozrzut z kilku przebiegów jednego kandydata na jednym rozmiarze.
+type perfSummary struct {
+	Candidate     string       `json:"candidate"`
+	MB            int          `json:"mb"`
+	Runs          int          `json:"runs"`
+	MedianSeconds float64      `json:"median_seconds"`
+	MinSeconds    float64      `json:"min_seconds"`
+	MaxSeconds    float64      `json:"max_seconds"`
+	MedianRSSMB   float64      `json:"median_max_rss_mb"`
+	Valid         string       `json:"verdict"`
+	Each          []perfResult `json:"each"`
+}
 
-// runPerf: każdy kandydat w osobnym procesie (`bench perf-one`) pod /usr/bin/time -l; libxml2 jako
-// xmllint --stream. Rozmiary w MB jako argumenty (domyślnie 20 i 200; 200 tylko dla walidatorów
-// strumieniowych, bo pozostałe budują drzewo całego dokumentu).
-func runPerf(root, out string, cands []candidate, args []string) error {
+func median(xs []float64) float64 {
+	s := append([]float64(nil), xs...)
+	sort.Float64s(s)
+	n := len(s)
+	if n == 0 {
+		return 0
+	}
+	if n%2 == 1 {
+		return s[n/2]
+	}
+	return (s[n/2-1] + s[n/2]) / 2
+}
+
+func summarize(rs []perfResult) perfSummary {
+	s := perfSummary{Candidate: rs[0].Candidate, MB: rs[0].MB, Runs: len(rs), Valid: rs[0].Valid, Each: rs}
+	var t, m []float64
+	s.MinSeconds = rs[0].Seconds
+	for _, r := range rs {
+		t = append(t, r.Seconds)
+		m = append(m, r.MaxRSSMB)
+		s.MinSeconds = min(s.MinSeconds, r.Seconds)
+		s.MaxSeconds = max(s.MaxSeconds, r.Seconds)
+		if r.Valid != s.Valid {
+			s.Valid = "inconsistent"
+		}
+	}
+	s.MedianSeconds, s.MedianRSSMB = median(t), median(m)
+	return s
+}
+
+// maxRSSMB: największy zestaw rezydentny procesu potomnego z rusage (macOS: bajty, Linux: KiB).
+func maxRSSMB(ps *os.ProcessState) float64 {
+	ru, ok := ps.SysUsage().(*syscall.Rusage)
+	if !ok || ru == nil {
+		return 0
+	}
+	b := float64(ru.Maxrss)
+	if runtime.GOOS != "darwin" {
+		b *= 1024
+	}
+	return b / (1 << 20)
+}
+
+// runPerf: każdy kandydat w osobnym procesie (`bench perf-one`), runs razy na każdy rozmiar, z medianą
+// i rozrzutem; pamięć to największy zestaw rezydentny procesu (rusage). libxml2 jako xmllint --stream.
+// Rozmiary w MB jako argumenty (domyślnie 20 i 200; 200 tylko dla walidatorów strumieniowych, bo pozostałe
+// budują drzewo całego dokumentu). Kolejność przebiegów jest przeplatana (kandydaci na zmianę), żeby
+// zmiana obciążenia maszyny rozkładała się na wszystkich.
+func runPerf(root, out string, cands []candidate, args []string, runs int) error {
 	sizes := []int{20, 200}
 	if len(args) > 0 {
 		sizes = nil
@@ -78,7 +136,10 @@ func runPerf(root, out string, cands []candidate, args []string) error {
 	if err != nil {
 		return err
 	}
-	var all []perfResult
+	if runs < 1 {
+		runs = 1
+	}
+	var all []perfSummary
 	for _, mb := range sizes {
 		doc := filepath.Join(out, fmt.Sprintf("jpk_v7m_3_%dmb.xml", mb))
 		if _, err := os.Stat(doc); err != nil {
@@ -87,33 +148,50 @@ func runPerf(root, out string, cands []candidate, args []string) error {
 				return err
 			}
 		}
-		for _, c := range cands {
-			streaming := c.name() == "goxsdgo" || c.name() == "jacoelho/xsd"
-			if mb > 100 && !streaming {
-				continue
+		byCand := map[string][]perfResult{}
+		var order []string
+		for i := 0; i < runs; i++ {
+			for _, c := range cands {
+				streaming := c.name() == "goxsdgo" || c.name() == "jacoelho/xsd"
+				if mb > 100 && !streaming {
+					continue
+				}
+				r := perfResult{Candidate: c.name(), MB: mb}
+				cmd := exec.Command(self, "-root", root, "perf-one", c.name(), doc)
+				// jacoelho/xsd domyślnie zatrzymuje się po 64 MiB wejścia; w pomiarze limit jest podniesiony.
+				cmd.Env = append(os.Environ(), "BENCH_RAISE_LIMITS=1")
+				var stdout, stderr bytes.Buffer
+				cmd.Stdout, cmd.Stderr = &stdout, &stderr
+				err := cmd.Run()
+				fmt.Sscan(strings.TrimSpace(stdout.String()), &r.Seconds, &r.Valid)
+				if cmd.ProcessState != nil {
+					r.MaxRSSMB = maxRSSMB(cmd.ProcessState)
+				}
+				if err != nil {
+					r.Note = strings.TrimSpace(lastLine(stderr.String()))
+				}
+				fmt.Printf("%-14s %4d MB run %d: %6.2f s, max RSS %7.1f MB, %s %s\n", r.Candidate, mb, i+1, r.Seconds, r.MaxRSSMB, r.Valid, r.Note)
+				if byCand[r.Candidate] == nil {
+					order = append(order, r.Candidate)
+				}
+				byCand[r.Candidate] = append(byCand[r.Candidate], r)
 			}
-			r := perfResult{Candidate: c.name(), MB: mb}
-			cmd := exec.Command("/usr/bin/time", "-l", self, "-root", root, "perf-one", c.name(), doc)
-			var stdout, stderr bytes.Buffer
-			cmd.Stdout, cmd.Stderr = &stdout, &stderr
-			err := cmd.Run()
-			fmt.Sscan(strings.TrimSpace(stdout.String()), &r.Seconds, &r.Valid)
-			if m := rssRe.FindStringSubmatch(stderr.String()); m != nil {
-				b, _ := strconv.ParseFloat(m[1], 64)
-				r.MaxRSSMB = b / (1 << 20)
+			// libxml2: xmllint --stream z katalogiem XML (importy MF bez sieci)
+			if r, err := perfXmllint(root, out, doc, mb); err == nil {
+				fmt.Printf("%-14s %4d MB run %d: %6.2f s, max RSS %7.1f MB, %s %s\n", r.Candidate, mb, i+1, r.Seconds, r.MaxRSSMB, r.Valid, r.Note)
+				if byCand[r.Candidate] == nil {
+					order = append(order, r.Candidate)
+				}
+				byCand[r.Candidate] = append(byCand[r.Candidate], r)
+			} else {
+				fmt.Println("xmllint:", err)
 			}
-			if err != nil {
-				r.Note = strings.TrimSpace(lastLine(stderr.String()))
-			}
-			fmt.Printf("%-14s %4d MB: %6.2f s, max RSS %7.1f MB, %s %s\n", r.Candidate, mb, r.Seconds, r.MaxRSSMB, r.Valid, r.Note)
-			all = append(all, r)
 		}
-		// libxml2: xmllint --stream z katalogiem XML (importy MF bez sieci)
-		if r, err := perfXmllint(root, out, doc, mb); err == nil {
-			fmt.Printf("%-14s %4d MB: %6.2f s, max RSS %7.1f MB, %s %s\n", r.Candidate, mb, r.Seconds, r.MaxRSSMB, r.Valid, r.Note)
-			all = append(all, r)
-		} else {
-			fmt.Println("xmllint:", err)
+		for _, name := range order {
+			s := summarize(byCand[name])
+			fmt.Printf("%-14s %4d MB: median %6.2f s (%.2f–%.2f, %d runs), median max RSS %7.1f MB, %s\n",
+				s.Candidate, mb, s.MedianSeconds, s.MinSeconds, s.MaxSeconds, s.Runs, s.MedianRSSMB, s.Valid)
+			all = append(all, s)
 		}
 	}
 	return writeJSON(out, "perf.json", all)
@@ -168,8 +246,6 @@ func perfOne(root string, args []string) error {
 	return nil
 }
 
-const xmllint = "/opt/homebrew/opt/libxml2/bin/xmllint"
-
 func perfXmllint(root, out, doc string, mb int) (perfResult, error) {
 	r := perfResult{Candidate: "libxml2", MB: mb}
 	catalog, err := writeCatalogFile(root, out)
@@ -177,16 +253,15 @@ func perfXmllint(root, out, doc string, mb int) (perfResult, error) {
 		return r, err
 	}
 	e, _, _ := mfEnv(root)
-	cmd := exec.Command("/usr/bin/time", "-l", xmllint, "--stream", "--noout", "--nonet", "--schema", e.abs("jpk_v7m_3.xsd"), doc)
+	cmd := exec.Command(xmllint, "--stream", "--noout", "--nonet", "--schema", e.abs("jpk_v7m_3.xsd"), doc)
 	cmd.Env = append(os.Environ(), "XML_CATALOG_FILES="+catalog)
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	start := time.Now()
 	err = cmd.Run()
 	r.Seconds = time.Since(start).Seconds()
-	if m := rssRe.FindStringSubmatch(stderr.String()); m != nil {
-		b, _ := strconv.ParseFloat(m[1], 64)
-		r.MaxRSSMB = b / (1 << 20)
+	if cmd.ProcessState != nil {
+		r.MaxRSSMB = maxRSSMB(cmd.ProcessState)
 	}
 	r.Valid = "valid"
 	if err != nil {

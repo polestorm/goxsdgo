@@ -30,11 +30,11 @@ type contestRule struct {
 
 // categoryTitles opisuje kategorie (kolejność = pierwszeństwo).
 var categoryTitles = []struct{ ID, Title string }{
-	{"a", "status queried, disputed-test albo disputed-spec w metadanych zestawu"},
-	{"b", "wynik zależy od wydania XML 1.0 (reguły znaków nazw)"},
-	{"c", "wynik zależy od wersji Unicode"},
-	{"d", "sprzeczne oczekiwania wewnątrz zestawu dla tej samej sytuacji (oba końce sprzeczności)"},
-	{"e", "oczekiwanie sprzeczne z jednoznacznym tekstem rekomendacji 2e"},
+	{"a", "status queried, disputed-test or disputed-spec in the suite's metadata"},
+	{"b", "the outcome depends on the edition of XML 1.0 (name character rules)"},
+	{"c", "the outcome depends on the Unicode version"},
+	{"d", "opposite expectations within the suite for the same situation (both sides of the contradiction)"},
+	{"e", "an expectation against the unambiguous text of the 2e recommendation"},
 }
 
 var unicodeRegexGroups = []string{"reJ11", "reJ13", "reJ19", "reJ21", "reJ23", "reJ25", "reJ29", "reJ31", "reJ33",
@@ -42,32 +42,32 @@ var unicodeRegexGroups = []string{"reJ11", "reJ13", "reJ19", "reJ21", "reJ23", "
 
 func contestRules() []contestRule {
 	return []contestRule{
-		{Category: "a", Reason: "status w metadanych zestawu W3C", match: func(c *w3c.Case) bool {
+		{Category: "a", Reason: "status in the W3C suite's metadata", match: func(c *w3c.Case) bool {
 			switch c.Status {
 			case "queried", "disputed-test", "disputed-spec":
 				return true
 			}
 			return false
 		}},
-		{Category: "b", Reason: "znaki nazw według XML 1.0 2e (odsyłacz XSD 1.0 2e) albo 5e (oczekiwanie grupy); " +
-			"goxsdgo rozstrzyga opcją Config.NameRules, ADR 0012", match: func(c *w3c.Case) bool {
+		{Category: "b", Reason: "name characters by XML 1.0 2e (the edition XSD 1.0 2e refers to) or 5e (what the group " +
+			"expects); goxsdgo has both, Config.NameRules, ADR 0012", match: func(c *w3c.Case) bool {
 			return c.Contributor == "Saxonica" && c.Set == "XmlVersions"
 		}},
-		{Category: "b", Reason: "klasa \\c według produkcji CombiningChar XML 1.0 2e (koniec przedziału na U+0345) " +
-			"albo nowszego wydania; ADR 0005, ADR 0012", contributor: "Microsoft", groups: []string{"reZ006i"}},
-		{Category: "c", Reason: "kategorie znaków spoza BMP: zestaw zakłada Unicode 3.0 (bez kategorii), " +
-			"biblioteka standardowa Go ma Unicode 15; ADR 0005", contributor: "Microsoft", groups: unicodeRegexGroups,
+		{Category: "b", Reason: "the class \\c by the CombiningChar production of XML 1.0 2e (a range ending at U+0345) " +
+			"or of a later edition; ADR 0005, ADR 0012", contributor: "Microsoft", groups: []string{"reZ006i"}},
+		{Category: "c", Reason: "character categories outside the BMP: the suite assumes Unicode 3.0 (no categories), " +
+			"the Go standard library has Unicode 15; ADR 0005", contributor: "Microsoft", groups: unicodeRegexGroups,
 			instances: true},
-		{Category: "d", Reason: "nierozwiązane odwołanie w nieużywanej deklaracji: grupa Missing oczekuje schematu " +
-			"poprawnego (§5.3), a elemM002, xsd015.e, xsd016.e i idB005 dla tej samej sytuacji błędu src-resolve; " +
-			"ADR 0012", contributor: "Saxonica", groups: []string{"missing001", "missing002", "missing003", "missing006"}},
-		{Category: "d", Reason: "przeciwny koniec sprzeczności z grupą Missing (błąd src-resolve dla nierozwiązanego " +
-			"odwołania w nieużywanej deklaracji); ADR 0012", contributor: "Microsoft",
+		{Category: "d", Reason: "an unresolved reference in an unused declaration: the Missing group expects a valid " +
+			"schema (§5.3), while elemM002, xsd015.e, xsd016.e and idB005 expect an src-resolve error for the same " +
+			"situation; ADR 0012", contributor: "Saxonica", groups: []string{"missing001", "missing002", "missing003", "missing006"}},
+		{Category: "d", Reason: "the other side of the contradiction with the Missing group (an src-resolve error for an " +
+			"unresolved reference in an unused declaration); ADR 0012", contributor: "Microsoft",
 			groups: []string{"elemM002", "idB005"}},
-		{Category: "d", Reason: "przeciwny koniec sprzeczności z grupą Missing; ADR 0012", contributor: "Sun",
+		{Category: "d", Reason: "the other side of the contradiction with the Missing group; ADR 0012", contributor: "Sun",
 			groups: []string{"xsd015.e", "xsd016.e"}},
-		{Category: "d", Reason: "RecurseAsIfGroup (3.9.6): particlesZ001 wymaga przeniesienia liczności elementu na " +
-			"grupę, particlesHa161 i particlesK006 — odczytu dosłownego; ADR 0007", contributor: "Microsoft",
+		{Category: "d", Reason: "RecurseAsIfGroup (3.9.6): particlesZ001 needs the element's occurrence range carried over " +
+			"to the group, particlesHa161 and particlesK006 the literal reading; ADR 0007", contributor: "Microsoft",
 			groups: []string{"particlesZ001", "particlesHa161", "particlesK006"}},
 	}
 }
@@ -246,33 +246,40 @@ func runContested(root, out string, writeDocs bool) error {
 
 // rejected to przypadki rozważone i niewłączone, z powodem (część dokumentu, żeby wybór był sprawdzalny).
 var rejected = []struct{ Cases, Reason string }{
-	{"particlesZ035_a, particlesZ036_b1, particlesZ036_b2, particlesZ036_c (dokumenty)",
-		"goxsdgo kończy je błędem limitu (`ErrLimit`, modele niejednoznaczne co do liczników, ADR 0011, pytanie 9): " +
-			"to ograniczenie goxsdgo, nie spór o oczekiwanie"},
-	{"IDREFS_length006, NMTOKENS_length006 (testy schematów, stable)",
-		"po ponownym przeczytaniu 4.3.1.4 (length-minLength-maxLength, punkt 1.2) oczekiwanie zestawu jest zgodne " +
-			"z tekstem: typy wbudowane IDREFS i NMTOKENS mają już minLength 1 bez length, więc minLength 1 obok " +
-			"length 5 jest dozwolone; to błąd goxsdgo do poprawienia, nie spór"},
-	{"attP031 (schemat i dokument)",
-		"zestaw rozdziela oczekiwania dla XSD 1.0 (poprawny) i 1.1 (błędny); tekst 3.2.2 o `use=\"prohibited\"` nie jest " +
-			"tu jednoznaczny wobec tej decyzji grupy roboczej"},
-	{"anyURI_b006 (test schematu)",
-		"zestaw rozdziela oczekiwania dla XSD 1.0 (błędny) i 1.1 (poprawny); odczyt 3.2.17 przez XLink §5.4 nie jest " +
-			"tu jednoznaczny wobec tej decyzji grupy roboczej"},
-	{"pozostałe przypadki, które goxsdgo oblewa",
-		"nie spełniają żadnego kryterium; samo to, że goxsdgo je oblewa, nie czyni ich spornymi"},
+	{"particlesZ035_a, particlesZ036_b1, particlesZ036_b2, particlesZ036_c (instances)",
+		"goxsdgo stops on them with a limit error (`ErrLimit`, content models ambiguous in their counters, ADR 0011, " +
+			"question 9): a limitation of goxsdgo, not a dispute about the expectation"},
+	{"IDREFS_length006, NMTOKENS_length006 (schema tests, stable)",
+		"on a second reading of 4.3.1.4 (length-minLength-maxLength, clause 1.2) the suite agrees with the text: the " +
+			"built-in IDREFS and NMTOKENS already have minLength 1 without length, so minLength 1 next to length 5 is " +
+			"allowed; this was a goxsdgo bug, fixed on 2026-11-25, not a dispute"},
+	{"attP031 (schema and instance)",
+		"the suite gives separate expectations for XSD 1.0 (valid) and 1.1 (invalid); the text of 3.2.2 on " +
+			"`use=\"prohibited\"` is not unambiguous enough to set aside that decision of the working group"},
+	{"anyURI_b006 (schema test)",
+		"the suite gives separate expectations for XSD 1.0 (invalid) and 1.1 (valid); reading 3.2.17 through XLink " +
+			"§5.4 is not unambiguous enough to set aside that decision of the working group"},
+	{"the other cases goxsdgo fails",
+		"they meet no criterion; that goxsdgo fails a case does not make it contested"},
 }
 
 func contestedDoc(inScope []*w3c.Case, cl map[string]contested, vs []*verdicts, scores []contestedScore) string {
 	var b strings.Builder
-	b.WriteString("# Przypadki sporne zestawu W3C w porównaniu z innymi walidatorami\n\n")
-	b.WriteString("Plik generowany przez `tools/bench` (`go -C tools/bench run . -root ../.. -docs contested`, po `w3c`);\n")
-	b.WriteString("nie edytuj go ręcznie. Stan: " + time.Now().Format("2006-01-02") +
-		", zestaw W3C z commitu `7bc3365c`, zakres XSD 1.0 2e jak `TestW3CSuite`.\n\n")
-	b.WriteString("Decyzja właściciela z 2026-11-25: w porównaniu z innymi walidatorami przypadki sporne są wyłączane albo\n")
-	b.WriteString("opatrzone zastrzeżeniem. Kryteria są ustalone z góry, obiektywne i te same dla wszystkich kandydatów;\n")
-	b.WriteString("przypadek dostaje kategorię pierwszego pasującego kryterium. W przypadkach spornych goxsdgo idzie za\n")
-	b.WriteString("tekstem rekomendacji (`differences.md`).\n\n## Kryteria\n\n")
+	b.WriteString("# Contested cases of the W3C test suite\n\n")
+	b.WriteString("Generated by `tools/bench` (`go -C tools/bench run . -root ../.. -docs contested`, after `w3c`);\n")
+	b.WriteString("do not edit by hand. As of " + time.Now().Format("2006-01-02") +
+		", W3C suite at commit `7bc3365c`, XSD 1.0 2e scope as in `TestW3CSuite`.\n\n")
+	b.WriteString("The W3C XML Schema test suite is the common yardstick for XSD validators, but some of its cases do not\n")
+	b.WriteString("have one right answer: the working group queried or disputed them, their outcome depends on which edition\n")
+	b.WriteString("of XML or Unicode a validator follows, or the suite expects opposite verdicts for the same situation.\n")
+	b.WriteString("Counting such cases rewards whoever happens to agree with one side, so the comparison in the README\n")
+	b.WriteString("shows the score with and without them.\n\n")
+	b.WriteString("The criteria were fixed in advance, before looking at who passes which case, and are the same for every\n")
+	b.WriteString("candidate. They are objective: each one is a property of the suite (its metadata, its expectations) or of\n")
+	b.WriteString("the standards it rests on, not of any validator's result. A case gets the category of the first\n")
+	b.WriteString("criterion it meets; the other criteria it also meets are listed. In the contested cases goxsdgo follows\n")
+	b.WriteString("the text of the recommendation; the cases it fails for that reason are explained one by one in\n")
+	b.WriteString("[differences.md](differences.md) (in Polish). Cases that were considered and left out are listed below with the reason.\n\n## Criteria\n\n")
 	count, also := map[string]int{}, map[string]int{}
 	for _, k := range cl {
 		count[k.Category]++
@@ -280,13 +287,13 @@ func contestedDoc(inScope []*w3c.Case, cl map[string]contested, vs []*verdicts, 
 			also[a]++
 		}
 	}
-	b.WriteString("| Kategoria | Kryterium | Przypadki (pierwsza pasująca) | Pasuje też, liczone wcześniej |\n|---|---|---|---|\n")
+	b.WriteString("| Category | Criterion | Cases (first match) | Also met, counted earlier |\n|---|---|---|---|\n")
 	for _, t := range categoryTitles {
 		fmt.Fprintf(&b, "| %s | %s | %d | %d |\n", t.ID, t.Title, count[t.ID], also[t.ID])
 	}
-	fmt.Fprintf(&b, "| razem | | %d z %d w zakresie | |\n\n", len(cl), len(inScope))
-	b.WriteString("Kategoria e jest pusta: żaden rozważony przypadek nie miał jednoznacznego cytatu (niżej).\n\n")
-	b.WriteString("## Wyniki\n\n| Kandydat | Wszystkie w zakresie | Bez spornych | Sporne zaliczone |")
+	fmt.Fprintf(&b, "| total | | %d of %d in scope | |\n\n", len(cl), len(inScope))
+	b.WriteString("Category e is empty: none of the cases considered had an unambiguous quotation (below).\n\n")
+	b.WriteString("## Results\n\n| Candidate | All in scope | Without contested | Contested passed |")
 	for _, t := range categoryTitles {
 		fmt.Fprintf(&b, " %s |", t.ID)
 	}
@@ -303,17 +310,17 @@ func contestedDoc(inScope []*w3c.Case, cl map[string]contested, vs []*verdicts, 
 		}
 		b.WriteString("\n")
 	}
-	b.WriteString("\nlibxml2 przez `goxsdval` (`tools/compare`): przypadki, których to narzędzie nie umie uruchomić (schemat z kilku\n")
-	b.WriteString("dokumentów, schemat tylko ze wskazówek), liczą się jako niezaliczone, jak w tabeli w README.\n\n")
-	b.WriteString("## Rozważone i niewłączone\n\n| Przypadki | Powód |\n|---|---|\n")
+	b.WriteString("\nlibxml2 runs through `goxsdval` (`tools/compare`): cases that tool cannot run (a schema of several\n")
+	b.WriteString("documents, a schema named only by hints) count as failed, as in the README table.\n\n")
+	b.WriteString("## Considered and not included\n\n| Cases | Reason |\n|---|---|\n")
 	for _, r := range rejected {
 		fmt.Fprintf(&b, "| %s | %s |\n", r.Cases, r.Reason)
 	}
-	b.WriteString("\n## Lista przypadków spornych\n\nKolumny kandydatów: ✓ zaliczony, · niezaliczony.\n\n| Przypadek | Kat. | Oczekiwane |")
+	b.WriteString("\n## The contested cases\n\nCandidate columns: ✓ passed, · failed.\n\n| Case | Cat. | Expected |")
 	for _, v := range vs {
 		fmt.Fprintf(&b, " %s |", v.Name)
 	}
-	b.WriteString(" Powód |\n|---|---|---|")
+	b.WriteString(" Reason |\n|---|---|---|")
 	for range vs {
 		b.WriteString("---|")
 	}
@@ -341,7 +348,7 @@ func contestedDoc(inScope []*w3c.Case, cl map[string]contested, vs []*verdicts, 
 		}
 		cat := cl[id].Category
 		if len(cl[id].Also) > 0 {
-			cat += " (też " + strings.Join(cl[id].Also, ", ") + ")"
+			cat += " (also " + strings.Join(cl[id].Also, ", ") + ")"
 		}
 		fmt.Fprintf(&b, "| `%s` | %s | %s |", id, cat, c.Expected)
 		for _, v := range vs {

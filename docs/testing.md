@@ -65,6 +65,7 @@ Wyniki zapisujemy tutaj z datą, wersją i sposobem pomiaru.
 
 | Data | Commit | W3C (zaliczone / w zakresie) | Korpus MF | Zgodność z libxml2 | Uwagi |
 |---|---|---|---|---|---|
+| 2026-11-26 | `tools/compare` bez goxsdval | 39 369 / 39 439 (bez zmian) | 170 / 170, 15 / 15 | 99,69% werdyktów, 99,7% wierszy; 530 rozbieżności (rację ma goxsdgo w 521, libxml2 w 9) | własne wiązanie libxml2 w `tools/compare` (wyniki identyczne jak przez goxsdval); `tools/bench perf` mediana z 5 przebiegów: 200 MB goxsdgo 4,00 s, libxml2 2.15.4 3,90 s, jacoelho/xsd 3,75 s; surowe wyniki w `docs/results/`, metoda w `docs/methodology.md` |
 | 2026-11-26 | po przepisaniu historii | 39 369 / 39 439 (bez zmian) | bez zmian | bez zmian | pakiet `messages` wydzielony z historią do osobnego modułu (ADR 0010); wymagań 129 (bez 7 MSG); identyfikatory od etapu 6b zmienione (`docs/fuzzing.md`) |
 | 2026-11-25 | poprawka `length-minLength-maxLength` 1.2/2.2 | 39 369 / 39 439 (+2: MS IDREFS_length006, NMTOKENS_length006) | bez zmian | — | błąd goxsdgo znaleziony przy porównaniu z knroy/go-xml i klasyfikacji przypadków spornych; zrzut błędów: zmieniły się wyłącznie te 2 przypadki |
 | 2026-11-25 | `b5d1f75` | 39 367 / 39 439 (domyślnie); z `NameRules: NamesXML10Edition5` 39 383 / 39 439 (+16: 15 XmlVersions i `reZ006i`, 0 utraconych) | bez zmian | bez zmian | ADR 0012; zrzut wszystkich błędów w ustawieniu domyślnym identyczny przed i po |

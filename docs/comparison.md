@@ -23,12 +23,12 @@ are validators in pure Go, published in 2026.
 |---|:---:|:---:|:---:|:---:|:---:|
 | Dependencies[^deps] | 0 🥇 | C, cgo | 1 | 0 🥇 | 0 🥇 |
 | Minimum Go | 1.22 🥇 | — | 1.25 | 1.27 | 1.24 |
-| Lines of Go code[^size] | 15,119 | (C) | 203,186 | 55,395 | 8,679 🥇 |
+| Lines of Go code[^size] | 15,293 | (C) | 203,186 | 55,395 | 8,679 🥇 |
 | Added to a program | 1.7 MB | 1.0 MB[^dylib] | 6.4 MB | 3.2 MB | 1.6 MB 🥇 |
-| Time, 20 MB JPK[^perf] | 0.39 s 🥇 | 0.39 s 🥇 | 0.57 s | 0.39 s 🥇 | 3.62 s |
-| Time, 200 MB JPK | 3.96 s | 3.85 s | —[^tree] | 3.79 s 🥇[^jlimit] | —[^tree] |
-| Memory, 20 MB JPK | 24 MB | 5 MB 🥇 | 219 MB | 21 MB | 442 MB |
-| Memory, 200 MB JPK | 26 MB | 5 MB 🥇 | — | 22 MB | — |
+| Time, 20 MB XML[^perf] | 0.41 s | 0.40 s | 0.59 s | 0.38 s 🥇 | 3.67 s |
+| Time, 200 MB XML | 4.00 s | 3.90 s | —[^tree] | 3.75 s 🥇[^jlimit] | —[^tree] |
+| Memory, 20 MB XML | 24 MB | 5 MB 🥇 | 219 MB | 21 MB | 433 MB |
+| Memory, 200 MB XML | 25 MB | 5 MB 🥇 | — | 22 MB | — |
 | Streaming | yes 🥇 | yes 🥇 | no, 11×[^tree] | yes 🥇 | no, 22×[^tree] |
 | 1 GB document | 6.3 MB[^gb] 🥇 | streams | — | limit[^jlimit] | — |
 
@@ -97,10 +97,12 @@ are validators in pure Go, published in 2026.
     the same program without a validator (`CGO_ENABLED=0`, `-ldflags="-s -w"`, macOS arm64); for libxml2 the size
     of `libxml2.16.dylib`.
 [^perf]: A synthetic JPK_V7M(3) file: the published MF sample with its `SprzedazWiersz` row repeated to 20, 60
-    and 200 MB; compile the schema and validate the file in a fresh process, wall time and maximum resident set
-    size (`/usr/bin/time -l`); libxml2 as `xmllint --stream`. Validators that build a tree of the document were not
-    run on 200 MB; on 60 MB they used 613 MB (knroy/go-xml) and 1,324 MB (cB-Sigma/xsd). Measured on 2026-11-25 on
-    one Apple M4 laptop shared with other work (load average 2–3). 🥇 marks the best value in a row.
+    and 200 MB; compile the schema and validate the file in a fresh process; median of 5 interleaved runs (the
+    spread of every row was under 5%), wall time and maximum resident set size; libxml2 2.15.4 as
+    `xmllint --stream`. Validators that build a tree of the document were not run on 200 MB; on 60 MB they used
+    612 MB (knroy/go-xml) and 1,334 MB (cB-Sigma/xsd). Measured on 2026-11-26 on one Apple M4 laptop (macOS 27.0.1,
+    load average about 2.5); every run and the machine are in [results/perf.json](results/perf.json) and
+    [results/environment-perf.json](results/environment-perf.json). 🥇 marks the best value in a row.
 [^tree]: knroy/go-xml and cB-Sigma/xsd build a tree of the whole document: process memory 11× and 22× the file
     size, so they were not run on 200 MB or 1 GB.
 [^dylib]: Size of the shared library `libxml2.16.dylib`, plus the cgo binding.
@@ -130,25 +132,6 @@ and 1.1 outcomes.
 
 ## How the comparison was measured
 
-All five validators run on the same inputs through their public API, by `tools/bench` (a separate module, so the
-library itself has no dependencies; libxml2 through `tools/compare` and `xmllint`):
-
-```sh
-go -C tools/fetch run . -root ../..                       # test data (W3C suite, MF schemas and samples)
-go -C tools/bench run . -root ../.. w3c                   # W3C suite, every candidate (and goxsdgo with 5e names)
-go -C tools/bench run . -root ../.. -docs contested       # contested cases, docs/contested-cases.md
-go -C tools/bench run . -root ../.. corpus                # MF corpus
-go -C tools/bench run . -root ../.. probe                 # safety, features, errors, patterns
-go -C tools/bench run . -root ../.. size                  # program size and lines of code
-go -C tools/bench build -o ../../out/bench/bench . && (cd tools/bench && ../../out/bench/bench -root ../.. perf 20 60 200)
-cd tools/compare && PKG_CONFIG_PATH=/opt/homebrew/opt/libxml2/lib/pkgconfig go run -tags libxml2 . w3c
-```
-
-The versions are the latest tags on 2026-11-25 (knroy/go-xml v2.3.1, jacoelho/xsd v0.6.15, cB-Sigma/xsd v1.0.0,
-libxml2 2.15.4 from Homebrew); `tools/bench` builds with Go 1.27 because jacoelho/xsd requires it.
-
-What the numbers do not say: the W3C rows count verdicts only, not error codes or positions. knroy/go-xml is also
-an XSD 1.1, XPath, XQuery and XSLT processor, which explains most of its size; it is configured here for XSD 1.0
-and allowed to read the DOCTYPE of suite documents (its default refuses it). A schema rejected by a candidate for a
-limit or an unsupported construct counts as a failure, as it does for goxsdgo. The timing rows are single runs on
-a shared machine; differences under 10% are within the noise.
+Inputs, the settings of each candidate, how each row is computed, the commands to run it again and the known
+limits of the numbers: [methodology.md](methodology.md). The raw results of the published run (every candidate's
+verdict for every W3C case, times of every run, the machine and versions): [results/](results/).

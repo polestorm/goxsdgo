@@ -1,0 +1,217 @@
+[
+  {
+    "candidate": "goxsdgo",
+    "in_scope": 39439,
+    "passed": 39369,
+    "schema_passed": 14372,
+    "schema_in_scope": 14384,
+    "instance_passed": 24997,
+    "instance_in_scope": 25055,
+    "not_comparable": 0,
+    "undecided": 20,
+    "timed_out": 0,
+    "by_contributor": {
+      "Boeing": [
+        18,
+        18
+      ],
+      "IBM": [
+        39,
+        39
+      ],
+      "Microsoft": [
+        14352,
+        14392
+      ],
+      "NIST": [
+        23170,
+        23170
+      ],
+      "Saxonica": [
+        88,
+        118
+      ],
+      "Sun": [
+        1610,
+        1610
+      ],
+      "W3C": [
+        92,
+        92
+      ]
+    },
+    "seconds": 4.49311975
+  },
+  {
+    "candidate": "knroy/go-xml",
+    "in_scope": 39439,
+    "passed": 39386,
+    "schema_passed": 14381,
+    "schema_in_scope": 14384,
+    "instance_passed": 25005,
+    "instance_in_scope": 25055,
+    "not_comparable": 0,
+    "undecided": 5,
+    "timed_out": 0,
+    "by_contributor": {
+      "Boeing": [
+        18,
+        18
+      ],
+      "IBM": [
+        39,
+        39
+      ],
+      "Microsoft": [
+        14339,
+        14392
+      ],
+      "NIST": [
+        23170,
+        23170
+      ],
+      "Saxonica": [
+        118,
+        118
+      ],
+      "Sun": [
+        1610,
+        1610
+      ],
+      "W3C": [
+        92,
+        92
+      ]
+    },
+    "seconds": 17.880901792
+  },
+  {
+    "candidate": "jacoelho/xsd",
+    "in_scope": 39439,
+    "passed": 39083,
+    "schema_passed": 14198,
+    "schema_in_scope": 14384,
+    "instance_passed": 24885,
+    "instance_in_scope": 25055,
+    "not_comparable": 55,
+    "undecided": 246,
+    "timed_out": 0,
+    "by_contributor": {
+      "Boeing": [
+        15,
+        18
+      ],
+      "IBM": [
+        26,
+        39
+      ],
+      "Microsoft": [
+        14100,
+        14392
+      ],
+      "NIST": [
+        23170,
+        23170
+      ],
+      "Saxonica": [
+        85,
+        118
+      ],
+      "Sun": [
+        1595,
+        1610
+      ],
+      "W3C": [
+        92,
+        92
+      ]
+    },
+    "seconds": 4.450073166
+  },
+  {
+    "candidate": "cB-Sigma/xsd",
+    "in_scope": 39439,
+    "passed": 39329,
+    "schema_passed": 14367,
+    "schema_in_scope": 14384,
+    "instance_passed": 24962,
+    "instance_in_scope": 25055,
+    "not_comparable": 0,
+    "undecided": 52,
+    "timed_out": 0,
+    "by_contributor": {
+      "Boeing": [
+        18,
+        18
+      ],
+      "IBM": [
+        39,
+        39
+      ],
+      "Microsoft": [
+        14308,
+        14392
+      ],
+      "NIST": [
+        23169,
+        23170
+      ],
+      "Saxonica": [
+        98,
+        118
+      ],
+      "Sun": [
+        1605,
+        1610
+      ],
+      "W3C": [
+        92,
+        92
+      ]
+    },
+    "seconds": 9.826186417
+  },
+  {
+    "candidate": "goxsdgo (XML 1.0 5e names)",
+    "in_scope": 39439,
+    "passed": 39385,
+    "schema_passed": 14374,
+    "schema_in_scope": 14384,
+    "instance_passed": 25011,
+    "instance_in_scope": 25055,
+    "not_comparable": 0,
+    "undecided": 18,
+    "timed_out": 0,
+    "by_contributor": {
+      "Boeing": [
+        18,
+        18
+      ],
+      "IBM": [
+        39,
+        39
+      ],
+      "Microsoft": [
+        14353,
+        14392
+      ],
+      "NIST": [
+        23170,
+        23170
+      ],
+      "Saxonica": [
+        103,
+        118
+      ],
+      "Sun": [
+        1610,
+        1610
+      ],
+      "W3C": [
+        92,
+        92
+      ]
+    },
+    "seconds": 4.182146084
+  }
+]

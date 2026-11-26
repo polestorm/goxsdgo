@@ -8,11 +8,13 @@
 //	go -C tools/bench run . -root ../.. w3c        # zestaw W3C, wszyscy kandydaci (kilka minut)
 //	go -C tools/bench run . -root ../.. corpus     # korpus MF
 //	go -C tools/bench run . -root ../.. probe      # bezpieczeństwo, konstrukcje, błędy, wzorce
-//	go -C tools/bench run . -root ../.. perf       # czas i pamięć (osobne procesy, /usr/bin/time)
+//	go -C tools/bench build -o ../../out/bench/bench . && (cd tools/bench && ../../out/bench/bench -root ../.. -runs 5 perf 20 200)
+//	                                                  # czas i pamięć (osobne procesy, mediana z -runs przebiegów)
 //	go -C tools/bench run . -root ../.. size       # rozmiar programu i linie kodu
 //	go -C tools/bench run . -root ../.. -docs contested  # przypadki sporne W3C i wyniki bez nich (po w3c)
+//	go -C tools/bench run . -root ../.. publish    # surowe wyniki do docs/results (po pozostałych trybach)
 //
-// Wyniki maszynowe: <root>/out/bench/*.json i *.tsv.
+// Wyniki maszynowe: <root>/out/bench/*.json i *.tsv, a opis maszyny i wersji w environment-<tryb>.json.
 package main
 
 import (
@@ -28,7 +30,10 @@ func main() {
 	root := flag.String("root", "../..", "goxsdgo repository root")
 	only := flag.String("only", "", "comma-separated candidate names (default: all)")
 	docs := flag.Bool("docs", false, "contested: also write docs/contested-cases.md")
+	runs := flag.Int("runs", 5, "perf: runs per candidate and size (median and range are reported)")
+	flag.StringVar(&xmllint, "xmllint", "xmllint", "path to libxml2's xmllint (perf, probe)")
 	flag.Parse()
+	xmllint = resolveXmllint(xmllint)
 	// Ścieżki bezwzględne: część kandydatów wylicza z nich adresy bazowe dokumentów.
 	if abs, err := filepath.Abs(*root); err == nil {
 		*root = abs
@@ -44,6 +49,11 @@ func main() {
 		return list
 	}
 	var err error
+	if m := flag.Arg(0); m != "" && m != "perf-one" && m != "publish" && m != "contested" {
+		if e := writeEnv(*root, out, m); e != nil {
+			fmt.Fprintln(os.Stderr, "bench: environment:", e)
+		}
+	}
 	switch flag.Arg(0) {
 	case "w3c":
 		var all []*w3cResult
@@ -81,15 +91,17 @@ func main() {
 	case "probe":
 		err = runProbes(*root, out, pick())
 	case "perf":
-		err = runPerf(*root, out, pick(), flag.Args()[1:])
+		err = runPerf(*root, out, pick(), flag.Args()[1:], *runs)
 	case "perf-one":
 		err = perfOne(*root, flag.Args()[1:])
 	case "size":
 		err = runSize(*root, out)
 	case "contested":
 		err = runContested(*root, out, *docs)
+	case "publish":
+		err = runPublish(*root, out)
 	default:
-		fmt.Fprintln(os.Stderr, "usage: bench [-root DIR] [-only NAMES] [-docs] w3c|corpus|probe|perf|size|contested")
+		fmt.Fprintln(os.Stderr, "usage: bench [-root DIR] [-only NAMES] [-docs] w3c|corpus|probe|perf|size|contested|publish")
 		os.Exit(2)
 	}
 	if err != nil {

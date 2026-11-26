@@ -1,0 +1,86 @@
+[
+  {
+    "Name": "goxsdgo",
+    "All": 39369,
+    "Uncontested": 39295,
+    "Contested": 74,
+    "AllN": 39439,
+    "UncontestedN": 39306,
+    "ContestedN": 133,
+    "ByCategory": {
+      "a": 37,
+      "b": 34,
+      "d": 3
+    }
+  },
+  {
+    "Name": "goxsdgo (XML 1.0 5e names)",
+    "All": 39385,
+    "Uncontested": 39295,
+    "Contested": 90,
+    "AllN": 39439,
+    "UncontestedN": 39306,
+    "ContestedN": 133,
+    "ByCategory": {
+      "a": 37,
+      "b": 50,
+      "d": 3
+    }
+  },
+  {
+    "Name": "libxml2 2.15.4",
+    "All": 38662,
+    "Uncontested": 38590,
+    "Contested": 72,
+    "AllN": 39439,
+    "UncontestedN": 39306,
+    "ContestedN": 133,
+    "ByCategory": {
+      "a": 27,
+      "b": 40,
+      "d": 5
+    }
+  },
+  {
+    "Name": "knroy/go-xml",
+    "All": 39386,
+    "Uncontested": 39281,
+    "Contested": 105,
+    "AllN": 39439,
+    "UncontestedN": 39306,
+    "ContestedN": 133,
+    "ByCategory": {
+      "a": 37,
+      "b": 53,
+      "d": 15
+    }
+  },
+  {
+    "Name": "jacoelho/xsd",
+    "All": 39083,
+    "Uncontested": 39015,
+    "Contested": 68,
+    "AllN": 39439,
+    "UncontestedN": 39306,
+    "ContestedN": 133,
+    "ByCategory": {
+      "a": 32,
+      "b": 22,
+      "d": 14
+    }
+  },
+  {
+    "Name": "cB-Sigma/xsd",
+    "All": 39329,
+    "Uncontested": 39257,
+    "Contested": 72,
+    "AllN": 39439,
+    "UncontestedN": 39306,
+    "ContestedN": 133,
+    "ByCategory": {
+      "a": 25,
+      "b": 45,
+      "d": 2
+    }
+  }
+]
