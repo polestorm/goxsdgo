@@ -77,6 +77,8 @@ jobs:
             "tools": ["$GOVULNCHECK", "$STATICCHECK", "$CYCLONEDX"]
           }
           EOF
+      - name: install tools
+        run: go install "$GOVULNCHECK" "$STATICCHECK" "$CYCLONEDX"
       - name: checks
         run: |
           test -z "$(gofmt -l .)"
@@ -90,17 +92,17 @@ jobs:
           go tool cover -html=out/release/coverage.out -o out/release/coverage.html
           tail -1 out/release/coverage.txt >> "$GITHUB_STEP_SUMMARY"
       - name: staticcheck
-        run: go run "$STATICCHECK" ./... 2>&1 | tee out/release/staticcheck.txt
+        run: staticcheck ./... 2>&1 | tee out/release/staticcheck.txt
       - name: govulncheck
         run: |
           set +e
-          go run "$GOVULNCHECK" ./... > out/release/govulncheck.txt 2>&1
+          govulncheck ./... > out/release/govulncheck.txt 2>&1
           status=$?
-          go run "$GOVULNCHECK" -format json ./... > out/release/govulncheck.json 2>/dev/null
+          govulncheck -format json ./... > out/release/govulncheck.json 2>/dev/null
           cat out/release/govulncheck.txt
           if [ $status -ne 0 ]; then echo "::warning::govulncheck reports findings (exit $status), see govulncheck.txt"; fi
       - name: SBOM
-        run: go run "$CYCLONEDX" mod -json -licenses -output out/release/sbom.cdx.json .
+        run: cyclonedx-gomod mod -json -licenses -output out/release/sbom.cdx.json .
       - name: evidence package
         run: |
           go -C tools/evidence run . -root ../.. -out ../../out/evidence -tar
