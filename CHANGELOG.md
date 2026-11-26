@@ -13,7 +13,7 @@ Every release lists its changes with an impact class and the requirements they t
 Tags up to v0.3.0 are annotated, not signed; from v0.4.0 on, tags are signed. Known limitations:
 [docs/known-issues.md](docs/known-issues.md).
 
-## Unreleased
+## v0.4.1 (2026-11-26)
 
 - **Class 1.** `xmlreader` (and so `xsd.Set.Validate`, which reads documents with it): input that arrives in small
   reads (`iotest.OneByteReader`, a small first network packet) made the XML declaration panic ("slice bounds out of
