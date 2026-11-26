@@ -1,26 +1,26 @@
 # go test ./xmlreader -run '^$' -bench 'BenchmarkJPK' -benchmem -count 5
-# date: 2026-11-26T16:52Z
-# goxsdgo: 3837618
+# date: 2026-11-26T18:04Z
+# goxsdgo: 41259d1
 # go version go1.26.6 darwin/arm64
-# macOS 27.0.1, load average  1,71 1,79 2,06 
+# macOS 27.0.1, load average  1,66 3,37 4,44 
 goos: darwin
 goarch: arm64
 pkg: github.com/polestorm/goxsdgo/xmlreader
 cpu: Apple M4
-BenchmarkJPK-10             	      28	  41537629 ns/op	 212.35 MB/s	  148956 B/op	      67 allocs/op
-BenchmarkJPK-10             	      28	  41858052 ns/op	 210.72 MB/s	  149249 B/op	      67 allocs/op
-BenchmarkJPK-10             	      27	  42499304 ns/op	 207.54 MB/s	  148959 B/op	      67 allocs/op
-BenchmarkJPK-10             	      27	  42430403 ns/op	 207.88 MB/s	  149263 B/op	      67 allocs/op
-BenchmarkJPK-10             	      28	  42489414 ns/op	 207.59 MB/s	  148956 B/op	      67 allocs/op
-BenchmarkJPKStdlib-10       	      12	  96324712 ns/op	  91.57 MB/s	45928960 B/op	 1260062 allocs/op
-BenchmarkJPKStdlib-10       	      12	  99866059 ns/op	  88.32 MB/s	45929440 B/op	 1260063 allocs/op
-BenchmarkJPKStdlib-10       	      12	 107796347 ns/op	  81.82 MB/s	45928942 B/op	 1260062 allocs/op
-BenchmarkJPKStdlib-10       	      12	 102671753 ns/op	  85.91 MB/s	45928909 B/op	 1260062 allocs/op
-BenchmarkJPKStdlib-10       	      12	  97942576 ns/op	  90.06 MB/s	45928990 B/op	 1260063 allocs/op
-BenchmarkJPKStdlibRaw-10    	      13	  89203814 ns/op	  98.88 MB/s	28647800 B/op	  900047 allocs/op
-BenchmarkJPKStdlibRaw-10    	      13	  88658282 ns/op	  99.49 MB/s	28647802 B/op	  900047 allocs/op
-BenchmarkJPKStdlibRaw-10    	      13	  87816128 ns/op	 100.44 MB/s	28647756 B/op	  900047 allocs/op
-BenchmarkJPKStdlibRaw-10    	      13	  88070295 ns/op	 100.15 MB/s	28647759 B/op	  900047 allocs/op
-BenchmarkJPKStdlibRaw-10    	      13	  88936718 ns/op	  99.18 MB/s	28647731 B/op	  900046 allocs/op
+BenchmarkJPK-10             	      24	  42039731 ns/op	 209.81 MB/s	  149408 B/op	      67 allocs/op
+BenchmarkJPK-10             	      27	  42686687 ns/op	 206.63 MB/s	  149360 B/op	      67 allocs/op
+BenchmarkJPK-10             	      26	  42617478 ns/op	 206.97 MB/s	  149058 B/op	      67 allocs/op
+BenchmarkJPK-10             	      27	  43894866 ns/op	 200.94 MB/s	  149055 B/op	      67 allocs/op
+BenchmarkJPK-10             	      26	  43329407 ns/op	 203.57 MB/s	  149374 B/op	      67 allocs/op
+BenchmarkJPKStdlib-10       	      12	  98548319 ns/op	  89.50 MB/s	45928932 B/op	 1260062 allocs/op
+BenchmarkJPKStdlib-10       	      12	  98196413 ns/op	  89.82 MB/s	45928948 B/op	 1260062 allocs/op
+BenchmarkJPKStdlib-10       	      12	  98799701 ns/op	  89.28 MB/s	45929388 B/op	 1260063 allocs/op
+BenchmarkJPKStdlib-10       	      12	  98728080 ns/op	  89.34 MB/s	45928933 B/op	 1260062 allocs/op
+BenchmarkJPKStdlib-10       	      12	 102275326 ns/op	  86.24 MB/s	45928945 B/op	 1260062 allocs/op
+BenchmarkJPKStdlibRaw-10    	      13	  89910324 ns/op	  98.10 MB/s	28647724 B/op	  900046 allocs/op
+BenchmarkJPKStdlibRaw-10    	      13	  89625468 ns/op	  98.41 MB/s	28647748 B/op	  900046 allocs/op
+BenchmarkJPKStdlibRaw-10    	      13	  89348365 ns/op	  98.72 MB/s	28647770 B/op	  900047 allocs/op
+BenchmarkJPKStdlibRaw-10    	      13	  88831122 ns/op	  99.29 MB/s	28647726 B/op	  900046 allocs/op
+BenchmarkJPKStdlibRaw-10    	      13	  89269163 ns/op	  98.81 MB/s	28647758 B/op	  900047 allocs/op
 PASS
-ok  	github.com/polestorm/goxsdgo/xmlreader	20.870s
+ok  	github.com/polestorm/goxsdgo/xmlreader	20.038s

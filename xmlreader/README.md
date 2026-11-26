@@ -29,7 +29,7 @@ before goxsdgo 1.0.
 | W3C XML Conformance, in-scope cases[^conf] | **1725 / 1727** | 1146 / 1727 |
 | … malformed documents rejected | **951 / 951** | 434 / 951 |
 | … well-formed documents read | **774 / 776** | 712 / 776 |
-| Speed, 8.8 MB JPK-like document[^perf] | **208 MB/s** | 88 MB/s (`Token`), 99 MB/s (`RawToken`) |
+| Speed, 8.8 MB JPK-like document[^perf] | **207 MB/s** | 89 MB/s (`Token`), 99 MB/s (`RawToken`) |
 | Memory allocated reading it | **149 KB, 67 allocations** | 46 MB, 1.26 M allocations (`Token`) |
 | Position | **line and column of every token and error**; end of each start tag | `InputPos` after a token; line in error text |
 | Errors | **fixed code** (`wfc-unique-att-spec`, …), line, column, message | message text only |
