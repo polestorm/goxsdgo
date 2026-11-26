@@ -139,19 +139,20 @@ Paczka z `d8c4e60` (kod biblioteki jak w `51b65ae`), 7 fuzzerów po 203 min, 3 w
 Godziny nie liczą się do K5 dla v0.4.0: od `d8c4e60` zmienił się kod biblioteki (`xmlreader.Attr.Type`,
 `Config.Resolve`). Nowa kampania na `v0.4.0` (z poprawionymi niezmiennikami, kod biblioteki bez zmian): niżej.
 
-## Zlecenie na Synology (2026-11-26): kandydat v0.4.0
+## Zlecenie na Synology (2026-11-26): kandydat v0.4.1
 
-Paczka z `e715fa1` (kod biblioteki jak w `v0.4.0` = `4749d94`, zmienione tylko niezmienniki testów fuzzingu
-i dokumenty) w `~/fuzz/goxsdgo/e715fa1/`, ustawiona 2026-11-26 21:37 we wspólnej kolejce: 1440 min (24 h,
-7 fuzzerów po ok. 205 min), 3 workery, `nice -n 19`. Ziarna wszystkich 7 fuzzerów (z obiema regresjami) przechodzą
-na serwerze. Ruszy po zadaniach `gohighlightgo` i `gomermaidgo`. Po zakończeniu: skopiować
-`~/fuzz/goxsdgo/e715fa1/fuzzpack/work/journal.tsv` i `go -C tools/fuzz run . -root ../.. -import journal.tsv`
-(identyfikator bez zmian), potem zbudować pakiet dowodów.
+Paczka z `e715fa1` (kod v0.4.0), ustawiona w kolejce 2026-11-26 21:37, została wycofana przed startem
+(23:36): poprawka KI-13 zmieniła kod biblioteki, więc jej godziny nie liczyłyby się dla wydania z poprawką.
+Zamiast niej paczka z tagu `v0.4.1` (`985c49f`, kod biblioteki jak w `140b2de`) w `~/fuzz/goxsdgo/985c49f/`,
+ustawiona 2026-11-26 23:37: 1440 min (24 h, 7 fuzzerów po ok. 205 min), 3 workery, `nice -n 19`, z nowym
+niezmiennikiem `FuzzReader` (niżej). Ziarna wszystkich 7 fuzzerów przechodzą na serwerze. Ruszy po zadaniach
+`gohighlightgo` i `gomermaidgo`. Po zakończeniu: skopiować `~/fuzz/goxsdgo/985c49f/fuzzpack/work/journal.tsv`
+i `go -C tools/fuzz run . -root ../.. -import journal.tsv`, potem zbudować pakiet dowodów.
 
 ## Nowy niezmiennik FuzzReader (2026-11-26)
 
 `FuzzReader` sprawdza też, że strumień tokenów i błędów nie zależy od podziału wejścia na odczyty (jeden odczyt,
 po jednym bajcie, porcjami po 7 bajtów; XML-019). Dotąd fuzzer podawał wejście jednym odczytem i dlatego nie znalazł
 błędu deklaracji XML czytanej porcjami (KI-13, znaleziony przy wydzielaniu czytnika do goxmlgo). Przebieg sprawdzający
-na Macu (zasilanie sieciowe, `-parallel 2`): 100 s, bez błędu. Poprawka zmienia kod biblioteki, więc kampania
-z `e715fa1` (kod v0.4.0) nie zaliczy godzin K5 dla wydania z poprawką.
+na Macu (zasilanie sieciowe, `-parallel 2`): 100 s, bez błędu. Poprawka zmienia kod biblioteki, dlatego kampania
+K5 biegnie na `v0.4.1` (wyżej).
