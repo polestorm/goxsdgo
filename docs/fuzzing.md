@@ -138,3 +138,12 @@ Paczka z `d8c4e60` (kod biblioteki jak w `51b65ae`), 7 fuzzerów po 203 min, 3 w
 
 Godziny nie liczą się do K5 dla v0.4.0: od `d8c4e60` zmienił się kod biblioteki (`xmlreader.Attr.Type`,
 `Config.Resolve`). Nowa kampania na `v0.4.0` (z poprawionymi niezmiennikami, kod biblioteki bez zmian): niżej.
+
+## Zlecenie na Synology (2026-11-26): kandydat v0.4.0
+
+Paczka z `e715fa1` (kod biblioteki jak w `v0.4.0` = `4749d94`, zmienione tylko niezmienniki testów fuzzingu
+i dokumenty) w `~/fuzz/goxsdgo/e715fa1/`, ustawiona 2026-11-26 21:37 we wspólnej kolejce: 1440 min (24 h,
+7 fuzzerów po ok. 205 min), 3 workery, `nice -n 19`. Ziarna wszystkich 7 fuzzerów (z obiema regresjami) przechodzą
+na serwerze. Ruszy po zadaniach `gohighlightgo` i `gomermaidgo`. Po zakończeniu: skopiować
+`~/fuzz/goxsdgo/e715fa1/fuzzpack/work/journal.tsv` i `go -C tools/fuzz run . -root ../.. -import journal.tsv`
+(identyfikator bez zmian), potem zbudować pakiet dowodów.
