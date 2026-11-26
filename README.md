@@ -94,16 +94,8 @@ instance tests, the MF corpus, safety probes, 20 MB and 1 GB documents, patholog
 
 ## Status
 
-Feature complete for XSD 1.0; the API may still change before 1.0. Requires Go 1.22 or newer. The replacement
-criteria of [ADR 0001](docs/adr/0001-scope-and-acceptance.md), from the evidence package of 2026-11-25
-([docs/evidence.md](docs/evidence.md)):
-
-- K1 W3C test suite: 39,369 of 39,439; the 70 others explained. K2 MF corpus: 170 of 170 schemas, 15 of 15
-  documents. K3 agreement with libxml2: 99.69% verdicts, 99.7% first-error lines, every difference described.
-  K4 requirements: 129, all tested. K6 memory: 1 GB in 6.3 MB. K7 speed: 1.05× libxml2 on the synthetic
-  200 MB file (1.19× on a private corpus of 1.6 GB of client files, which cannot be published). K8 consumer:
-  xml.pro passes its tests with goxsdgo as its validator (branch, not yet deployed). K9 evidence package: built.
-- K5 fuzzing: 24 hours on the release candidate in progress (15 minutes done).
+- Feature complete for XSD 1.0; the API may still change before 1.0. Requires Go 1.22 or newer.
+- Acceptance criteria met, except 24 h of fuzzing (in progress): [docs/evidence.md](docs/evidence.md).
 
 ## Documentation
 
