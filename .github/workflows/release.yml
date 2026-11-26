@@ -78,7 +78,7 @@ jobs:
           }
           EOF
       - name: install tools
-        run: go install "$GOVULNCHECK" "$STATICCHECK" "$CYCLONEDX"
+        run: for t in "$GOVULNCHECK" "$STATICCHECK" "$CYCLONEDX"; do go install "$t"; done
       - name: checks
         run: |
           test -z "$(gofmt -l .)"
