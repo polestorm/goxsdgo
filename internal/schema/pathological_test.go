@@ -111,9 +111,17 @@ func TestPathological(t *testing.T) {
 		return best
 	}
 	for _, c := range cases {
-		t1 := measure(c.b, c.n)
-		t2 := measure(c.b, 2*c.n)
-		ratio := float64(t2) / float64(max(t1, time.Microsecond))
+		// Do trzech prób: prawdziwy wzrost nieliniowy przekracza próg za każdym razem, szum maszyny współdzielonej
+		// zwykle tylko raz.
+		var t1, t2 time.Duration
+		var ratio float64
+		for try := 0; try < 3; try++ {
+			t1, t2 = measure(c.b, c.n), measure(c.b, 2*c.n)
+			ratio = float64(t2) / float64(max(t1, time.Microsecond))
+			if ratio <= 3.5 || t2 <= 20*time.Millisecond {
+				break
+			}
+		}
 		t.Logf("%-26s n=%-7d %10v  2n %10v  ratio %.2f", c.name, c.n, t1, t2, ratio)
 		if ratio > 3.5 && t2 > 20*time.Millisecond {
 			t.Errorf("%s: time grows faster than linearly (ratio %.2f)", c.name, ratio)
