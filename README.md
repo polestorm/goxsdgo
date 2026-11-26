@@ -55,9 +55,8 @@ All of them were run as programs through their public API, on the same cases and
 | | goxsdgo | libxml2 | knroy | jacoelho | cB-Sigma |
 |---|:---:|:---:|:---:|:---:|:---:|
 | W3C XSD 1.0 test suite[^w3c] | 99.82% | 98.03% | 99.87% 🥇 | 99.10% | 99.72% |
-| — without contested cases[^contested] | 99.97% 🥇 | 98.18% | 99.94% | 99.26% | 99.88% |
 | Dependencies | 0 | C, cgo | 1 | 0 | 0 |
-| Added to a program | 1.7 MB | 1.0 MB shared library | 6.4 MB | 3.2 MB | 1.6 MB 🥇 |
+| Added to a program | 1.7 MB | 1.0 MB lib + … | 6.4 MB | 3.2 MB | 1.6 MB 🥇 |
 | Time, 200 MB XML[^perf] | 4.00 s | 3.90 s | —[^tree] | 3.75 s 🥇 | —[^tree] |
 | Memory, 200 MB XML | 25 MB | 5 MB 🥇 | — | 22 MB | — |
 | XSD 1.1 | no | no | yes 🥇 | no | no |
@@ -75,10 +74,11 @@ instance tests, the MF corpus, safety probes, 20 MB and 1 GB documents, patholog
 [docs/methodology.md](docs/methodology.md), raw results: [docs/results/](docs/results/).
 
 [^w3c]: The W3C XML Schema test suite, all 39,439 cases that apply to XSD 1.0 Second Edition, run by one harness
-    with the same expected verdicts for every candidate.
-[^contested]: 133 cases without one right answer (queried or disputed by the working group, dependent on the XML
-    edition, or with opposite expectations in the suite), chosen by fixed criteria, the same for every candidate:
-    [docs/contested-cases.md](https://github.com/polestorm/goxsdgo/blob/main/docs/contested-cases.md).
+    with the same expected verdicts for every candidate. Without 133 contested cases (no one right answer: queried
+    or disputed by the working group, dependent on the XML edition, or with opposite expectations in the suite),
+    chosen by fixed criteria, the same for every candidate: goxsdgo 99.97%, knroy 99.94%, cB-Sigma 99.88%,
+    jacoelho 99.26%, libxml2 98.18%
+    ([docs/contested-cases.md](https://github.com/polestorm/goxsdgo/blob/main/docs/contested-cases.md)).
 [^details]: What the validator knows about an error beyond its position. goxsdgo gives it as separate fields of
     `xsd.Error`, so a program can use it without parsing the message: `Expected` (the elements allowed at that
     point), `Reason` (missing, unexpected or in the wrong namespace), `Value` and `Facet` (the value and the facet

@@ -24,7 +24,7 @@ are validators in pure Go, published in 2026.
 | Dependencies[^deps] | 0 🥇 | C, cgo | 1 | 0 🥇 | 0 🥇 |
 | Minimum Go | 1.22 🥇 | — | 1.25 | 1.27 | 1.24 |
 | Lines of Go code[^size] | 15,293 | (C) | 203,186 | 55,395 | 8,679 🥇 |
-| Added to a program | 1.7 MB | 1.0 MB[^dylib] | 6.4 MB | 3.2 MB | 1.6 MB 🥇 |
+| Added to a program | 1.7 MB | 1.0 MB lib + …[^dylib] | 6.4 MB | 3.2 MB | 1.6 MB 🥇 |
 | Time, 20 MB XML[^perf] | 0.41 s | 0.40 s | 0.59 s | 0.38 s 🥇 | 3.67 s |
 | Time, 200 MB XML | 4.00 s | 3.90 s | —[^tree] | 3.75 s 🥇[^jlimit] | —[^tree] |
 | Memory, 20 MB XML | 24 MB | 5 MB 🥇 | 219 MB | 21 MB | 433 MB |
