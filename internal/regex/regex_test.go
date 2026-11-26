@@ -346,7 +346,10 @@ func FuzzRegexTranslate(f *testing.F) {
 			}
 			return
 		}
-		if d := time.Since(start); d > 2*time.Second {
+		// Tłumaczenie i kompilacja RE2 są liniowe względem rozmiaru rozwinięcia (do maxExpansion); duży licznik,
+		// np. (ab){0,999990}, daje program RE2 z ok. 2 mln instrukcji: 0,4 s na Apple M4, 2,2 s na Celeronie
+		// J4125 przy trzech fuzzerach naraz. Próg 10 s łapie wzrost wykładniczy, a nie wolny sprzęt.
+		if d := time.Since(start); d > 10*time.Second {
 			t.Fatalf("%q: translation took %v", pattern, d)
 		}
 	})

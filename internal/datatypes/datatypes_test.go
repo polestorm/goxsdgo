@@ -691,7 +691,7 @@ func FuzzLexical(f *testing.F) {
 			if err != nil {
 				t.Fatalf("%s: %q -> canonical %q invalid: %v", name, s, c, err)
 			}
-			if !Identical(v, w) && !(name == "float" || name == "double") {
+			if !Identical(v, w) && !(name == "float" || name == "double") && !timeAcrossMidnight(name, v, w) {
 				t.Fatalf("%s: %q -> %q is a different value", name, s, c)
 			}
 			if ty.Canonical(w) != c {
@@ -699,4 +699,20 @@ func FuzzLexical(f *testing.F) {
 			}
 		}
 	})
+}
+
+// timeAcrossMidnight: niespójność XSD 1.0 2e dla time ze strefą (docs/known-issues.md, KI-12). Postać kanoniczna
+// sprowadza czas do UTC i pomija dzień (3.2.8.2), a porządek liczy chwilę od daty odniesienia (3.2.8, 3.2.7.4),
+// więc 20:00:00-07:00 i jego postać kanoniczna 03:00:00Z różnią się dokładnie o dobę. Wymagamy tej samej pory dnia
+// w UTC i różnicy jednej doby.
+func timeAcrossMidnight(name string, v, w Value) bool {
+	a, ok1 := v.(*DateTimeValue)
+	b, ok2 := w.(*DateTimeValue)
+	if name != "time" || !ok1 || !ok2 || !a.HasTZ || !b.HasTZ {
+		return false
+	}
+	as, af := a.instant()
+	bs, bf := b.instant()
+	d := as - bs
+	return af == bf && (d == secondsPerDay || d == -secondsPerDay)
 }

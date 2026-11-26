@@ -13,6 +13,12 @@ Every release lists its changes with an impact class and the requirements they t
 Tags up to v0.3.0 are annotated, not signed; from v0.4.0 on, tags are signed. Known limitations:
 [docs/known-issues.md](docs/known-issues.md).
 
+## Unreleased
+
+- **Class 0.** Two fuzz-test invariants corrected after the Synology campaign (docs/fuzzing.md): `FuzzLexical`
+  accepts the XSD 1.0 2e inconsistency for `time` across midnight (new known issue KI-12, behaviour unchanged),
+  `FuzzRegexTranslate` allows 10 s instead of 2 s on slow hardware. Library code unchanged.
+
 ## v0.4.0 (2026-11-26)
 
 - **Class 2.** `Config.Resolve`, `SchemaRef`, `MaxResolvedSize`: schema documents the library cannot find in

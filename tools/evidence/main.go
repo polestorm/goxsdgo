@@ -213,8 +213,9 @@ func testEnv() []string {
 	return env
 }
 
-// sameLibrary mówi, czy commit ma ten sam kod biblioteki co kandydat: różnica poza testami, danymi testowymi,
-// dokumentami i narzędziami jest pusta (docs/fuzzing.md, „Jak liczymy godziny do K5”).
+// sameLibrary mówi, czy commit ma ten sam kod biblioteki co kandydat: różnica poza testami, danymi testowymi
+// (w każdym katalogu testdata), dokumentami (docs i pliki .md), narzędziami, CI i ustawieniami Claude jest pusta
+// (docs/fuzzing.md, „Jak liczymy godziny do K5”). W pathspec bez „glob” gwiazdka obejmuje też „/”.
 func sameLibrary(root, candidate, commit string) bool {
 	if candidate == "" || commit == "" {
 		return false
@@ -222,10 +223,13 @@ func sameLibrary(root, candidate, commit string) bool {
 	if strings.HasPrefix(candidate, commit) || strings.HasPrefix(commit, candidate) {
 		return true
 	}
-	cmd := exec.Command("git", "diff", "--quiet", candidate, commit, "--", ".", ":!*_test.go", ":!testdata", ":!docs", ":!tools")
+	cmd := exec.Command("git", append([]string{"diff", "--quiet", candidate, commit, "--", "."}, libraryExcludes...)...)
 	cmd.Dir = root
 	return cmd.Run() == nil
 }
+
+// libraryExcludes: ścieżki, które nie są kodem biblioteki (sameLibrary, docs/evidence.md K5).
+var libraryExcludes = []string{":!*_test.go", ":!*testdata/*", ":!docs", ":!*.md", ":!tools", ":!.github", ":!.claude"}
 
 func runCmd(dir string, env []string, name string, args ...string) []byte {
 	out, _ := runCmdErr(dir, env, name, args...)

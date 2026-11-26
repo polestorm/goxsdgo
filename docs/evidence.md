@@ -41,7 +41,7 @@ wygenerowania. Czasy przebiegów są wyłącznie w plikach surowych.
 | K2 | wyjście `TestSchemaCorpus` i `TestInstanceCorpus` (bez kompletu danych MF: „oczekuje”) |
 | K3 | `docs/measurements.json` (pomiar `tools/compare` z datą i commitem) i nagłówek `docs/differences-libxml2.md` (liczba rozbieżności, ile bez kategorii) |
 | K4 | macierz śledzenia z `requirements/*.md` i odwołań `REQ:` w testach, wynik `TestRequirementsCovered` |
-| K5 | dziennik `docs/fuzzing.md`: przebiegi „ok” bez „(zmiany)” na kandydacie z `docs/measurements.json` albo na commitach, które nie zmieniają kodu biblioteki (`git diff --quiet <kandydat> <commit> -- . ':!*_test.go' ':!testdata' ':!docs' ':!tools'`); wynik `TestPathological` w `xsd` i `internal/schema` |
+| K5 | dziennik `docs/fuzzing.md`: przebiegi „ok” bez „(zmiany)” na kandydacie z `docs/measurements.json` albo na commitach, które nie zmieniają kodu biblioteki (`git diff --quiet <kandydat> <commit> -- . ':!*_test.go' ':!*testdata/*' ':!docs' ':!*.md' ':!tools' ':!.github' ':!.claude'`); wynik `TestPathological` w `xsd` i `internal/schema` |
 | K6 | wynik `TestSafeByDefault` i `TestStreamingMemory`; szczyt pamięci dla 1 GB z `docs/measurements.json` albo z tego przebiegu (`-stream-mb 1024`) |
 | K7 | `docs/measurements.json` (ilorazy czasu względem libxml2) |
 | K8 | `docs/measurements.json` (`k8`: testy odbiorcy po przepięciu) i wynik `TestCompatTable` |

@@ -46,8 +46,9 @@ go -C tools/fuzz run . -root ../.. -import /ścieżka/do/journal.tsv   # wynik z
 ## Jak liczymy godziny do K5
 
 - Liczy się czas przebiegów zakończonych wynikiem „ok” na jednym commicie kandydata albo na commitach późniejszych,
-  które nie zmieniają kodu biblioteki poza testami (sprawdza to `git diff --stat <kandydat> -- ':!*_test.go'
-  ':!testdata' ':!docs' ':!tools'` — pusty wynik).
+  które nie zmieniają kodu biblioteki poza testami (sprawdza to `git diff --stat <kandydat> -- . ':!*_test.go'
+  ':!*testdata/*' ':!docs' ':!*.md' ':!tools' ':!.github' ':!.claude'` — pusty wynik; od 2026-11-26 także dane
+  testowe w każdym katalogu `testdata`, pliki `.md`, CI i ustawienia Claude).
 - Wiersz z oznaczeniem „(zmiany)” to przebieg na kodzie z niezatwierdzonymi zmianami: nie liczy się do K5.
 - Przebieg zakończony błędem zeruje licznik dla kodu, którego dotyczy: błąd naprawiamy, wejście zostaje w
   `testdata/fuzz/<Fuzzer>/` jako test regresji, a godziny liczymy od nowego commitu.
@@ -109,3 +110,31 @@ commitów od etapu 6b znów się zmieniły; kod pakietów objętych fuzzingiem b
 Pełne przypisanie starych identyfikatorów do nowych: `git log` w kopii `goxsdgo-backup-2026-11-26.git` obok
 repozytorium (te same opisy commitów, w tej samej kolejności).
 
+## Wynik kampanii na Synology (2026-11-25 19:57 – 2026-11-26 13:04)
+
+Paczka z `d8c4e60` (kod biblioteki jak w `51b65ae`), 7 fuzzerów po 203 min, 3 workery, Synology „StormSyn”
+(Celeron J4125). Dziennik zaimportowany 2026-11-26 (`-import`, identyfikator paczki `7aa29c4` zamieniony na `d8c4e60`).
+
+| Data | Commit | Pakiet | Fuzzer | Czas | Wykonania | Wynik |
+|---|---|---|---|---|---|---|
+| 2026-11-25 19:57 | `d8c4e60` | ./internal/datatypes | `FuzzDecimal` | 3h23m0s | 1256022899 | ok (Synology) |
+| 2026-11-25 23:20 | `d8c4e60` | ./internal/datatypes | `FuzzLexical` | 1s | 0 | **błąd**: FAIL rc=1 input=internal/datatypes/testdata/fuzz/FuzzLexical/f16e7cb754284fef log=~/fuzz/goxsdgo/7aa29c4/fuzzpack/work/logs/20261125-232016-FuzzLexical.log (Synology) |
+| 2026-11-25 23:20 | `d8c4e60` | ./internal/regex | `FuzzRegexTranslate` | 11m50s | 47289214 | **błąd**: FAIL rc=1 input=internal/regex/testdata/fuzz/FuzzRegexTranslate/91dd650195e5d5ae log=~/fuzz/goxsdgo/7aa29c4/fuzzpack/work/logs/20261125-232017-FuzzRegexTranslate.log (Synology) |
+| 2026-11-25 23:32 | `d8c4e60` | ./internal/schema | `FuzzContentModel` | 3h23m0s | 918296274 | ok (Synology) |
+| 2026-11-26 02:55 | `d8c4e60` | ./internal/xmlreader | `FuzzReader` | 3h23m0s | 358040267 | ok (Synology) |
+| 2026-11-26 06:18 | `d8c4e60` | ./xsd | `FuzzCompile` | 3h23m1s | 136133422 | ok (Synology) |
+| 2026-11-26 09:41 | `d8c4e60` | ./xsd | `FuzzValidate` | 3h23m1s | 176876533 | ok (Synology) |
+
+Łącznie 17,1 h bez paniki; dwa przebiegi zakończone naruszeniem niezmiennika testu, żadne nie jest błędem biblioteki
+(wejścia są w repozytorium jako regresje, w `internal/datatypes/testdata/fuzz/FuzzLexical/` i
+`internal/regex/testdata/fuzz/FuzzRegexTranslate/`):
+
+- `FuzzLexical`, `time` `20:00:00-07:00`: postać kanoniczna `03:00:00Z` (3.2.8.2: UTC, bez dnia) nie jest tą samą
+  wartością według porządku z datą odniesienia (3.2.8, 3.2.7.4); różnica dokładnie jednej doby. Niespójność samej
+  rekomendacji XSD 1.0 2e, biblioteka stosuje oba przepisy dosłownie; niezmiennik testu dopuszcza ten przypadek
+  (`timeAcrossMidnight`), opis w `docs/known-issues.md` (KI-12).
+- `FuzzRegexTranslate`, `(ab){0,999990}`: tłumaczenie i kompilacja RE2 2,2 s przy progu 2 s. Czas liniowy względem
+  rozmiaru rozwinięcia (0,4 s na Apple M4); próg był za ciasny na wolny sprzęt z trzema fuzzerami naraz. Próg 10 s.
+
+Godziny nie liczą się do K5 dla v0.4.0: od `d8c4e60` zmienił się kod biblioteki (`xmlreader.Attr.Type`,
+`Config.Resolve`). Nowa kampania na `v0.4.0` (z poprawionymi niezmiennikami, kod biblioteki bez zmian): niżej.
