@@ -2,6 +2,7 @@ package schema
 
 import (
 	"fmt"
+	"runtime"
 	"testing"
 	"time"
 )
@@ -83,7 +84,10 @@ func TestPathological(t *testing.T) {
 	}
 	measure := func(b build, n int) time.Duration {
 		best := time.Duration(1<<63 - 1)
-		for r := 0; r < 3; r++ {
+		// Najlepszy z 5 przebiegów, każdy po pełnym sprzątaniu pamięci: na małych współdzielonych maszynach (CI)
+		// odśmiecanie w trakcie pomiaru 2n zawyżało iloraz, choć sam algorytm jest liniowy.
+		for r := 0; r < 5; r++ {
+			runtime.GC()
 			start := time.Now()
 			m, in := b(n)
 			if c := m.checkUPA(); c != nil {
