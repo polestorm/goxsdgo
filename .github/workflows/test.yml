@@ -39,8 +39,8 @@ jobs:
           for set in w3c-xsdtests w3c-xmlconf w3c-schemas mf-instances; do
             go -C tools/fetch run . -root ../.. -set $set
           done
-          # epuap.gov.pl, na który crd.gov.pl przekierowuje część schematów MF, nie odpowiada z serwerów GitHuba;
-          # testy korpusu MF są wtedy pomijane z komunikatem (docs/testing.md)
+          # schematy MF: gdy serwer MF nie odpowiada (np. epuap.gov.pl z serwerów GitHuba), tools/fetch bierze plik
+          # z lustra polestorm/goxsdgo-testdata (ta sama suma); gdyby zawiodły oba, testy korpusu MF są pomijane
           go -C tools/fetch run . -root ../.. -set mf-schemas || echo "::warning::MF schemas incomplete; MF corpus tests skipped"
       - name: gofmt
         if: matrix.os == 'ubuntu-latest'
