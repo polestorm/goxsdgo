@@ -7,14 +7,25 @@ name: release artifacts
 on:
   push:
     tags: ["v*"]
+  # ponowne zbudowanie artefaktów dla istniejącego tagu (bez przesuwania tagu), z bieżącą wersją tego pliku
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "existing tag, e.g. v0.4.0"
+        required: true
 
 permissions:
   contents: write
+
+defaults:
+  run:
+    shell: bash # -eo pipefail: błąd przed `| tee` przerywa krok
 
 jobs:
   artifacts:
     runs-on: ubuntu-latest
     env:
+      TAG: ${{ inputs.tag || github.ref_name }}
       GOVULNCHECK: golang.org/x/vuln/cmd/govulncheck@v1.9.0
       STATICCHECK: honnef.co/go/tools/cmd/staticcheck@v0.8.2
       CYCLONEDX: github.com/CycloneDX/cyclonedx-gomod/cmd/cyclonedx-gomod@v1.12.0
@@ -22,6 +33,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref }}
+      # checkout pobiera tag jako commit; obiekt tagu (z podpisem) trzeba pobrać osobno
+      - name: fetch the tag object
+        run: git fetch --force origin "refs/tags/$TAG:refs/tags/$TAG"
       - uses: actions/setup-go@v5
         with:
           go-version: stable
@@ -42,18 +57,18 @@ jobs:
       - name: tag signature
         run: |
           mkdir -p out/release
-          git cat-file tag "$GITHUB_REF_NAME" > out/release/tag.txt
+          git cat-file tag "$TAG" > out/release/tag.txt
           if grep -q "BEGIN SSH SIGNATURE\|BEGIN PGP SIGNATURE" out/release/tag.txt; then
             echo "signed tag" >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "::warning::tag $GITHUB_REF_NAME is not signed"
+            echo "::warning::tag $TAG is not signed"
           fi
       - name: environment
         run: |
           cat > out/release/environment.json <<EOF
           {
-            "tag": "$GITHUB_REF_NAME",
-            "commit": "$GITHUB_SHA",
+            "tag": "$TAG",
+            "commit": "$(git rev-parse HEAD)",
             "date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
             "go": "$(go version)",
             "os": "$(. /etc/os-release && echo "$PRETTY_NAME"), $(uname -r), $(uname -m)",
@@ -97,10 +112,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           # wydanie z notatkami zakłada właściciel; gdyby go jeszcze nie było, powstaje z odsyłaczem do CHANGELOG
-          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
-            gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" \
-              --notes "Changes: [CHANGELOG.md](https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/CHANGELOG.md)"
-          gh release upload "$GITHUB_REF_NAME" out/release/* --clobber
+          gh release view "$TAG" >/dev/null 2>&1 || \
+            gh release create "$TAG" --verify-tag --title "$TAG" \
+              --notes "Changes: [CHANGELOG.md](https://github.com/$GITHUB_REPOSITORY/blob/$TAG/CHANGELOG.md)"
+          gh release upload "$TAG" out/release/* --clobber
       - uses: actions/upload-artifact@v4
         with:
           name: release-${{ github.ref_name }}
