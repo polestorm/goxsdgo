@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -15,7 +14,6 @@ import (
 	"github.com/polestorm/goxsdgo/internal/testkit"
 	"github.com/polestorm/goxsdgo/internal/xmlreader"
 	"github.com/polestorm/goxsdgo/xsd"
-	"github.com/polestorm/goxsdval"
 )
 
 // runPrivate porównuje goxsdgo i libxml2 na prywatnym korpusie z katalogu GOXSDGO_PRIVATE_CORPUS (K3, K7, ADR 0011):
@@ -70,7 +68,7 @@ func runPrivate(root string) error {
 
 	gcfg := xsd.Config{Locations: src.Locations("mf-schemas")}
 	gsets := map[string]*xsd.Set{}
-	lsets := map[string]*goxsdval.Schema{}
+	lsets := map[string]*libSchema{}
 	defer func() {
 		for _, s := range lsets {
 			s.Close()
@@ -112,7 +110,7 @@ func runPrivate(root string) error {
 		}
 		ls, ok := lsets[schema]
 		if !ok {
-			ls, err = goxsdval.ParseSchemaFile(filepath.Join(schemas, filepath.FromSlash(schema)))
+			ls, err = parseSchemaFile(filepath.Join(schemas, filepath.FromSlash(schema)))
 			if err != nil {
 				return fmt.Errorf("libxml2: MF schema does not compile: %v", err)
 			}
@@ -122,7 +120,7 @@ func runPrivate(root string) error {
 		gerrs, gerr := goxsdgoErrors(gs, file)
 		gd := time.Since(start)
 		start = time.Now()
-		lerrs, lerr := ls.ValidateFile(context.Background(), file, goxsdval.Options{MaxErrors: 1000})
+		lerrs, lerr := ls.ValidateFile(file, 1000)
 		ld := time.Since(start)
 		switch {
 		case errors.Is(gerr, xsd.ErrLimit):
@@ -134,7 +132,7 @@ func runPrivate(root string) error {
 		case gerr != nil:
 			unreadable++
 			continue
-		case lerr != nil && !errors.Is(lerr, goxsdval.ErrTooManyErrors):
+		case lerr != nil && !errors.Is(lerr, errTooManyErrors):
 			lFail++
 			continue
 		}
@@ -235,7 +233,7 @@ func runTimeFile(root, file, schema string, runs int) error {
 	if err != nil {
 		return err
 	}
-	ls, err := goxsdval.ParseSchemaFile(filepath.Join(schemas, filepath.FromSlash(schema)))
+	ls, err := parseSchemaFile(filepath.Join(schemas, filepath.FromSlash(schema)))
 	if err != nil {
 		return err
 	}
@@ -266,7 +264,7 @@ func runTimeFile(root, file, schema string, runs int) error {
 		return err
 	}
 	ld, err := best(func() error {
-		errs, err := ls.ValidateFile(context.Background(), file, goxsdval.Options{MaxErrors: 1000})
+		errs, err := ls.ValidateFile(file, 1000)
 		if err == nil && hasErrors(errs) {
 			err = fmt.Errorf("libxml2: %d errors", len(errs))
 		}

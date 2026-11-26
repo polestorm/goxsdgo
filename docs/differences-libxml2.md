@@ -1,7 +1,7 @@
 # Rozbieżności werdyktu goxsdgo i libxml2 na zestawie W3C
 
 Plik generowany przez `tools/compare` (`go run -tags libxml2 . -docs w3c`); nie edytuj go ręcznie.
-Stan: 2026-11-25, libxml2 2.15.4 przez goxsdval, zestaw W3C z commitu `7bc3365c`. Kategorie i decyzje: `differences.md`.
+Stan: 2026-11-25, libxml2 2.15.4 przez `tools/compare`, zestaw W3C z commitu `7bc3365c`. Kategorie i decyzje: `differences.md`.
 
 Rozbieżności: 528 (testy schematów 452, testy dokumentów 76); bez kategorii: 0. „Rację ma” według oczekiwanego
 werdyktu zestawu W3C.

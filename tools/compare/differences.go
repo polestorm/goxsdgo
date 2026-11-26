@@ -187,7 +187,7 @@ func writeDifferences(root, out string, docs bool, schema, instance []difference
 	var b strings.Builder
 	fmt.Fprintf(&b, "# Rozbieżności werdyktu goxsdgo i libxml2 na zestawie W3C\n\n")
 	fmt.Fprintf(&b, "Plik generowany przez `tools/compare` (`go run -tags libxml2 . -docs w3c`); nie edytuj go ręcznie.\n")
-	fmt.Fprintf(&b, "Stan: %s, libxml2 %s przez goxsdval, zestaw W3C z commitu `7bc3365c`. Kategorie i decyzje: `differences.md`.\n\n",
+	fmt.Fprintf(&b, "Stan: %s, libxml2 %s przez `tools/compare`, zestaw W3C z commitu `7bc3365c`. Kategorie i decyzje: `differences.md`.\n\n",
 		time.Now().Format("2006-01-02"), libxml2Version())
 	fmt.Fprintf(&b, "Rozbieżności: %d (testy schematów %d, testy dokumentów %d); bez kategorii: %d. „Rację ma” według oczekiwanego\n"+
 		"werdyktu zestawu W3C.\n\n", len(all), len(schema), len(instance), len(uncategorized))

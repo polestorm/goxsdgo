@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/polestorm/goxsdgo/xsd"
-	"github.com/polestorm/goxsdval"
 )
 
 // pairCounter liczy pary (kod goxsdgo, kod libxml2) na tych samych danych: podstawa empiryczna tabeli compat
@@ -48,10 +46,10 @@ func (p *pairCounter) add(kind, goCode string, lib int, first bool) {
 }
 
 // addDocument dopisuje pary dla dokumentu odrzuconego przez oba walidatory.
-func (p *pairCounter) addDocument(gerrs []xsd.Error, lerrs []goxsdval.ValidationError) {
-	var lib []goxsdval.ValidationError
+func (p *pairCounter) addDocument(gerrs []xsd.Error, lerrs []libError) {
+	var lib []libError
 	for _, e := range lerrs {
-		if e.Severity >= goxsdval.SeverityError {
+		if e.Severity >= sevError {
 			lib = append(lib, e)
 		}
 	}
@@ -131,14 +129,14 @@ func readPairs(path string, into *pairCounter) error {
 // runCompat łączy pary z przebiegów w3c i corpus, wybiera dla każdego kodu goxsdgo najczęstszy kod libxml2
 // (najpierw pary z tego samego wiersza, potem pierwsze błędy) i porównuje wynik z tabelą xsd.LibXML2Code.
 // Zapisuje out/compare/compat.tsv z liczebnościami i alternatywami.
-func runCompat(root, out, messages string) error {
+func runCompat(root, out string) error {
 	pc := newPairCounter()
 	for _, f := range []string{"code-pairs-w3c.tsv", "code-pairs-corpus.tsv", "code-pairs-probe.tsv"} {
 		if err := readPairs(filepath.Join(out, f), pc); err != nil {
 			return fmt.Errorf("%w (run the w3c, corpus and probe commands first)", err)
 		}
 	}
-	known, err := readMessages(messages)
+	known, err := readConsumerCodes(filepath.Join(root, "testdata", "libxml2-consumer-codes.tsv"))
 	if err != nil {
 		return err
 	}
@@ -194,7 +192,7 @@ func runCompat(root, out, messages string) error {
 			best.first+best.line, total, inMsg, status, strings.Join(alts, " ")))
 	}
 	if err := writeLines(filepath.Join(out, "compat.tsv"),
-		"kind\tgoxsdgo\tlibxml2 (most frequent)\tshare\tin messages.json\ttable\talternatives code:count", lines); err != nil {
+		"kind\tgoxsdgo\tlibxml2 (most frequent)\tshare\tconsumer code\ttable\talternatives code:count", lines); err != nil {
 		return err
 	}
 	fmt.Printf("goxsdgo codes observed with a libxml2 counterpart: %d; table agrees %d, differs %d, missing %d\n",
@@ -202,22 +200,20 @@ func runCompat(root, out, messages string) error {
 	return nil
 }
 
-// readMessages czyta kody libxml2, dla których odbiorca ma tłumaczenia (goxsdval/messages/messages.json).
-func readMessages(path string) (map[int]bool, error) {
+// readConsumerCodes czyta kody libxml2, dla których odbiorca ma tłumaczenia (testdata/libxml2-consumer-codes.tsv:
+// kod i opis rozdzielone tabulatorem, wiersze z # to komentarze).
+func readConsumerCodes(path string) (map[int]bool, error) {
 	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	var m struct {
-		Codes map[string]json.RawMessage `json:"codes"`
-	}
-	if err := json.Unmarshal(b, &m); err != nil {
-		return nil, err
-	}
 	out := map[int]bool{}
-	for k := range m.Codes {
-		n, err := strconv.Atoi(k)
-		if err == nil {
+	for _, line := range strings.Split(string(b), "\n") {
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		code, _, _ := strings.Cut(line, "\t")
+		if n, err := strconv.Atoi(strings.TrimSpace(code)); err == nil {
 			out[n] = true
 		}
 	}

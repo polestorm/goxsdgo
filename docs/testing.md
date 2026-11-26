@@ -11,7 +11,7 @@
 | korpus schematów | `testdata/schemas/mf/`, `TestSchemaCorpus` | każdy ze 170 schematów MF (JPK, KSeF, e-Sprawozdania) kompiluje się bez błędów; importy rozwiązuje katalog adresów z manifestu, bez sieci; zapadki `testdata/mf-schemas.ratchet`, `testdata/mf-instances.ratchet` |
 | korpus dokumentów | `testdata/instances/` + `expected.json`, `TestInstanceCorpus` | werdykt (później też kody i miejsca błędów) zgodny z oczekiwanym; zapadka jak wyżej |
 | korpus własny | `testdata/corpus/` | małe schematy i dokumenty dla każdego wymagania, w tym polskie znaki, duże liczności, typy z ograniczeniami |
-| różnicowe | `tools/compare` (osobny moduł, cgo) | ten sam zestaw W3C i korpus MF przez libxml2 (`goxsdval`); werdykty dla każdego przypadku w `out/compare/*.tsv`, od etapu 3 także rozbieżności testów schematów goxsdgo i libxml2 (`out/compare/schemas-goxsdgo-libxml2.tsv`), od etapu 5 testów dokumentów i korpusu z wierszem pierwszego błędu (`out/compare/instances-goxsdgo-libxml2.tsv`), od etapu 6 pary kodów (`code-pairs-*.tsv`, polecenia `probe` i `compat`, `compat.tsv`) i wygenerowana lista rozbieżności `docs/differences-libxml2.md` (`-docs w3c`); od etapu 3 raport różnic względem `goxsdgo` i miejsca pierwszego błędu; każda różnica werdyktu w `differences.md` |
+| różnicowe | `tools/compare` (osobny moduł, cgo) | ten sam zestaw W3C i korpus MF przez libxml2 (własne wiązanie cgo w `tools/compare`); werdykty dla każdego przypadku w `out/compare/*.tsv`, od etapu 3 także rozbieżności testów schematów goxsdgo i libxml2 (`out/compare/schemas-goxsdgo-libxml2.tsv`), od etapu 5 testów dokumentów i korpusu z wierszem pierwszego błędu (`out/compare/instances-goxsdgo-libxml2.tsv`), od etapu 6 pary kodów (`code-pairs-*.tsv`, polecenia `probe` i `compat`, `compat.tsv`) i wygenerowana lista rozbieżności `docs/differences-libxml2.md` (`-docs w3c`); od etapu 3 raport różnic względem `goxsdgo` i miejsca pierwszego błędu; każda różnica werdyktu w `differences.md` |
 | katalog i compat | `TestCatalogMatchesSource`, `TestCompatTable`, `TestErrorsDoc` (od etapu 6) | każdy kod emitowany w źródłach jest w katalogu `xsd/codes.go` i odwrotnie; każdy zwrócony błąd ma kod z katalogu i właściwe pola; każdy kod ma odpowiednik w kodach libxml2 (K8); `docs/errors.md` zgodny z katalogiem |
 | porównanie z innymi walidatorami | `tools/bench` (od 2026-11-25, osobny moduł; wynik w README, „Comparison”) | goxsdgo, knroy/go-xml v2.3.1, jacoelho/xsd v0.6.15 i cB-Sigma/xsd v1.0.0 jako czarne skrzynki przez publiczne API (bez czytania ich kodu, ADR 0002); ten sam harness i reguły zestawu W3C co `TestW3CSuite`, korpus MF, rozmiar programu i liczba linii, czas i pamięć na syntetycznym JPK (osobne procesy), próby bezpieczeństwa z ustawieniami domyślnymi; libxml2 z `tools/compare`; wyniki w `out/bench/` |
 | pakiet dowodów | `tools/evidence` (od etapu 8), `docs/evidence.md`, `docs/measurements.json` | K9: wynik ostatniego przebiegu testów, macierz wymaganie → test → wynik, tabela K1–K9 ze źródłami, sumy danych testowych; `go -C tools/evidence run . -root ../..` |
@@ -20,7 +20,7 @@
 | powtarzalność | `TestDeterministic` (od etapu 5, także walidacja współbieżna) | wielokrotna walidacja daje te same błędy w tej samej kolejności |
 | odporność | `FuzzCompile`, `FuzzValidate`, `FuzzContentModel` (automat porównywany z niezależnym, prostym dopasowaniem), `FuzzReader`, `FuzzRegexTranslate`, `FuzzLexical`, `FuzzDecimal`; kampania `tools/fuzz` (paczka dla serwera bez Go: `-pack`, dziennik: `-import`), dziennik godzin w `docs/fuzzing.md`; fuzzing według reguły z globalnego `CLAUDE.md` właściciela (Synology, lokalnie tylko w nocy na zasilaniu sieciowym) | dowolny schemat i dokument: bez paniki, czas ograniczony |
 | patologiczne | `TestPathological` (`internal/schema`: modele zawartości; `xsd`: wzorce, liczności, zagnieżdżenia, długie atrybuty i teksty, klucze, ID, wyliczenia, listy, symbole wieloznaczne, encje; iloraz czasów 2n/n ≤ 3,2; wejścia ponad limitem kończą się `ErrLimit`) | wzorce z zagnieżdżonymi powtórzeniami, `maxOccurs` w setkach tysięcy, głębokie zagnieżdżenia, tysiące kluczy: czas rośnie liniowo |
-| wydajność | `BenchmarkValidateJPK`, `BenchmarkCorpus`, `tools/compare private` i `timefile` | porównanie z libxml2 przez `goxsdval` (K7); korpus prywatny z `GOXSDGO_PRIVATE_CORPUS`, wyłącznie liczby zbiorcze |
+| wydajność | `BenchmarkValidateJPK`, `BenchmarkCorpus`, `tools/compare private` i `timefile` | porównanie z libxml2 przez `tools/compare` (K7); korpus prywatny z `GOXSDGO_PRIVATE_CORPUS`, wyłącznie liczby zbiorcze |
 | bez zmian wyników | `TestDumpErrors` (`GOXSDGO_DUMP_ERRORS`) | zrzut wszystkich błędów zestawu W3C i korpusu przed i po optymalizacji; różnica musi być pusta |
 
 ## CI i dane testowe
@@ -49,14 +49,15 @@ PKG_CONFIG_PATH=/opt/homebrew/opt/libxml2/lib/pkgconfig go run -tags libxml2 . w
 PKG_CONFIG_PATH=/opt/homebrew/opt/libxml2/lib/pkgconfig go run -tags libxml2 . corpus  # korpus MF
 ```
 
-Na Linuksie wystarczy `go run -tags libxml2 . w3c` (pakiet `libxml2-dev`). Moduł zależy od prywatnego
-`github.com/polestorm/goxsdval`, więc potrzebny jest dostęp do niego i `GOPRIVATE=github.com/polestorm/*`. Importy
+Na Linuksie wystarczy `go run -tags libxml2 . w3c` (pakiet `libxml2-dev`). Moduł ma własne, małe wiązanie cgo
+do libxml2 (`tools/compare/libxml2*.go`, z deklaracji publicznego API libxml2), więc wystarczy libxml2 z nagłówkami
+i pkg-config; do 2026-11-26 używał prywatnego `goxsdval`, z tymi samymi wynikami co do przypadku. Importy
 spod adresów w sieci (MF: crd.gov.pl, gov.pl; W3C: `xml.xsd`, `xlink.xsd`) rozwiązuje katalog XML zbudowany
 z manifestu.
 
-Przypadki W3C, których libxml2 przez `goxsdval` nie potrafi wykonać, są oznaczone jako nieporównywalne: 55 przypadków
+Przypadki W3C, których `tools/compare` nie wykonuje przez libxml2, są oznaczone jako nieporównywalne: 55 przypadków
 bez schematu w metadanych (schemat z `xsi:schemaLocation`) i 154 przypadki ze schematem z kilku dokumentów
-(`goxsdval` kompiluje schemat z jednego pliku).
+(`tools/compare` kompiluje schemat libxml2 z jednego pliku, jak wcześniej `goxsdval`).
 
 ## Pomiary
 

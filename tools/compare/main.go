@@ -1,4 +1,4 @@
-// Command compare uruchamia walidator odniesienia, libxml2 przez goxsdval, na tych samych danych co testy
+// Command compare uruchamia walidator odniesienia, libxml2 przez własne wiązanie cgo (libxml2*.go), na tych samych danych co testy
 // goxsdgo: zestawie W3C i korpusie MF (kryterium K3). libxml2 jest tu czarną skrzynką (docs/provenance.md).
 //
 // Moduł jest osobny, bo wymaga cgo i libxml2; biblioteka goxsdgo go nie importuje. Budowanie na macOS
@@ -12,8 +12,8 @@
 //	go run -tags libxml2 . compat     # łączy pary kodów i porównuje z xsd/compat.go (ADR 0009)
 //
 // Werdykty dla każdego przypadku, pary kodów i tabela compat trafiają do ../../out/compare/ (poza
-// repozytorium), raport na wyjście. compat czyta tłumaczenia odbiorcy z -messages (domyślnie
-// ../controls/goxsdval/messages/messages.json obok repozytorium).
+// repozytorium), raport na wyjście. compat zaznacza kody libxml2, które ma odbiorca
+// (testdata/libxml2-consumer-codes.tsv).
 package main
 
 import (
@@ -28,16 +28,14 @@ import (
 	"github.com/polestorm/goxsdgo/internal/testkit"
 	"github.com/polestorm/goxsdgo/internal/w3c"
 	"github.com/polestorm/goxsdgo/xsd"
-	"github.com/polestorm/goxsdval"
 )
 
 func main() {
 	root := flag.String("root", "../..", "goxsdgo repository root")
 	out := flag.String("out", "", "directory for per-case verdicts (default <root>/out/compare)")
-	messages := flag.String("messages", "", "consumer messages.json (default <root>/../controls/goxsdval/messages/messages.json)")
 	docs := flag.Bool("docs", false, "w3c: also write docs/differences-libxml2.md")
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "usage: compare [-root DIR] [-out DIR] [-docs] [-messages FILE] w3c|corpus|probe|compat|private|timefile")
+		fmt.Fprintln(os.Stderr, "usage: compare [-root DIR] [-out DIR] [-docs] w3c|corpus|probe|compat|private|timefile")
 		flag.PrintDefaults()
 	}
 	flag.Parse()
@@ -65,10 +63,7 @@ func main() {
 		}
 		err = runTimeFile(*root, flag.Arg(1), flag.Arg(2), runs)
 	case "compat":
-		if *messages == "" {
-			*messages = filepath.Join(*root, "..", "controls", "goxsdval", "messages", "messages.json")
-		}
-		err = runCompat(*root, *out, *messages)
+		err = runCompat(*root, *out)
 	default:
 		flag.Usage()
 		os.Exit(2)
@@ -106,7 +101,7 @@ func runW3C(root, out string, docs bool) error {
 	defer cleanup()
 	var (
 		current string
-		schema  *goxsdval.Schema
+		schema  *libSchema
 		perr    error
 	)
 	closeSchema := func() {
@@ -120,7 +115,7 @@ func runW3C(root, out string, docs bool) error {
 	// firstLine: wiersz pierwszego błędu libxml2 w dokumentach odrzuconych (K3: miejsce pierwszego błędu).
 	firstLine := map[string]int{}
 	// libErrs: błędy libxml2 dokumentów odrzuconych; libSchemaCode: pierwszy kod błędu schematu (tabela compat).
-	libErrs := map[string][]goxsdval.ValidationError{}
+	libErrs := map[string][]libError{}
 	libSchemaCode := map[string]int{}
 	for _, c := range cases {
 		if !c.InScope() {
@@ -131,22 +126,22 @@ func runW3C(root, out string, docs bool) error {
 			results[c.ID] = "not comparable: schema from xsi:schemaLocation"
 			continue
 		case len(c.SchemaDocs) > 1:
-			// goxsdval kompiluje schemat z jednego pliku; dokument zbiorczy zmieniłby znaczenie przypadku.
+			// libxml2 kompiluje tu schemat z jednego pliku; dokument zbiorczy zmieniłby znaczenie przypadku.
 			results[c.ID] = "not comparable: several schema documents"
 			continue
 		}
 		if key := c.SchemaDocs[0]; key != current {
 			closeSchema()
 			current = key
-			schema, perr = goxsdval.ParseSchemaFile(filepath.Join(suite, filepath.FromSlash(key)))
-			if errors.Is(perr, goxsdval.ErrNotEnabled) {
+			schema, perr = parseSchemaFile(filepath.Join(suite, filepath.FromSlash(key)))
+			if errors.Is(perr, errNotEnabled) {
 				return fmt.Errorf("%w (build with -tags libxml2)", perr)
 			}
 		}
 		if c.Kind == w3c.SchemaTest || perr != nil {
 			if perr != nil {
 				results[c.ID] = invalid
-				var spe *goxsdval.SchemaParseError
+				var spe *schemaParseError
 				if errors.As(perr, &spe) {
 					// Pierwszy błąd, nie ostrzeżenie: libxml2 poprzedza błędy schematu ostrzeżeniami (kod 100).
 					if e := firstError(spe.Errors); e.Code != 0 {
@@ -239,7 +234,7 @@ func runW3C(root, out string, docs bool) error {
 // dokument, wiersz pierwszego błędu (kryterium K3, od etapu 5). goxsdgo działa jak w TestW3CSuite: z włączonymi
 // wskazówkami xsi:schemaLocation, bo przypadki zestawu z nich korzystają.
 func compareInstanceTests(root, out string, cases []*w3c.Case, libxml2 map[string]verdict, libLine map[string]int,
-	libErrs map[string][]goxsdval.ValidationError, pairs *pairCounter) ([]difference, error) {
+	libErrs map[string][]libError, pairs *pairCounter) ([]difference, error) {
 	src, err := testkit.LoadSources(root)
 	if err != nil {
 		return nil, err
@@ -456,7 +451,7 @@ func runCorpus(root, out string) error {
 	sort.Strings(paths)
 	ok := 0
 	for _, p := range paths {
-		s, err := goxsdval.ParseSchemaFile(filepath.Join(abs, filepath.FromSlash(p)))
+		s, err := parseSchemaFile(filepath.Join(abs, filepath.FromSlash(p)))
 		if err != nil {
 			lines = append(lines, "schema:"+p+"\tinvalid\t"+oneLine(err.Error()))
 			fmt.Printf("schema %s: %v\n", p, err)
@@ -493,7 +488,7 @@ func runCorpus(root, out string) error {
 			continue
 		}
 		checked++
-		s, err := goxsdval.ParseSchemaFile(filepath.Join(abs, filepath.FromSlash(e.Schema)))
+		s, err := parseSchemaFile(filepath.Join(abs, filepath.FromSlash(e.Schema)))
 		if err != nil {
 			fmt.Printf("instance %s: schema %s: %v\n", e.Path, e.Schema, err)
 			continue
@@ -589,29 +584,29 @@ func loadCatalog(root, set, dir string) (func(), error) {
 		return nil, err
 	}
 	cleanup := func() { os.Remove(catalog) }
-	if err := goxsdval.LoadCatalogFile(catalog); err != nil {
+	if err := loadCatalogFile(catalog); err != nil {
 		cleanup()
 		return nil, err
 	}
 	return cleanup, nil
 }
 
-func hasErrors(errs []goxsdval.ValidationError) bool {
+func hasErrors(errs []libError) bool {
 	for _, e := range errs {
-		if e.Severity >= goxsdval.SeverityError {
+		if e.Severity >= sevError {
 			return true
 		}
 	}
 	return false
 }
 
-func firstError(errs []goxsdval.ValidationError) goxsdval.ValidationError {
+func firstError(errs []libError) libError {
 	for _, e := range errs {
-		if e.Severity >= goxsdval.SeverityError {
+		if e.Severity >= sevError {
 			return e
 		}
 	}
-	return goxsdval.ValidationError{}
+	return libError{}
 }
 
 func oneLine(s string) string { return strings.Join(strings.Fields(s), " ") }

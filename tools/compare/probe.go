@@ -9,7 +9,6 @@ import (
 	"unicode/utf16"
 
 	"github.com/polestorm/goxsdgo/xsd"
-	"github.com/polestorm/goxsdval"
 )
 
 // Próbki: małe dokumenty i schematy, każdy ma wywołać jeden kod goxsdgo, którego zestaw W3C i korpus nie
@@ -106,8 +105,8 @@ func runProbe(out string) error {
 				goCode = se.Errors[0].Code
 			}
 			lib := 0
-			s, lerr := goxsdval.ParseSchemaBytes([]byte(p.schema))
-			var spe *goxsdval.SchemaParseError
+			s, lerr := parseSchemaBytes([]byte(p.schema))
+			var spe *schemaParseError
 			if errors.As(lerr, &spe) {
 				lib = firstError(spe.Errors).Code
 			} else if s != nil {
@@ -128,7 +127,7 @@ func runProbe(out string) error {
 		} else if verr != nil {
 			goCode = "error: " + verr.Error()
 		}
-		s, err := goxsdval.ParseSchemaBytes([]byte(p.schema))
+		s, err := parseSchemaBytes([]byte(p.schema))
 		if err != nil {
 			return fmt.Errorf("probe %s: libxml2 rejects the schema: %w", p.code, err)
 		}
