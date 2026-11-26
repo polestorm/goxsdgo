@@ -19,6 +19,7 @@ type entity struct {
 
 type attDecl struct {
 	name   string
+	typ    string // AttrType* (wartości [attribute type] z XML Infoset)
 	cdata  bool
 	def    string
 	hasDef bool
@@ -388,14 +389,15 @@ func (r *Reader) attlistDecl() error {
 		if err := r.needSpace("after the attribute name"); err != nil {
 			return err
 		}
-		cdata, err := r.attType()
+		typ, err := r.attType()
 		if err != nil {
 			return err
 		}
+		cdata := typ == AttrTypeCDATA
 		if err := r.needSpace("before the default declaration"); err != nil {
 			return err
 		}
-		d := attDecl{name: name, cdata: cdata}
+		d := attDecl{name: name, typ: typ, cdata: cdata}
 		switch {
 		case r.keyword("#REQUIRED"), r.keyword("#IMPLIED"):
 		default:
@@ -424,48 +426,50 @@ func (r *Reader) attlistDecl() error {
 	}
 }
 
-// attType czyta [54] AttType; zwraca, czy to CDATA.
-func (r *Reader) attType() (bool, error) {
+// attType czyta [54] AttType; zwraca typ jako AttrType*.
+func (r *Reader) attType() (string, error) {
 	for _, k := range []string{"CDATA", "IDREFS", "IDREF", "ID", "ENTITIES", "ENTITY", "NMTOKENS", "NMTOKEN"} {
 		if r.keyword(k) {
-			return k == "CDATA", nil
+			return k, nil
 		}
 	}
+	typ := AttrTypeEnumeration
 	notation := r.keyword("NOTATION")
 	if notation {
+		typ = AttrTypeNotation
 		if err := r.needSpace("after NOTATION"); err != nil {
-			return false, err
+			return "", err
 		}
 	}
 	if !r.fill(1) || r.cur.buf[r.cur.pos] != '(' {
-		return false, r.syntaxOrEOF("attribute type", "attribute-list declaration")
+		return "", r.syntaxOrEOF("attribute type", "attribute-list declaration")
 	}
 	r.advance(1)
 	for {
 		if _, err := r.declSpace(); err != nil {
-			return false, err
+			return "", err
 		}
 		if notation {
 			if _, err := r.readName("notation name"); err != nil {
-				return false, err
+				return "", err
 			}
 		} else if err := r.nmtoken(); err != nil {
-			return false, err
+			return "", err
 		}
 		if _, err := r.declSpace(); err != nil {
-			return false, err
+			return "", err
 		}
 		if !r.fill(1) {
-			return false, r.eofErr("attribute-list declaration")
+			return "", r.eofErr("attribute-list declaration")
 		}
 		switch r.cur.buf[r.cur.pos] {
 		case ')':
 			r.advance(1)
-			return false, nil
+			return typ, nil
 		case '|':
 			r.advance(1)
 		default:
-			return false, r.errorf(CodeSyntax, `expected "|" or ")" in the enumeration`)
+			return "", r.errorf(CodeSyntax, `expected "|" or ")" in the enumeration`)
 		}
 	}
 }
@@ -766,6 +770,7 @@ func (d *dtd) applyAttlist(elem string, attrs *[]rawAttr, l, c int) {
 			a := &(*attrs)[i]
 			if a.name == decl.name {
 				found = true
+				a.typ = decl.typ
 				if !decl.cdata {
 					a.value = collapse(a.value)
 				}
@@ -776,7 +781,7 @@ func (d *dtd) applyAttlist(elem string, attrs *[]rawAttr, l, c int) {
 			if !decl.cdata {
 				v = collapse(v)
 			}
-			*attrs = append(*attrs, rawAttr{name: decl.name, value: v, line: l, column: c})
+			*attrs = append(*attrs, rawAttr{name: decl.name, typ: decl.typ, value: v, line: l, column: c})
 		}
 	}
 }

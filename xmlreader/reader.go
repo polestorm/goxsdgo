@@ -46,10 +46,28 @@ type Name struct {
 type Attr struct {
 	Name  Name
 	Value string // normalized (3.3.3), by the type declared in ATTLIST, if any
+	// Type is the type declared for the attribute in the internal subset (one of the AttrType* constants), or ""
+	// when it has no declaration that was processed.
+	Type string
 	// Specified is false for an attribute added from a default value in ATTLIST.
 	Specified    bool
 	Line, Column int
 }
+
+// Attribute types (Attr.Type): the values of the [attribute type] property of the XML Information Set, from the
+// attribute-list declarations of the internal subset.
+const (
+	AttrTypeCDATA       = "CDATA"
+	AttrTypeID          = "ID"
+	AttrTypeIDREF       = "IDREF"
+	AttrTypeIDREFS      = "IDREFS"
+	AttrTypeENTITY      = "ENTITY"
+	AttrTypeENTITIES    = "ENTITIES"
+	AttrTypeNMTOKEN     = "NMTOKEN"
+	AttrTypeNMTOKENS    = "NMTOKENS"
+	AttrTypeNotation    = "NOTATION"
+	AttrTypeEnumeration = "ENUMERATION"
+)
 
 // Token is one unit of the document. Attrs and Data are valid until the next call to Next.
 type Token struct {
@@ -159,6 +177,7 @@ type binding struct{ prefix, uri string }
 
 type rawAttr struct {
 	name         string
+	typ          string
 	value        string
 	specified    bool
 	line, column int
@@ -1056,7 +1075,7 @@ func (r *Reader) startTag(l, c int) (Token, error) {
 	if r.noNS {
 		el.name = Name{Local: name}
 		for _, a := range r.attrs {
-			r.out = append(r.out, Attr{Name: Name{Local: a.name}, Value: a.value, Specified: a.specified, Line: a.line, Column: a.column})
+			r.out = append(r.out, Attr{Name: Name{Local: a.name}, Value: a.value, Type: a.typ, Specified: a.specified, Line: a.line, Column: a.column})
 		}
 	} else {
 		var err error
@@ -1329,7 +1348,7 @@ func (r *Reader) namespaces(name string, l, c int) (Name, error) {
 		if r.duplicateExpanded(an) {
 			return Name{}, errorAt(CodeAttributesUnique, a.line, a.column, "attribute "+a.name+" has the same expanded name as another attribute")
 		}
-		r.out = append(r.out, Attr{Name: an, Value: a.value, Specified: a.specified, Line: a.line, Column: a.column})
+		r.out = append(r.out, Attr{Name: an, Value: a.value, Type: a.typ, Specified: a.specified, Line: a.line, Column: a.column})
 	}
 	return en, nil
 }
