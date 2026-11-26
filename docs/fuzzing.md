@@ -134,7 +134,7 @@ Paczka z `d8c4e60` (kod biblioteki jak w `51b65ae`), 7 fuzzerów po 203 min, 3 w
   rekomendacji XSD 1.0 2e, biblioteka stosuje oba przepisy dosłownie; niezmiennik testu dopuszcza ten przypadek
   (`timeAcrossMidnight`), opis w `docs/known-issues.md` (KI-12).
 - `FuzzRegexTranslate`, `(ab){0,999990}`: tłumaczenie i kompilacja RE2 2,2 s przy progu 2 s. Czas liniowy względem
-  rozmiaru rozwinięcia (0,4 s na Apple M4); próg był za ciasny na wolny sprzęt z trzema fuzzerami naraz. Próg 10 s.
+  rozmiaru rozwinięcia (0,4 s na Apple M4); próg był za ciasny na wolny sprzęt (na Synology z `nice -n 19` obok innej kampanii 6,5–8,4 s). Próg 60 s.
 
 Godziny nie liczą się do K5 dla v0.4.0: od `d8c4e60` zmienił się kod biblioteki (`xmlreader.Attr.Type`,
 `Config.Resolve`). Nowa kampania na `v0.4.0` (z poprawionymi niezmiennikami, kod biblioteki bez zmian): niżej.
