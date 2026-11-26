@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"runtime"
+	"runtime/debug"
 	"strings"
 	"testing"
 	"testing/fstest"
@@ -34,7 +36,11 @@ func TestPathological(t *testing.T) {
 				t.Fatalf("%s: %v", name, err)
 			}
 			best := time.Duration(1 << 62)
-			for i := 0; i < 3; i++ {
+			// Najlepszy z 5 przebiegów, bez odśmiecania w trakcie pomiaru: na współdzielonych maszynach CI
+			// odśmiecanie w przebiegu 2n zawyżało iloraz ponad próg, choć walidacja jest liniowa.
+			defer debug.SetGCPercent(debug.SetGCPercent(-1))
+			for i := 0; i < 5; i++ {
+				runtime.GC()
 				start := time.Now()
 				errs, err := set.Validate(strings.NewReader(doc))
 				d := time.Since(start)
