@@ -1,7 +1,6 @@
 # Moving from libxml2 to goxsdgo
 
-For programs that validate with libxml2 today (directly, through cgo, or through a wrapper such as
-[goxsdval](https://github.com/polestorm/goxsdval)) and translate or post-process its errors.
+For programs that validate with libxml2 today (directly, or through cgo in Go) and translate or post-process its errors.
 
 ## What an error carries
 

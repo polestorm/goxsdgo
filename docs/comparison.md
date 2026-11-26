@@ -55,7 +55,7 @@ are validators in pure Go, published in 2026.
     [jacoelho/xsd](https://github.com/jacoelho/xsd) 0.6.15, cB-Sigma is [cB-Sigma/xsd](https://github.com/cB-Sigma/xsd)
     1.0.0; libxml2 is 2.15.4.
 [^ref]: libxml2 is the reference validator throughout this project's tests (`tools/compare`, through
-    [goxsdval](https://github.com/polestorm/goxsdval), and `xmllint`). It and the other validators are only run
+    its C API, and `xmllint`). It and the other validators are only run
     as programs, through their public API; goxsdgo is written from the recommendations, not from the source code of
     other validators ([docs/provenance.md](provenance.md)).
 [^w3c]: The W3C XML Schema test suite at commit `7bc3365c`, every schema and instance test that applies to
@@ -86,7 +86,7 @@ are validators in pure Go, published in 2026.
     sides); Unicode-version cases are all already marked queried. Every case, its reason and each candidate's result
     are listed in [docs/contested-cases.md](contested-cases.md). On the contested cases themselves goxsdgo passes
     74 of 133 (90 with Fifth Edition names), knroy/go-xml 105, libxml2 72, cB-Sigma/xsd 72, jacoelho/xsd 68.
-[^libxml2run]: Counted by `tools/compare` through goxsdval, which compiles a schema from one file and does not
+[^libxml2run]: Counted by `tools/compare`, which compiles a schema from one file and does not
     follow hints: 209 cases (154 with several schema documents, 55 with hints only) cannot run and count as failed.
 [^mf]: The 170 schemas of `testdata/sources.json` with their imports, resolved from a local catalogue; the 8
     published MF samples and 7 synthetic documents of `testdata/instances/expected.json`. jacoelho/xsd stops at its

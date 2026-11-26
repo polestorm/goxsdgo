@@ -201,7 +201,7 @@ func runCompat(root, out string) error {
 }
 
 // readConsumerCodes czyta kody libxml2, dla których odbiorca ma tłumaczenia (testdata/libxml2-consumer-codes.tsv:
-// kod i opis rozdzielone tabulatorem, wiersze z # to komentarze).
+// jeden kod w wierszu, opcjonalnie z dalszymi kolumnami po tabulatorze; wiersze z # to komentarze).
 func readConsumerCodes(path string) (map[int]bool, error) {
 	b, err := os.ReadFile(path)
 	if err != nil {

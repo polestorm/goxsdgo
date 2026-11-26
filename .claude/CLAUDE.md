@@ -89,7 +89,7 @@ Zasady:
   (`go -C tools/bench run . -root ../.. publish`); żadnej liczby z korpusu prywatnego w porównaniu;
 - **komunikaty dla ludzi (EN/PL) są w prywatnym `../goxsdgo-messages`** (`github.com/polestorm/goxsdgo-messages`,
   wydzielone 2026-11-26 z historią); polskich tekstów komunikatów nie dopisujemy do tego repozytorium ani do jego
-  dokumentów, bo to przewaga produktu (decyzja właściciela). Nowy albo zmieniony kod w `xsd/codes.go` wymaga wpisu
+  dokumentów (decyzja właściciela). Nowy albo zmieniony kod w `xsd/codes.go` wymaga wpisu
   w `catalog.json` tamtego modułu w każdym języku, zanim odbiorca podbije zależność;
 - w katalogu głównym trzymamy tylko `README.md`, `LICENSE`, `NOTICE`, `go.mod` (i `.gitignore`); ten plik leży
   w `.claude/CLAUDE.md`.

@@ -20,8 +20,9 @@ scientific publications, may be used, with the source cited in a comment.
 
 We do not read, copy or port the code of XSD validators or of validating XML parsers: libxml2 (including
 `xmlschemas.c` and `xmlregexp.c`), Xerces (C and Java), Saxon, xmlschema (Python), lxml, go-libxml2, helium,
-xsd-validator, or their ports. This also covers [goxsdval](https://github.com/polestorm/goxsdval) beyond its public
-API: it wraps libxml2, so it may be called, but its `*_libxml2.go` files are not ported.
+xsd-validator, or their ports. This also covers goxsdval, our earlier cgo wrapper of libxml2, beyond its public API: it
+may be called, but its `*_libxml2.go` files are not ported; `tools/compare` has its own binding written from the
+public headers of libxml2.
 
 The list is not closed: it also covers newer XSD validators, including those written in Go (`knroy/go-xml`,
 `jacoelho/xsd`, `cB-Sigma/xsd`, `moolekkari/validatexml-go`), and local copies of libxml2 wrappers.
@@ -34,7 +35,7 @@ built. Once criteria K1 and K2 are met, competitors' code under a permissive lic
 
 ## What we may do
 
-- run libxml2 (through `goxsdval` or `xmllint`) and other validators as black boxes and compare verdicts and error
+- run libxml2 (through its C API in `tools/compare`, or `xmllint`) and other validators as black boxes and compare verdicts and error
   locations (`tools/compare`, `tools/bench`; the comparison is in [comparison.md](comparison.md));
 - read the user documentation of validators (descriptions of options, lists of known deviations);
 - read `encoding/xml` and `regexp` from the Go standard library (BSD, the same licence as the rest of a program's

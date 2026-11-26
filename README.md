@@ -42,8 +42,8 @@ libxml2 needs less memory (5 MB of process memory against 25 MB); jacoelho/xsd i
 
 ## Contents
 
-- [Why goxsdgo](#why-goxsdgo) · [Comparison](#comparison) · [Status](#status) · [Documentation](#documentation) ·
-  [Goals](#goals) · [License](#license)
+- [Why goxsdgo](#why-goxsdgo) · [Comparison](#comparison) · [Status](#status) · [Testing](#testing) ·
+  [Documentation](#documentation) · [Goals](#goals) · [License](#license)
 
 ## Comparison
 
@@ -96,6 +96,16 @@ instance tests, the MF corpus, safety probes, 20 MB and 1 GB documents, patholog
 
 - Feature complete for XSD 1.0; the API may still change before 1.0. Requires Go 1.22 or newer.
 - Acceptance criteria met, except 24 h of fuzzing (in progress): [docs/evidence.md](docs/evidence.md).
+
+## Testing
+
+```sh
+go -C tools/fetch run . -root ../..   # test data: W3C suites, MF schemas and samples, checked against SHA-256
+go test ./...                         # unit tests, the W3C suite, the MF corpus, requirements, streaming memory
+```
+
+Without the fetched data the suite and corpus tests are skipped. `python tools/fetch/fetch.py` does the same
+without Go. The comparison with other validators: [docs/methodology.md](docs/methodology.md).
 
 ## Documentation
 
