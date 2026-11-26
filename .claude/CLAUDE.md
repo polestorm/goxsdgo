@@ -68,12 +68,13 @@ Zasady:
   `python tools/fetch/fetch.py` według `testdata/sources.json`; nie trafiają do repozytorium (ADR 0003). Obie wersje
   narzędzia zmieniamy razem;
 - zapadki `testdata/**/*.ratchet` (`docs/testing.md`): po zmianie, która dodaje zaliczenia,
-  `go test ./xsd ./internal/datatypes ./internal/xmlreader -update` (flagę `-update` mają tylko pakiety z zapadkami); walidator odniesienia: `tools/compare` (polecenia w `docs/testing.md`);
+  `go test ./xsd ./internal/datatypes ./xmlreader -update` (flagę `-update` mają tylko pakiety z zapadkami); walidator odniesienia: `tools/compare` (polecenia w `docs/testing.md`);
 - **żadnych prawdziwych danych podatników ani klientów w korpusie**: tylko przykłady opublikowane przez MF i dokumenty
   syntetyczne (`testdata/README.md`);
 - nazwy plików, pakietów i identyfikatorów po angielsku; komentarze i dokumentacja po polsku; po angielsku: `README.md`,
-  `docs/comparison.md`, `docs/contested-cases.md` (generuje `tools/bench`), `docs/provenance.md`, `docs/migrating-from-libxml2.md`, `docs/methodology.md` i `docs/results/` (strony publiczne) oraz komentarze dokumentacyjne publicznego API
-  (opis pakietu, eksportowane typy, funkcje, metody, stałe, zmienne i pola struktur w `xsd/`), bo
+  `docs/comparison.md`, `docs/contested-cases.md` (generuje `tools/bench`), `docs/provenance.md`, `docs/migrating-from-libxml2.md`, `docs/methodology.md`, `docs/results/` i `xmlreader/README.md` (strony publiczne) oraz komentarze
+  dokumentacyjne publicznego API (opis pakietu, eksportowane typy, funkcje, metody, stałe, zmienne i pola struktur
+  w `xsd/` i `xmlreader/`), bo
   pokazuje je pkg.go.dev (decyzja właściciela z 2026-11-25, jak w gomdgo); komentarze wewnętrzne i pakiety
   `internal/` zostają po polsku;
   komunikaty błędów biblioteki po angielsku, ze stałym kodem do tłumaczenia przez wywołującego;
@@ -91,5 +92,8 @@ Zasady:
   wydzielone 2026-11-26 z historią); polskich tekstów komunikatów nie dopisujemy do tego repozytorium ani do jego
   dokumentów (decyzja właściciela). Nowy albo zmieniony kod w `xsd/codes.go` wymaga wpisu
   w `catalog.json` tamtego modułu w każdym języku, zanim odbiorca podbije zależność;
+- czytnik XML jest publicznym pakietem `xmlreader` (od 2026-11-26, wcześniej `internal/xmlreader`); jego porównanie
+  z `encoding/xml` (`TestStdlibConformance`, `BenchmarkJPK*`) podlega tej samej regule powtarzalności, wyniki
+  w `docs/results/xmlreader-*`;
 - w katalogu głównym trzymamy tylko `README.md`, `LICENSE`, `NOTICE`, `go.mod` (i `.gitignore`); ten plik leży
   w `.claude/CLAUDE.md`.

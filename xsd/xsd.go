@@ -13,7 +13,7 @@ import (
 	"github.com/polestorm/goxsdgo/internal/schema"
 	"github.com/polestorm/goxsdgo/internal/validate"
 	"github.com/polestorm/goxsdgo/internal/xmlchars"
-	"github.com/polestorm/goxsdgo/internal/xmlreader"
+	"github.com/polestorm/goxsdgo/xmlreader"
 )
 
 // DocumentLimits are the limits for reading a validated document (Config.Document). They guard against hostile

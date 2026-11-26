@@ -1,5 +1,5 @@
 // Package validate waliduje dokument XML według skompilowanego schematu (XSD 1.0 Second Edition, część 1,
-// rozdział 3: Validation Rules, i rozdział 5) strumieniowo: w jednym przejściu czytnika internal/xmlreader, bez
+// rozdział 3: Validation Rules, i rozdział 5) strumieniowo: w jednym przejściu czytnika xmlreader, bez
 // budowania drzewa. Pamięć zależy od głębokości dokumentu, od tabel ID/IDREF i od ograniczeń tożsamości, nie od
 // rozmiaru pliku (ADR 0008).
 //
@@ -18,7 +18,7 @@ import (
 	"github.com/polestorm/goxsdgo/internal/datatypes"
 	"github.com/polestorm/goxsdgo/internal/schema"
 	"github.com/polestorm/goxsdgo/internal/xmlchars"
-	"github.com/polestorm/goxsdgo/internal/xmlreader"
+	"github.com/polestorm/goxsdgo/xmlreader"
 )
 
 // Hint to wskazówka lokalizacji schematu z xsi:schemaLocation (para przestrzeń, adres) albo

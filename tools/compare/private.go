@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/polestorm/goxsdgo/internal/testkit"
-	"github.com/polestorm/goxsdgo/internal/xmlreader"
+	"github.com/polestorm/goxsdgo/xmlreader"
 	"github.com/polestorm/goxsdgo/xsd"
 )
 

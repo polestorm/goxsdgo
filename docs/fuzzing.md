@@ -58,7 +58,7 @@ go -C tools/fuzz run . -root ../.. -import /ścieżka/do/journal.tsv   # wynik z
 
 | Fuzzer | Pakiet | Niezmienniki |
 |---|---|---|
-| `FuzzReader` | `internal/xmlreader` | brak paniki; czytanie się kończy; pozycje tokenów i błędów w granicach wejścia; błąd zawsze typu `*Error` |
+| `FuzzReader` | `xmlreader` (do 2026-11-26 `internal/xmlreader`) | brak paniki; czytanie się kończy; pozycje tokenów i błędów w granicach wejścia; błąd zawsze typu `*Error` |
 | `FuzzRegexTranslate` | `internal/regex` | brak paniki; wynik tłumaczenia kompiluje się w RE2 albo daje `regex-too-large`; czas tłumaczenia ograniczony |
 | `FuzzLexical` | `internal/datatypes` | postać kanoniczna należy do przestrzeni leksykalnej, oznacza tę samą wartość i jest stała |
 | `FuzzDecimal` | `internal/datatypes` | `Decimal` zgodny z niezależnym wzorcem na `big.Rat`: przyjęcie literału, porządek, znak, postać kanoniczna, liczba cyfr, jednoznaczna reprezentacja |

@@ -81,3 +81,6 @@ wartości domyślne, typy atrybutów), nie sprawdza ograniczeń przestrzeni nazw
 − ok. 2,7 tys. linii własnego kodu (bez testów) do utrzymania;
 − dokumenty z encjami zewnętrznymi są odrzucane; dla JPK, KSeF i e-Sprawozdań to bez znaczenia, ale trzeba to
   opisać w `differences.md`.
+
+**Uzupełnienie 2026-11-26.** Czytnik jest publicznym pakietem `xmlreader` (decyzja właściciela): bez zmian w kodzie,
+z angielską dokumentacją API i porównaniem z `encoding/xml` w `xmlreader/README.md`. Moduł nadal nie ma zależności.

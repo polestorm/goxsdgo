@@ -19,8 +19,8 @@ import (
 var update = flag.Bool("update", false, "rewrite the ratchet file testdata/w3c/xmlconf.ratchet")
 
 const (
-	xmlconfRoot    = "../../testdata/w3c/xmlconf"
-	xmlconfRatchet = "../../testdata/w3c/xmlconf.ratchet"
+	xmlconfRoot    = "../testdata/w3c/xmlconf"
+	xmlconfRatchet = "../testdata/w3c/xmlconf.ratchet"
 )
 
 // confTest to jeden przypadek zestawu W3C XML Conformance (element TEST, testcases.dtd).
@@ -230,7 +230,7 @@ func TestXMLConformance(t *testing.T) {
 		}
 	}
 
-	testkit.Ratchet(t, xmlconfRatchet, "W3C XML Conformance (TestXMLConformance, go test ./internal/xmlreader -update).",
+	testkit.Ratchet(t, xmlconfRatchet, "W3C XML Conformance (TestXMLConformance, go test ./xmlreader -update).",
 		inScope, passed, *update)
 }
 

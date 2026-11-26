@@ -109,6 +109,30 @@ is taken from `PATH` or given with `-xmllint`. Give it explicitly: macOS ships a
 `XMLLINT=/opt/homebrew/opt/libxml2/bin/xmllint`. `environment-perf.json` records the version that was used. `tools/bench` builds with Go 1.27 because jacoelho/xsd requires it.
 Results land in `out/` (not committed) until `publish` copies them.
 
+## XML reader
+
+The comparison of [`xmlreader`](../xmlreader/README.md) with `encoding/xml` (Go standard library, default
+settings, `Strict` on) is run by the tests of the package, on inputs fetched by `tools/fetch` (the W3C XML
+Conformance suite, `w3c-xmlconf` in `testdata/sources.json`) and on a generated document:
+
+```sh
+go test ./xmlreader -run TestStdlibConformance -v -stdlib-out ../docs/results/xmlreader-conformance.tsv
+go test ./xmlreader -run '^$' -bench 'BenchmarkJPK' -benchmem -count 5
+```
+
+- **Conformance**: the in-scope cases of `TestXMLConformance` (XML 1.0 Fifth Edition, Namespaces 1.0, no external
+  entities; the exclusions and their counts are printed by `go test ./xmlreader -run TestXMLConformance -v`). A
+  well-formed case (`valid`, `invalid`) passes when the reader reads the whole document without an error;
+  for xmlreader also with the suite's canonical form where it has one. A `not-wf` case passes when the reader
+  rejects the document. encoding/xml is read with `Token`, which resolves namespaces.
+- **Speed and memory**: `BenchmarkJPK` (xmlreader), `BenchmarkJPKStdlib` (`Token`) and `BenchmarkJPKStdlibRaw`
+  (`RawToken`, without namespace resolution) read the same deterministic document of 20,000 JPK-like rows
+  (8.8 MB, generated in memory by `jpkLike` in `xmlreader/reader_test.go`), one goroutine; the table gives the
+  median of 5 runs of `MB/s`, and `B/op` and `allocs/op` from the same output.
+- Raw results: [`results/xmlreader-conformance.tsv`](results/xmlreader-conformance.tsv) (each case, both readers)
+  and [`results/xmlreader-bench.txt`](results/xmlreader-bench.txt) (the `go test` output with date, commit, Go
+  version and machine).
+
 ## Known limits of the numbers
 
 - The W3C rows count verdicts only, not error codes or positions.

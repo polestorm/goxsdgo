@@ -1,8 +1,18 @@
-// Package xmlreader to strumieniowy czytnik XML 1.0 (Fifth Edition) z przestrzeniami nazw (Namespaces in XML 1.0,
-// Third Edition), napisany z tekstu rekomendacji. Sprawdza pełną dobrą formę i ograniczenia przestrzeni nazw,
-// podaje wiersz i kolumnę każdego tokenu i błędu, nigdy nie czyta encji zewnętrznych i pilnuje limitów
-// (ADR 0004). Nie waliduje według DTD; z podzbioru wewnętrznego bierze tylko to, czego rekomendacja wymaga od
-// procesora bez walidacji (rozdział 5.1): encje wewnętrzne, wartości domyślne i typy atrybutów, notacje.
+// Package xmlreader is a streaming XML 1.0 (Fifth Edition) reader with namespaces (Namespaces in XML 1.0, Third
+// Edition), written from the text of the recommendations. It is the reader goxsdgo validates with, and it can be
+// used on its own.
+//
+// It checks every well-formedness and namespace constraint (1725 of the 1727 in-scope cases of the W3C XML
+// Conformance suite), gives the line and column of every token and error, reports errors with a fixed code (the
+// Code* constants), never reads external entities or the network, and enforces limits on depth, names,
+// attributes, text and entity expansion (Limits). It does not validate against a DTD; from the internal subset it
+// takes what the recommendation requires of a non-validating processor (section 5.1): internal entities, default
+// values and types of attributes, notations.
+//
+// Tokens are not copied: the Attrs and Data of a Token are valid until the next call to Next. Memory does not grow
+// with the size of the document, only with its depth and the size of its largest token.
+//
+// Supported encodings: UTF-8, UTF-16 (LE and BE), ISO-8859-1 and US-ASCII.
 package xmlreader
 
 import (
@@ -12,7 +22,7 @@ import (
 	"unicode/utf8"
 )
 
-// Kind to rodzaj tokenu.
+// Kind is the kind of a token.
 type Kind uint8
 
 const (
@@ -24,51 +34,55 @@ const (
 	KindDoctype
 )
 
-// Name to nazwa po rozwiązaniu przestrzeni nazw. Bez przetwarzania przestrzeni nazw (Options.NoNamespaces)
-// Local zawiera całą nazwę, a Space i Prefix są puste.
+// Name is a name after namespace resolution: Space is the namespace name, Local the local part, Prefix the prefix
+// as written. Without namespace processing (Options.NoNamespaces) Local holds the whole name and Space and Prefix
+// are empty.
 type Name struct {
 	Space, Local, Prefix string
 }
 
-// Attr to atrybut elementu. Deklaracje przestrzeni nazw (xmlns, xmlns:p) nie są atrybutami: udostępnia je
-// LookupNamespace.
+// Attr is an attribute of an element. Namespace declarations (xmlns, xmlns:p) are not attributes; see
+// LookupNamespace and DeclaredNamespaces.
 type Attr struct {
 	Name  Name
-	Value string // po normalizacji (3.3.3), według typu z ATTLIST, jeśli był zadeklarowany
-	// Specified jest fałszywe dla atrybutu dodanego z wartości domyślnej w ATTLIST.
+	Value string // normalized (3.3.3), by the type declared in ATTLIST, if any
+	// Specified is false for an attribute added from a default value in ATTLIST.
 	Specified    bool
 	Line, Column int
 }
 
-// Token to jedna jednostka dokumentu. Attrs i Data są ważne do następnego wywołania Next.
+// Token is one unit of the document. Attrs and Data are valid until the next call to Next.
 type Token struct {
 	Kind  Kind
-	Name  Name // element; KindProcInst: Local to cel PI; KindDoctype: Local to nazwa z DOCTYPE
+	Name  Name // the element; KindProcInst: Local is the PI target; KindDoctype: Local is the name in DOCTYPE
 	Attrs []Attr
-	// Data: tekst (KindText), treść komentarza albo dane PI (bez początkowych białych znaków).
+	// Data is the text (KindText), the content of a comment, or the data of a PI (without leading white space).
 	Data []byte
-	// CDATA: tekst pochodzi z sekcji CDATA. Whitespace: tekst składa się wyłącznie ze znaków S ([3]).
+	// CDATA: the text comes from a CDATA section. Whitespace: the text consists of S characters ([3]) only.
 	CDATA, Whitespace bool
-	// SelfClosing: znacznik pustego elementu; następny token to jego KindEndElement.
-	SelfClosing  bool
+	// SelfClosing: an empty-element tag; the next token is its KindEndElement.
+	SelfClosing bool
+	// Line and Column are the position of the first character of the token, from 1; the column counts characters.
 	Line, Column int
-	// EndLine i EndColumn (KindStartElement): pozycja tuż za końcem znacznika początkowego („>” albo „/>”).
-	// Walidacja XSD wskazuje nią element w błędach, tak jak libxml2 (ADR 0008).
+	// EndLine and EndColumn (KindStartElement): the position just after the end of the start tag (">" or "/>").
+	// goxsdgo reports element errors at this position, as libxml2 does.
 	EndLine, EndColumn int
 }
 
-// Limits to limity czytnika. Zero oznacza wartość domyślną (DefaultLimits), wartość ujemna brak limitu.
+// Limits are the limits of the reader. Zero means the default (DefaultLimits), a negative value no limit.
+// Exceeding a limit is an *Error with a limit-* code.
 type Limits struct {
-	MaxDepth           int // głębokość zagnieżdżenia elementów
-	MaxNameLength      int // długość nazwy w bajtach UTF-8
-	MaxAttributes      int // atrybuty jednego elementu, łącznie z deklaracjami przestrzeni nazw
-	MaxTextSize        int // jeden token tekstu, komentarza albo PI, w bajtach
-	MaxEntityExpansion int // łączna długość tekstu zastępczego rozwiniętych encji w dokumencie, w bajtach
-	MaxEntityDepth     int // zagnieżdżenie odwołań do encji
-	MaxDTDSize         int // długość deklaracji DOCTYPE z podzbiorem wewnętrznym, w bajtach
+	MaxDepth           int // nesting of elements
+	MaxNameLength      int // length of a name in UTF-8 bytes
+	MaxAttributes      int // attributes of one element, namespace declarations included
+	MaxTextSize        int // one text, comment or PI token, in bytes
+	MaxEntityExpansion int // total length of the replacement text of expanded entities, in bytes
+	MaxEntityDepth     int // nesting of entity references
+	MaxDTDSize         int // length of the DOCTYPE declaration with its internal subset, in bytes
 }
 
-// DefaultLimits to bezpieczne wartości domyślne (ADR 0004).
+// DefaultLimits returns the default limits: depth 512, names 16 KiB, 4096 attributes, text tokens 16 MiB, entity
+// expansion 4 MiB in total, entity nesting 32, DOCTYPE 1 MiB.
 func DefaultLimits() Limits {
 	return Limits{
 		MaxDepth:           512,
@@ -103,15 +117,15 @@ func (l Limits) withDefaults() Limits {
 	}
 }
 
-// Options ustawia czytnik. Wartość zerowa to ustawienia domyślne.
+// Options configure a Reader. The zero value is the default.
 type Options struct {
 	Limits Limits
-	// NoNamespaces wyłącza przetwarzanie przestrzeni nazw (sama dobra forma XML 1.0). Walidacja XSD zawsze
-	// przetwarza przestrzenie nazw; opcja służy testom zgodności XML 1.0.
+	// NoNamespaces turns off namespace processing: only XML 1.0 well-formedness is checked, and colons in names
+	// have no meaning.
 	NoNamespaces bool
 }
 
-// Notation to deklaracja notacji z podzbioru wewnętrznego.
+// Notation is a notation declared in the internal subset.
 type Notation struct {
 	Name, PublicID, SystemID string
 	HasPublic, HasSystem     bool
@@ -150,7 +164,7 @@ type rawAttr struct {
 	line, column int
 }
 
-// Reader czyta dokument XML token po tokenie.
+// Reader reads an XML document token by token.
 type Reader struct {
 	in     *input
 	lim    Limits
@@ -188,7 +202,7 @@ type Reader struct {
 	bomUTF8    bool
 }
 
-// New zwraca czytnik dokumentu z r.
+// New returns a Reader of the document in r. Reads from r are buffered.
 func New(r io.Reader, opts Options) *Reader {
 	rd := &Reader{
 		in:    newInput(r),
@@ -205,8 +219,9 @@ func New(r io.Reader, opts Options) *Reader {
 	return rd
 }
 
-// Next zwraca następny token albo io.EOF na końcu dokumentu. Błąd dobrej formy ma typ *Error; po pierwszym
-// błędzie Next zwraca stale ten sam błąd.
+// Next returns the next token, or io.EOF at the end of the document. Well-formedness and namespace errors and
+// exceeded limits are an *Error; a read error of r is returned as it is. After the first error Next returns the
+// same error.
 func (r *Reader) Next() (Token, error) {
 	if r.err != nil {
 		return Token{}, r.err
@@ -218,8 +233,8 @@ func (r *Reader) Next() (Token, error) {
 	return t, err
 }
 
-// LookupNamespace zwraca przestrzeń nazw przypisaną prefiksowi w zasięgu bieżącego elementu (po KindStartElement:
-// tego elementu, po KindEndElement: jego rodzica). Pusty prefiks to przestrzeń domyślna.
+// LookupNamespace returns the namespace bound to prefix in the scope of the current element (after
+// KindStartElement: that element; after KindEndElement: its parent). The empty prefix is the default namespace.
 func (r *Reader) LookupNamespace(prefix string) (string, bool) {
 	if prefix == "xml" {
 		return nsXML, true
@@ -232,13 +247,12 @@ func (r *Reader) LookupNamespace(prefix string) (string, bool) {
 	return "", false
 }
 
-// Binding to deklaracja przestrzeni nazw: prefiks (pusty dla przestrzeni domyślnej) i jej nazwa (pusta, gdy
-// deklaracja xmlns="" znosi przestrzeń domyślną).
+// Binding is a namespace declaration: the prefix (empty for the default namespace) and the namespace name (empty
+// when xmlns="" undeclares the default namespace).
 type Binding struct{ Prefix, URI string }
 
-// DeclaredNamespaces zwraca deklaracje przestrzeni nazw z bieżącego elementu (po KindStartElement), w kolejności
-// z dokumentu. Wynik jest kopią. Wczytanie schematu potrzebuje go, żeby zachować [in-scope namespaces] każdego
-// elementu dokumentu schematu dla wartości typu QName (XSD część 1, 3.15.3).
+// DeclaredNamespaces returns the namespace declarations of the current element (after KindStartElement), in
+// document order. The result is a copy and stays valid.
 func (r *Reader) DeclaredNamespaces() []Binding {
 	if len(r.stack) == 0 {
 		return nil
@@ -254,10 +268,10 @@ func (r *Reader) DeclaredNamespaces() []Binding {
 	return out
 }
 
-// Notations zwraca notacje zadeklarowane w podzbiorze wewnętrznym, w kolejności deklaracji.
+// Notations returns the notations declared in the internal subset, in declaration order.
 func (r *Reader) Notations() []Notation { return r.dtd.notations }
 
-// UnparsedEntity mówi, czy name to zadeklarowana encja nieparsowana (dla typów ENTITY i ENTITIES w XSD).
+// UnparsedEntity reports whether name is a declared unparsed entity (for the XSD types ENTITY and ENTITIES).
 func (r *Reader) UnparsedEntity(name string) bool {
 	e := r.dtd.general[name]
 	return e != nil && e.ndata != ""

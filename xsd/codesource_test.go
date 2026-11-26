@@ -27,7 +27,11 @@ func sourceCodes(t *testing.T) map[string]string {
 	var pkgs []pkgFiles
 	consts := map[string]map[string]string{} // pakiet → nazwa stałej → wartość
 	for _, p := range codePackages {
-		matches, err := filepath.Glob(filepath.Join("..", "internal", p, "*.go"))
+		dir := filepath.Join("..", "internal", p)
+		if p == "xmlreader" { // publiczny od 2026-11-26
+			dir = filepath.Join("..", p)
+		}
+		matches, err := filepath.Glob(filepath.Join(dir, "*.go"))
 		if err != nil {
 			t.Fatal(err)
 		}

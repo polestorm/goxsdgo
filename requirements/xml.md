@@ -1,9 +1,9 @@
 # Wymagania: czytnik XML
 
-Pakiet `internal/xmlreader`. Decyzje: `docs/adr/0004-xml-reader.md`. Źródła: Extensible Markup Language (XML) 1.0
+Pakiet `xmlreader` (publiczny od 2026-11-26). Decyzje: `docs/adr/0004-xml-reader.md`. Źródła: Extensible Markup Language (XML) 1.0
 Fifth Edition (W3C, 2008-11-26) i Namespaces in XML 1.0 Third Edition (W3C, 2009-12-08). Numery w nawiasach
 kwadratowych to produkcje gramatyki XML 1.0. Testy tych wymagań to `TestXMLConformance` (zestaw W3C XML Conformance)
-i testy jednostkowe w `internal/xmlreader/reader_test.go`.
+i testy jednostkowe w `xmlreader/reader_test.go`.
 
 | Id | Wymaganie |
 |---|---|

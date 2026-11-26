@@ -42,8 +42,8 @@ libxml2 needs less memory (5 MB of process memory against 25 MB); jacoelho/xsd i
 
 ## Contents
 
-- [Why goxsdgo](#why-goxsdgo) · [Comparison](#comparison) · [Status](#status) · [Testing](#testing) ·
-  [Documentation](#documentation) · [Goals](#goals) · [License](#license)
+- [Why goxsdgo](#why-goxsdgo) · [Comparison](#comparison) · [XML reader](#xml-reader) · [Status](#status) ·
+  [Testing](#testing) · [Documentation](#documentation) · [Goals](#goals) · [License](#license)
 
 ## Comparison
 
@@ -91,6 +91,13 @@ instance tests, the MF corpus, safety probes, 20 MB and 1 GB documents, patholog
 [^pop]: Stars on 2026-11-26 (`gh api repos/OWNER/REPO`); libxml2 is developed on GNOME's GitLab, the count is of
     its GitHub mirror `GNOME/libxml2`.
 [^tree]: Builds a tree of the whole document (11× and 22× the file size in memory), so not run on 200 MB.
+
+## XML reader
+
+The streaming XML reader goxsdgo validates with is a public package of its own,
+[`xmlreader`](xmlreader/): XML 1.0 and namespaces checked in full (1725 of 1727 W3C XML Conformance cases against
+1146 for `encoding/xml`), line, column and a fixed code for every error, limits on by default, and about twice the
+speed of `encoding/xml` with almost no allocations. Comparison and examples: [xmlreader/README.md](xmlreader/README.md).
 
 ## Status
 

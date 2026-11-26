@@ -1,4 +1,4 @@
-# W3C XML Conformance (TestXMLConformance, go test ./internal/xmlreader -update).
+# W3C XML Conformance (TestXMLConformance, go test ./xmlreader -update).
 # in scope 1727, passing 1725
 # mode: failing
 eduni/rmt-e3e-13

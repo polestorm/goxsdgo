@@ -1,0 +1,26 @@
+# go test ./xmlreader -run '^$' -bench 'BenchmarkJPK' -benchmem -count 5
+# date: 2026-11-26T16:44Z
+# goxsdgo: 516cbc0 with the uncommitted move of internal/xmlreader to xmlreader (reader code unchanged)
+# go version go1.26.6 darwin/arm64
+# macOS 27.0.1, load average  2,13 2,24 2,33 
+goos: darwin
+goarch: arm64
+pkg: github.com/polestorm/goxsdgo/xmlreader
+cpu: Apple M4
+BenchmarkJPK-10             	      28	  42271372 ns/op	 208.66 MB/s	  149249 B/op	      67 allocs/op
+BenchmarkJPK-10             	      27	  42615810 ns/op	 206.97 MB/s	  149263 B/op	      67 allocs/op
+BenchmarkJPK-10             	      27	  42663323 ns/op	 206.74 MB/s	  149263 B/op	      67 allocs/op
+BenchmarkJPK-10             	      27	  42695302 ns/op	 206.59 MB/s	  148960 B/op	      67 allocs/op
+BenchmarkJPK-10             	      27	  42937073 ns/op	 205.43 MB/s	  148959 B/op	      67 allocs/op
+BenchmarkJPKStdlib-10       	      12	  98199257 ns/op	  89.82 MB/s	45929431 B/op	 1260063 allocs/op
+BenchmarkJPKStdlib-10       	      12	 106097243 ns/op	  83.13 MB/s	45929466 B/op	 1260063 allocs/op
+BenchmarkJPKStdlib-10       	      12	  98173764 ns/op	  89.84 MB/s	45928997 B/op	 1260063 allocs/op
+BenchmarkJPKStdlib-10       	      12	  97656038 ns/op	  90.32 MB/s	45928969 B/op	 1260062 allocs/op
+BenchmarkJPKStdlib-10       	      12	  98606812 ns/op	  89.45 MB/s	45928978 B/op	 1260062 allocs/op
+BenchmarkJPKStdlibRaw-10    	      13	  88827080 ns/op	  99.30 MB/s	28647733 B/op	  900046 allocs/op
+BenchmarkJPKStdlibRaw-10    	      12	  89743767 ns/op	  98.28 MB/s	28647872 B/op	  900047 allocs/op
+BenchmarkJPKStdlibRaw-10    	      13	  89161974 ns/op	  98.93 MB/s	28647867 B/op	  900048 allocs/op
+BenchmarkJPKStdlibRaw-10    	      13	  88861503 ns/op	  99.26 MB/s	28647780 B/op	  900047 allocs/op
+BenchmarkJPKStdlibRaw-10    	      13	  88379199 ns/op	  99.80 MB/s	28647775 B/op	  900047 allocs/op
+PASS
+ok  	github.com/polestorm/goxsdgo/xmlreader	20.655s

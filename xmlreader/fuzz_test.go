@@ -27,7 +27,7 @@ func FuzzReader(f *testing.F) {
 	for _, dir := range []struct {
 		path string
 		max  int
-	}{{"../../testdata/instances/mf", 20}, {"../../testdata/schemas/mf", 30}, {"../../testdata/w3c/xmlconf", 150}} {
+	}{{"../testdata/instances/mf", 20}, {"../testdata/schemas/mf", 30}, {"../testdata/w3c/xmlconf", 150}} {
 		for _, b := range testkit.SampleFiles(dir.path, []string{".xml", ".xsd"}, dir.max, 128<<10) {
 			f.Add(b)
 		}
