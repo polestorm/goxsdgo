@@ -45,11 +45,11 @@ are validators in pure Go, published in 2026.
 | `key`, `xsi:type`, subst. groups | yes 🥇 | yes 🥇 | yes 🥇 | yes 🥇 | yes 🥇 |
 | `xsi:schemaLocation` hints | opt-in | yes | opt-in | no | opt-in |
 | XSD 1.1 | no | no | yes 🥇 | no | no |
-| Error code[^err] | W3C rule 🥇 | number | W3C rule 🥇 | own | category |
-| Line, column, path | all 🥇 | line, name | all 🥇 | all 🥇 | line, path |
+| Error code[^err] | W3C 🥇 | number | W3C 🥇 | own | category |
+| Error col, line, path | all 🥇 | line, name | all 🥇 | all 🥇 | line, path |
 | Error details[^details] | fields 🥇 | in text | in text | in text | in text |
 | License | Apache 2.0 | MIT | MIT | MIT | Apache 2.0 |
-| GitHub stars[^pop] | new | 771 (mirror) | 8 | 3 | 0 |
+| GitHub stars[^pop] | new | 771 (mirror) 🥇 | 8 | 3 | 0 |
 
 [^names]: knroy is [knroy/go-xml](https://github.com/knroy/go-xml) 2.3.1, jacoelho is
     [jacoelho/xsd](https://github.com/jacoelho/xsd) 0.6.15, cB-Sigma is [cB-Sigma/xsd](https://github.com/cB-Sigma/xsd)
@@ -118,7 +118,7 @@ are validators in pure Go, published in 2026.
 [^feat]: Small schemas and documents with a known verdict; "yes" means the verdict was right. For XSD 1.1, a
     schema with `xs:assert`: knroy/go-xml supports XSD 1.1 through an option.
 [^err]: The same invalid document (a missing element and a wrong value) through each public API.
-[^pop]: Stars on 2026-11-25; libxml2 is developed on GNOME's GitLab, the count is of its GitHub mirror.
+[^pop]: Stars on 2026-11-26 (`gh api repos/OWNER/REPO`); libxml2 is developed on GNOME's GitLab, the count is of its GitHub mirror.
 
 Where the suite's expectation is contested (queried or disputed in its own metadata, dependent on the XML edition
 or the Unicode version, or contradictory within the suite), goxsdgo follows the text of the recommendation; each

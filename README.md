@@ -61,10 +61,11 @@ All of them were run as programs through their public API, on the same cases and
 | Time, 200 MB XML[^perf] | 4.00 s | 3.90 s | —[^tree] | 3.75 s 🥇 | —[^tree] |
 | Memory, 200 MB XML | 25 MB | 5 MB 🥇 | — | 22 MB | — |
 | XSD 1.1 | no | no | yes 🥇 | no | no |
-| Error code | W3C rule 🥇 | number | W3C rule 🥇 | own | category |
-| Line, column, path of an error | all | line, name | all | all | line, path |
+| Error code | W3C 🥇 | number | W3C 🥇 | own | category |
+| Error col, line, path | all | line, name | all | all | line, path |
 | Error details[^details] | fields 🥇 | in text | in text | in text | in text |
 | License | Apache 2.0 | MIT | MIT | MIT | Apache 2.0 |
+| GitHub stars[^pop] | new | 771 (mirror) 🥇 | 8 | 3 | 0 |
 
 🥇 marks the best value in a row, when no more than two candidates share it. The full comparison (schema and
 instance tests, the MF corpus, safety probes, 20 MB and 1 GB documents, pathological patterns, `xs:redefine`,
@@ -87,6 +88,8 @@ instance tests, the MF corpus, safety probes, 20 MB and 1 GB documents, patholog
 [^perf]: A synthetic file in the JPK_V7M(3) format (a Polish VAT report), generated from a published sample;
     schema compiled and file validated in a fresh process; median of 5 runs, wall time and process memory; one
     Apple M4 laptop ([docs/methodology.md](docs/methodology.md)).
+[^pop]: Stars on 2026-11-26 (`gh api repos/OWNER/REPO`); libxml2 is developed on GNOME's GitLab, the count is of
+    its GitHub mirror `GNOME/libxml2`.
 [^tree]: Builds a tree of the whole document (11× and 22× the file size in memory), so not run on 200 MB.
 
 ## Status
