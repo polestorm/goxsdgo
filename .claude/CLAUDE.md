@@ -70,8 +70,8 @@ Zasady:
 - **żadnych prawdziwych danych podatników ani klientów w korpusie**: tylko przykłady opublikowane przez MF i dokumenty
   syntetyczne (`testdata/README.md`);
 - nazwy plików, pakietów i identyfikatorów po angielsku; komentarze i dokumentacja po polsku; po angielsku: `README.md`,
-  `docs/comparison.md` i `docs/provenance.md` (strony publiczne) oraz komentarze dokumentacyjne publicznego API
-  (opis pakietu, eksportowane typy, funkcje, metody, stałe, zmienne i pola struktur w `xsd/` i `messages/`), bo
+  `docs/comparison.md`, `docs/provenance.md` i `docs/migrating-from-libxml2.md` (strony publiczne) oraz komentarze dokumentacyjne publicznego API
+  (opis pakietu, eksportowane typy, funkcje, metody, stałe, zmienne i pola struktur w `xsd/`), bo
   pokazuje je pkg.go.dev (decyzja właściciela z 2026-11-25, jak w gomdgo); komentarze wewnętrzne i pakiety
   `internal/` zostają po polsku;
   komunikaty błędów biblioteki po angielsku, ze stałym kodem do tłumaczenia przez wywołującego;
@@ -82,5 +82,9 @@ Zasady:
 - opis commita kończy się jedną linią `Made with the help of Claude Code` (po pustym wierszu); nie dopisuj
   `Co-Authored-By` ani `Claude-Session` (decyzja właściciela z 2026-11-25, jak w gomdgo, gopdfgo i gomermaidgo;
   tego dnia przepisano opisy wszystkich commitów, więc ich identyfikatory się zmieniły);
+- **komunikaty dla ludzi (EN/PL) są w prywatnym `../goxsdgo-messages`** (`github.com/polestorm/goxsdgo-messages`,
+  wydzielone 2026-11-26 z historią); polskich tekstów komunikatów nie dopisujemy do tego repozytorium ani do jego
+  dokumentów, bo to przewaga produktu (decyzja właściciela). Nowy albo zmieniony kod w `xsd/codes.go` wymaga wpisu
+  w `catalog.json` tamtego modułu w każdym języku, zanim odbiorca podbije zależność;
 - w katalogu głównym trzymamy tylko `README.md`, `LICENSE`, `NOTICE`, `go.mod` (i `.gitignore`); ten plik leży
   w `.claude/CLAUDE.md`.

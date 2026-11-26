@@ -1,7 +1,7 @@
 {
   "note": "Pomiary wykonywane poza `go test` (libxml2 przez tools/compare, plik 1 GB, korpus prywatny, testy odbiorcy), z których korzysta pakiet dowodów (tools/evidence, docs/evidence.md). Wartości przepisane z docs/testing.md; po nowym pomiarze zmień je tutaj i zbuduj pakiet ponownie. Korpus prywatny wyłącznie jako liczby zbiorcze.",
   "candidate": {
-    "commit": "59d6910",
+    "commit": "51b65ae",
     "note": "Kandydat do wydania (etap 7). K5 liczy godziny fuzzingu na nim i na commitach, które nie zmieniają kodu biblioteki (docs/fuzzing.md)."
   },
   "k3": {
@@ -17,14 +17,14 @@
     "corpus_verdict_same": "15/15",
     "private_corpus_verdict_same": "151/151",
     "private_corpus_first_error_line_same": "50/51",
-    "private_corpus_commit": "59d6910",
+    "private_corpus_commit": "51b65ae",
     "verdict_threshold_percent": 99.5,
     "line_threshold_percent": 95,
     "differences_file": "docs/differences-libxml2.md"
   },
   "k6": {
     "date": "2026-11-25",
-    "commit": "59d6910",
+    "commit": "51b65ae",
     "method": "TestStreamingMemory z GOXSDGO_STREAM_MB=1024 (syntetyczny JPK generowany w teście)",
     "size_mb": 1024,
     "peak_mb": 6.3,
@@ -32,7 +32,7 @@
   },
   "k7": {
     "date": "2026-11-25",
-    "commit": "59d6910",
+    "commit": "51b65ae",
     "method": "tools/compare timefile i private: libxml2 strumieniowo przez goxsdval; ten sam komputer, te same warunki",
     "synthetic_size_mb": 200,
     "synthetic_ratio": 1.05,

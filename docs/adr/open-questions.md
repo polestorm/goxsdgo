@@ -16,7 +16,7 @@
    `Compile` zwraca `*SchemaError`; ADR 0006. Etap 5: `SchemaLocationHints`, `MaxErrors`, `MaxIdentityEntries`,
    `Set.ValidateDocument`, `ErrLimit`, `ErrTooManyErrors`, pola `Error.Name`, `Value`, `Facet`, `Expected`; ADR 0008.
    Etap 6: `OnValue`, `TypedValue`, `Codes`, `LookupCode`, `LibXML2Code`; ADR 0009. Etap 6b: pola `Error.Namespace`,
-   `Reason`, `ExpectedNamespace`, `Type`, `TypeNamespace`, `Builtin`, `InsertLine`, `InsertColumn` i pakiet `messages`;
+   `Reason`, `ExpectedNamespace`, `Type`, `TypeNamespace`, `Builtin`, `InsertLine`, `InsertColumn`;
    ADR 0010. Kodem podstawowym zostają nazwy reguł W3C; numer libxml2 tylko przez `LibXML2Code`, przejściowo
    (decyzja właściciela z 2026-11-25). Etap 7: `DocumentLimits`, `Config.Document`, `DefaultDocumentLimits`;
    ADR 0011. Opcja `Config.NameRules` (domyślnie XML 1.0 2e, na życzenie 5e); ADR 0012.) Czy wystawiamy skompilowany model schematu (typy, deklaracje) do odczytu, np. dla edytorów

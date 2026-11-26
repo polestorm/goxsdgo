@@ -268,7 +268,7 @@ func buildCriteria(in Inputs) []Criterion {
 
 	// K8
 	k8 := Criterion{ID: "K8", Name: "odbiorca", Target: "testy odbiorcy przechodzą po przepięciu; każdy kod ma odpowiednik w compat",
-		Source: "docs/measurements.json (k8), TestCompatTable (xsd), docs/consumer-migration.md"}
+		Source: "docs/measurements.json (k8), TestCompatTable (xsd), docs/migrating-from-libxml2.md"}
 	compat := in.result(pkgXSD + ".TestCompatTable")
 	k8.Value = fmt.Sprintf("TestCompatTable %s; testy %s: %s", orNone(compat), orDash(m.K8.Consumer), orDash(m.K8.Result))
 	if m.K8.Branch != "" {

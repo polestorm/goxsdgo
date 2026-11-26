@@ -33,44 +33,18 @@ przyszłości komunikaty w kolejnych językach.
    Pozycja główna (`Line`, `Column`) zostaje końcem znacznika początkowego (ADR 0008, pytanie 8); werdykty, kody
    i pozycje główne się nie zmieniają. Katalog kodów (`xsd/codes.go`) deklaruje nowe parametry: `Reason`, `Type`,
    `Insert` (`Name` obejmuje `Namespace`).
-2. **Pakiet `github.com/polestorm/goxsdgo/messages`**, opcjonalny, tylko biblioteka standardowa, zależny od `xsd`
-   (nie odwrotnie). Biblioteka `xsd` zostaje przy komunikatach po angielsku i stałych kodach (CLAUDE.md).
-   - Dane: osadzony `messages/catalog.json`, według kodu z `xsd.Codes()` i wariantu, dla każdego języka tytuł
-     i podpowiedź z parametrami. Warianty: `cvc-complex-type.2.4` ma `missing`, `missing_one_of`, `unexpected`,
-     `unexpected_no_expected`, `wrong_namespace`; `cvc-datatype-valid.1.2.1`, `cvc-length-valid`,
-     `cvc-minLength-valid`, `cvc-pattern-valid`, `cvc-enumeration-valid` mają `empty` (pusta wartość, najczęstszy
-     błąd w JPK); pozostałe kody wariant podstawowy `""`. Razem 234 kody, 243 warianty, 486 tekstów (EN i PL).
-   - API: `Describe(lang, e, Params) Message` (tytuł, podpowiedź jako tekst i jako segmenty `{Text, Param, Em}`),
-     `Variant(e)`, `Lookup`, `Languages`, `Variants`, `Render`. Nieznany język daje angielski, kod spoza katalogu
-     tekst zastępczy. Pusty parametr znika razem ze spacją i pustymi nawiasami lub cudzysłowami.
-   - Parametry wyliczone z błędu: `{name}`, `{namespace}`, `{container}`, `{element}`, `{expected}` (nazwy lokalne,
-     symbol wieloznaczny opisany słowami języka), `{expected_namespace}`, `{value}`, `{facet}`, `{limit}`
-     (wartość aspektu), `{type}` (typ ze schematu albo wbudowany), `{builtin}`, `{where}` („elemencie”/„atrybucie”),
-     `{path}`, `{line}`, `{column}`, `{insert_line}`, `{insert_column}`, `{code}`, `{document}`, `{message}`.
-     Parametry odbiorcy przez `Params`, np. `{type_desc}` z opisem typu z `jpktypes`.
-3. **Źródła tekstów.** Angielskie teksty są napisane w goxsdgo z opisów katalogu i rekomendacji. Polskie przeniesione
-   z xml.pro (`errors.yaml`: pola `pl`, `hint_pl`; `chrome.yaml`: `diagnose.*`) są przypisane od nowa do kodów
-   goxsdgo według znaczenia reguły, nie przez numer libxml2, i mają `source: "xml.pro"` (61 tekstów). Zdania
-   o widoku podglądu zostały w xml.pro, bo dotyczą interfejsu, nie błędu. Pozostałe 182
-   polskie teksty napisano w tym samym stylu (`source: "goxsdgo"`, `review: true`, do przeglądu przez właściciela).
-   **Pól `en:` z `errors.yaml` nie przenosimy**: według nagłówka tego pliku pochodzą ze źródeł libxml2
-   (`docs/provenance.md`).
-4. **Błędy schematu** mają wspólny tytuł i zdanie według kodu
-   w podpowiedzi, z dokumentem i wierszem. Odbiorca pokazuje dziś wszystkie błędy schematu jednym komunikatem; zdanie
-   według kodu jest dokładniejsze, a tytuł wspólny wystarcza, bo schematy przygotowuje odbiorca, nie użytkownik.
-5. **Nowy język** to kolumna w danych: kod w `languages`, słowa w `words` i tekst każdego wariantu; test kompletności
-   wskaże braki. Kod pakietu się nie zmienia.
-6. **Tabela `compat` jest przejściowa.** Służy odbiorcy, który chce najpierw podmienić walidator, a dopiero potem
-   teksty. Docelowo odbiorca tłumaczy według kodu goxsdgo i wariantu (`docs/consumer-migration.md`). Przy przejściu
+2. **Komunikaty dla ludzi** (tytuł i podpowiedź według kodu i wariantu, w wielu językach) powstały w etapie 6b
+   jako pakiet `messages` w tym repozytorium. 2026-11-26 właściciel wydzielił go razem z historią do osobnego,
+   prywatnego modułu; z historii goxsdgo został usunięty. Biblioteka `xsd` zostaje przy komunikatach po angielsku,
+   stałych kodach i polach błędu, z których wywołujący buduje własne teksty.
+3. **Tabela `compat` jest przejściowa.** Służy odbiorcy, który chce najpierw podmienić walidator, a dopiero potem
+   teksty. Docelowo odbiorca tłumaczy według kodu goxsdgo i pola `Reason` (`docs/migrating-from-libxml2.md`). Przy przejściu
    tylko przez `compat` rozszerzenia xml.pro (`Diagnose()`) przestaną działać, bo rozpoznają zdania libxml2.
 
 ## Konsekwencje
 
-+ odbiorca może usunąć `Diagnose()`, heurystyki położenia i przypisanie tekstów do kodów libxml2;
-+ teksty są w jednym miejscu, sprawdzane testami (kompletność, parametry, wszystkie błędy z zestawu W3C i korpusu,
-  porównanie z tekstami xml.pro dla czterech przypadków);
-+ bez użycia pakietu `messages` koszt jest zerowy; nowe pola nie zmieniają szybkości walidacji (BenchmarkValidateJPK
-  41 MB/s przed i po, te same alokacje);
-− 182 polskie teksty czekają na przegląd właściciela;
-− `{container}` przy błędach innych niż `missing` pochodzi ze ścieżki (nazwa lokalna rodzica, bez przestrzeni nazw);
-− zmiana kodu w `xsd/codes.go` wymaga wpisu w `catalog.json` w każdym języku (test to wymusza).
++ odbiorca może usunąć wyrażenia regularne na tekstach libxml2, heurystyki położenia i przypisanie tekstów do kodów
+  libxml2;
++ nowe pola nie zmieniają szybkości walidacji (BenchmarkValidateJPK 41 MB/s przed i po, te same alokacje);
+− element nadrzędny przy błędach innych niż `missing` trzeba wziąć ze ścieżki (nazwa lokalna rodzica, bez przestrzeni
+  nazw).

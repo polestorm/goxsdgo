@@ -47,8 +47,7 @@ are validators in pure Go, published in 2026.
 | XSD 1.1 | no | no | yes 🥇 | no | no |
 | Error code[^err] | W3C rule 🥇 | number | W3C rule 🥇 | own | category |
 | Line, column, path | all 🥇 | line, name | all 🥇 | all 🥇 | line, path |
-| Expected elements | a field 🥇 | in text | in text | in text | in text |
-| Message languages | EN, PL 🥇 | EN | EN | EN | EN |
+| Error details[^details] | fields 🥇 | in text | in text | in text | in text |
 | License | Apache 2.0 | MIT | MIT | MIT | Apache 2.0 |
 | GitHub stars[^pop] | new | 771 (mirror) | 8 | 3 | 0 |
 
@@ -72,6 +71,12 @@ are validators in pure Go, published in 2026.
     none, so 55 cases that name their schema only in the document cannot run on it. Self-reported figures, not
     measured here: knroy/go-xml 99.90% of instance and 99.98% of schema tests, cB-Sigma/xsd 99.6% of 39,369
     tests (their READMEs).
+[^details]: What the validator knows about an error beyond its position. goxsdgo gives it as separate fields of
+    `xsd.Error`, so a program can use it without parsing the message: `Expected` (the elements allowed at that
+    point), `Reason` (missing, unexpected or in the wrong namespace), `Value` and `Facet` (the value and the facet
+    it broke), `Type` and `Builtin` (the type and its built-in base), `InsertLine` and `InsertColumn` (where a
+    missing element should go). In the other validators the expected elements appear only in the text of the
+    message.
 [^names5]: With `Config.NameRules: xsd.NamesXML10Edition5` (name characters of XML 1.0 Fifth Edition instead of
     the Second Edition that XSD 1.0 2e refers to; ADR 0012) goxsdgo passes 39,385 of 39,439; the default stays the
     Second Edition.
