@@ -147,3 +147,11 @@ i dokumenty) w `~/fuzz/goxsdgo/e715fa1/`, ustawiona 2026-11-26 21:37 we wspólne
 na serwerze. Ruszy po zadaniach `gohighlightgo` i `gomermaidgo`. Po zakończeniu: skopiować
 `~/fuzz/goxsdgo/e715fa1/fuzzpack/work/journal.tsv` i `go -C tools/fuzz run . -root ../.. -import journal.tsv`
 (identyfikator bez zmian), potem zbudować pakiet dowodów.
+
+## Nowy niezmiennik FuzzReader (2026-11-26)
+
+`FuzzReader` sprawdza też, że strumień tokenów i błędów nie zależy od podziału wejścia na odczyty (jeden odczyt,
+po jednym bajcie, porcjami po 7 bajtów; XML-019). Dotąd fuzzer podawał wejście jednym odczytem i dlatego nie znalazł
+błędu deklaracji XML czytanej porcjami (KI-13, znaleziony przy wydzielaniu czytnika do goxmlgo). Przebieg sprawdzający
+na Macu (zasilanie sieciowe, `-parallel 2`): 100 s, bez błędu. Poprawka zmienia kod biblioteki, więc kampania
+z `e715fa1` (kod v0.4.0) nie zaliczy godzin K5 dla wydania z poprawką.

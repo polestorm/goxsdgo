@@ -15,6 +15,17 @@ Tags up to v0.3.0 are annotated, not signed; from v0.4.0 on, tags are signed. Kn
 
 ## Unreleased
 
+- **Class 1.** `xmlreader` (and so `xsd.Set.Validate`, which reads documents with it): input that arrives in small
+  reads (`iotest.OneByteReader`, a small first network packet) made the XML declaration panic ("slice bounds out of
+  range") or fail with a false `xml-decl`; a very short document with white space before `?>`, such as
+  `<?xml version="1.0" ?><a/>`, was rejected with `xml-eof` even in one read; a disallowed ASCII character right
+  after a name gave `xml-syntax` or `xml-char` depending on where a read ended. Affected: v0.1.0 to v0.4.0 (the
+  reader was internal before v0.2.0). Known issue KI-13, closed. New requirement XML-019: the result does not depend
+  on how the input is split into reads (`TestChunkedInput`, `TestXMLDeclSmallDocument`, `TestValidateChunkedInput`,
+  and a new `FuzzReader` invariant). On the W3C XML Conformance suite read in one piece the token stream and errors
+  are unchanged (1725 / 1727); the only change in the whole suite is the out-of-scope external entity
+  `ibm/xml-1.1/valid/P03/ibm03v09.ent` (`xml-eof 1:20` becomes `xml-decl 1:21`). Validation errors on the W3C XSD
+  suite and the MF corpus are byte for byte the same. Found while extracting the reader to goxmlgo.
 - **Class 0.** Two fuzz-test invariants corrected after the Synology campaign (docs/fuzzing.md): `FuzzLexical`
   accepts the XSD 1.0 2e inconsistency for `time` across midnight (new known issue KI-12, behaviour unchanged),
   `FuzzRegexTranslate` allows 60 s instead of 2 s of wall time on slow or busy hardware. Library code unchanged.

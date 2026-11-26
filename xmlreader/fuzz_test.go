@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"testing"
+	"testing/iotest"
 	"unicode/utf8"
 
 	"github.com/polestorm/goxsdgo/internal/testkit"
@@ -12,6 +13,8 @@ import (
 
 // FuzzReader: dowolne wejście nie powoduje paniki, czytanie się kończy, a pozycje tokenów i błędów leżą
 // w granicach wejścia (wiersz nie większy niż liczba wierszy, kolumna nie większa niż długość wiersza + 1).
+// Strumień tokenów i błędów nie zależy od podziału wejścia na odczyty (po jednym bajcie i porcjami po 7 bajtów
+// daje to samo co jeden odczyt; od 2026-11-26, wcześniej fuzzer podawał wejście jednym odczytem).
 func FuzzReader(f *testing.F) {
 	for _, s := range []string{
 		"<a/>",
@@ -33,6 +36,15 @@ func FuzzReader(f *testing.F) {
 		}
 	}
 	f.Fuzz(func(t *testing.T, data []byte) {
+		whole := dumpStream(bytes.NewReader(data), Options{})
+		for name, src := range map[string]io.Reader{
+			"one byte at a time": iotest.OneByteReader(bytes.NewReader(data)),
+			"7 bytes at a time":  &chunked{data: data, n: 7},
+		} {
+			if got := dumpStream(src, Options{}); got != whole {
+				t.Fatalf("%s: stream differs from reading the whole input\n%s", name, firstDiff(got, whole))
+			}
+		}
 		lines := bytes.Count(data, []byte{'\n'}) + bytes.Count(data, []byte{'\r'}) + 1
 		longest := 0
 		for _, l := range bytes.FieldsFunc(data, func(r rune) bool { return r == '\n' || r == '\r' }) {

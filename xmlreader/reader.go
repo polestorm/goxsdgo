@@ -508,6 +508,15 @@ func (r *Reader) readName(what string) (string, error) {
 		if !r.fill(1) {
 			break
 		}
+		// Znak ASCII po nazwie ocenia wywołujący, tak jak na szybkiej ścieżce: inaczej kod błędu dla znaku
+		// niedozwolonego tuż za nazwą zależałby od tego, gdzie skończył się bufor.
+		if b := r.cur.buf[r.cur.pos]; b < utf8.RuneSelf {
+			if asciiName[b]&2 == 0 {
+				break
+			}
+			size = 1
+			continue
+		}
 		c, size, err = r.peekRune()
 		if err != nil {
 			return "", err
@@ -1447,16 +1456,22 @@ func (r *Reader) resolve(qname string, elem bool, l, c int) (Name, error) {
 func (r *Reader) xmlDecl() error {
 	r.advance(5)
 	bad := func(msg string) error { return r.errorf(CodeXMLDecl, msg) }
+	// spaced: białe znaki przed następnym pseudoatrybutem są już zużyte (poprzedni attr ich nie dopasował).
+	// Pozycji w buforze nie wolno zapamiętywać: fill przesuwa jego zawartość, gdy wejście przychodzi małymi
+	// porcjami (do v0.4.0 kończyło się to paniką albo fałszywym błędem xml-decl lub xml-eof).
+	spaced := false
+	wsL, wsC := r.position() // miejsce przed białymi znakami: tam zgłaszamy brak wersji, jak dotąd
 	attr := func(want string) (string, bool, error) {
-		save := r.cur.pos
-		saveL, saveC, saveN := r.line, r.col, r.consumed
-		if !r.skipSpace() {
+		if !spaced {
+			wsL, wsC = r.position()
+		}
+		if r.skipSpace() {
+			spaced = true
+		}
+		if !spaced || !r.hasPrefix(want) {
 			return "", false, nil
 		}
-		if !r.hasPrefix(want) {
-			r.cur.pos, r.line, r.col, r.consumed = save, saveL, saveC, saveN
-			return "", false, nil
-		}
+		spaced = false
 		r.advance(len(want))
 		r.skipSpace()
 		if err := r.expect("=", `"=" in the XML declaration`); err != nil {
@@ -1471,20 +1486,21 @@ func (r *Reader) xmlDecl() error {
 			return "", false, bad(want + " value must be quoted")
 		}
 		r.advance(1)
-		start := r.cur.pos
+		r.nbuf = r.nbuf[:0]
 		for r.fill(1) && r.cur.buf[r.cur.pos] != q {
 			if r.cur.buf[r.cur.pos] >= 0x80 || r.cur.buf[r.cur.pos] < 0x20 {
 				return "", false, bad("invalid character in " + want)
 			}
+			r.nbuf = append(r.nbuf, r.cur.buf[r.cur.pos])
 			r.advance(1)
-			if r.cur.pos-start > 64 {
+			if len(r.nbuf) > 64 {
 				return "", false, bad(want + " value too long")
 			}
 		}
 		if !r.fill(1) {
 			return "", false, r.eofErr("XML declaration")
 		}
-		v := string(r.cur.buf[start:r.cur.pos])
+		v := string(r.nbuf)
 		r.advance(1)
 		return v, true, nil
 	}
@@ -1493,7 +1509,7 @@ func (r *Reader) xmlDecl() error {
 		return err
 	}
 	if !ok {
-		return bad("version is required in the XML declaration")
+		return errorAt(CodeXMLDecl, wsL, wsC, "version is required in the XML declaration")
 	}
 	if len(version) < 3 || version[:2] != "1." || !allDigits(version[2:]) {
 		return bad("version must match '1.' [0-9]+")

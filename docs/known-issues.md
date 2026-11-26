@@ -27,4 +27,6 @@ it and has to know; **high** — can change a verdict without a visible sign. No
 
 ## Closed
 
-None yet.
+| # | Issue | Affected | Fixed in |
+|---|---|---|---|
+| KI-13 | **Input in small reads**: the XML declaration read in pieces (`iotest.OneByteReader`, a small first network packet) panicked in the reader ("slice bounds out of range"), so also in `xsd.Set.Validate`, or gave a false `xml-decl`; `<?xml version="1.0" ?><a/>` was rejected with `xml-eof` even in one read; the error code for a disallowed ASCII character right after a name depended on where a read ended. Workaround for affected versions: read the first bytes in one piece, `head := make([]byte, 512); n, _ := io.ReadFull(r, head); r = io.MultiReader(bytes.NewReader(head[:n]), r)` (`bufio.Reader` does not help: it passes large reads straight to the source); a document of only a declaration with white space before `?>` and a short root element stays rejected. | v0.1.0 – v0.4.0 | next release (unreleased); [CHANGELOG.md](../CHANGELOG.md) |
