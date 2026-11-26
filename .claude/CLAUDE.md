@@ -72,7 +72,8 @@ Zasady:
 - **żadnych prawdziwych danych podatników ani klientów w korpusie**: tylko przykłady opublikowane przez MF i dokumenty
   syntetyczne (`testdata/README.md`);
 - nazwy plików, pakietów i identyfikatorów po angielsku; komentarze i dokumentacja po polsku; po angielsku: `README.md`,
-  `docs/comparison.md`, `docs/contested-cases.md` (generuje `tools/bench`), `docs/provenance.md`, `docs/migrating-from-libxml2.md`, `docs/methodology.md`, `docs/results/` i `xmlreader/README.md` (strony publiczne) oraz komentarze
+  `docs/comparison.md`, `docs/contested-cases.md` (generuje `tools/bench`), `docs/provenance.md`, `docs/migrating-from-libxml2.md`, `docs/methodology.md`, `docs/results/`, `xmlreader/README.md`, `CHANGELOG.md` i `docs/known-issues.md` (strony
+  publiczne) oraz komentarze
   dokumentacyjne publicznego API (opis pakietu, eksportowane typy, funkcje, metody, stałe, zmienne i pola struktur
   w `xsd/` i `xmlreader/`), bo
   pokazuje je pkg.go.dev (decyzja właściciela z 2026-11-25, jak w gomdgo); komentarze wewnętrzne i pakiety
@@ -92,8 +93,15 @@ Zasady:
   wydzielone 2026-11-26 z historią); polskich tekstów komunikatów nie dopisujemy do tego repozytorium ani do jego
   dokumentów (decyzja właściciela). Nowy albo zmieniony kod w `xsd/codes.go` wymaga wpisu
   w `catalog.json` tamtego modułu w każdym języku, zanim odbiorca podbije zależność;
+- dokumenty schematu spoza `fs.FS` tylko przez `Config.Resolve` (ADR 0013); pakiet `xsd` nie importuje `net/http`,
+  sieć jest wyłącznie w opcjonalnym `xsd/resolve` i tylko z `Options.Network`; testy sieci tylko na lokalnym
+  `httptest`;
 - czytnik XML jest publicznym pakietem `xmlreader` (od 2026-11-26, wcześniej `internal/xmlreader`); jego porównanie
   z `encoding/xml` (`TestStdlibConformance`, `BenchmarkJPK*`) podlega tej samej regule powtarzalności, wyniki
   w `docs/results/xmlreader-*`;
-- w katalogu głównym trzymamy tylko `README.md`, `LICENSE`, `NOTICE`, `go.mod` (i `.gitignore`); ten plik leży
-  w `.claude/CLAUDE.md`.
+- w katalogu głównym trzymamy tylko `README.md`, `CHANGELOG.md`, `LICENSE`, `NOTICE`, `go.mod` (i `.gitignore`); ten
+  plik leży w `.claude/CLAUDE.md`;
+- **teczka walidacyjna** (dla odbiorców walidujących moduł, np. QMS `module-validation.md`): każda zmiana ma wpis
+  w `CHANGELOG.md` z klasą wpływu 0–3 i ID wymagań; `docs/known-issues.md` aktualne przed tagiem; `docs/risk.md`
+  (ryzyka bez klas, klasy nadaje odbiorca) i `docs/design.md` przeglądane przy zmianach klasy 2 i 3; tagi
+  podpisane (`git tag -s`, klucz SSH); artefakty wydania buduje `.github/workflows/release.yml`.

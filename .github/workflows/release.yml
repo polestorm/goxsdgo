@@ -1,0 +1,108 @@
+name: release artifacts
+
+# Artefakty wydania dla teczki walidacyjnej odbiorcy (docs/design.md, CHANGELOG.md): przy wypchnięciu tagu v*
+# raport testów, pakiet dowodów (wymagania → testy → wynik), pokrycie, staticcheck, govulncheck, SBOM i zapis
+# środowiska, dołączone do wydania na GitHubie z sumami SHA-256. Wersje narzędzi przypięte.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  artifacts:
+    runs-on: ubuntu-latest
+    env:
+      GOVULNCHECK: golang.org/x/vuln/cmd/govulncheck@v1.9.0
+      STATICCHECK: honnef.co/go/tools/cmd/staticcheck@v0.8.2
+      CYCLONEDX: github.com/CycloneDX/cyclonedx-gomod/cmd/cyclonedx-gomod@v1.12.0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - uses: actions/cache@v4
+        with:
+          path: |
+            testdata/w3c/xsdtests
+            testdata/w3c/xmlconf
+            testdata/w3c/schemas
+            testdata/schemas/mf
+            testdata/instances/mf
+          key: testdata-${{ hashFiles('testdata/sources.json') }}
+      - name: fetch test data
+        run: |
+          for set in w3c-xsdtests w3c-xmlconf w3c-schemas mf-instances mf-schemas; do
+            go -C tools/fetch run . -root ../.. -set $set
+          done
+      - name: tag signature
+        run: |
+          mkdir -p out/release
+          git cat-file tag "$GITHUB_REF_NAME" > out/release/tag.txt
+          if grep -q "BEGIN SSH SIGNATURE\|BEGIN PGP SIGNATURE" out/release/tag.txt; then
+            echo "signed tag" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::tag $GITHUB_REF_NAME is not signed"
+          fi
+      - name: environment
+        run: |
+          cat > out/release/environment.json <<EOF
+          {
+            "tag": "$GITHUB_REF_NAME",
+            "commit": "$GITHUB_SHA",
+            "date": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "go": "$(go version)",
+            "os": "$(. /etc/os-release && echo "$PRETTY_NAME"), $(uname -r), $(uname -m)",
+            "runner": "$RUNNER_NAME ($RUNNER_OS, $RUNNER_ARCH)",
+            "workflow_run": "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID",
+            "tools": ["$GOVULNCHECK", "$STATICCHECK", "$CYCLONEDX"]
+          }
+          EOF
+      - name: checks
+        run: |
+          test -z "$(gofmt -l .)"
+          if grep -q '^require' go.mod; then echo 'the library module must not have dependencies'; exit 1; fi
+          CGO_ENABLED=0 go build ./...
+          go vet ./... 2>&1 | tee out/release/vet.txt
+      - name: tests and coverage
+        run: |
+          go test -count=1 -json -coverprofile=out/release/coverage.out ./... > out/release/test-report.json
+          go tool cover -func=out/release/coverage.out > out/release/coverage.txt
+          go tool cover -html=out/release/coverage.out -o out/release/coverage.html
+          tail -1 out/release/coverage.txt >> "$GITHUB_STEP_SUMMARY"
+      - name: staticcheck
+        run: go run "$STATICCHECK" ./... 2>&1 | tee out/release/staticcheck.txt
+      - name: govulncheck
+        run: |
+          set +e
+          go run "$GOVULNCHECK" ./... > out/release/govulncheck.txt 2>&1
+          status=$?
+          go run "$GOVULNCHECK" -format json ./... > out/release/govulncheck.json 2>/dev/null
+          cat out/release/govulncheck.txt
+          if [ $status -ne 0 ]; then echo "::warning::govulncheck reports findings (exit $status), see govulncheck.txt"; fi
+      - name: SBOM
+        run: go run "$CYCLONEDX" mod -json -licenses -output out/release/sbom.cdx.json .
+      - name: evidence package
+        run: |
+          go -C tools/evidence run . -root ../.. -out ../../out/evidence -tar
+          cp out/evidence/*.tar.gz out/release/evidence.tar.gz
+      - name: checksums
+        run: cd out/release && sha256sum * > SHA256SUMS
+      - name: attach to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # wydanie z notatkami zakłada właściciel; gdyby go jeszcze nie było, powstaje z odsyłaczem do CHANGELOG
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
+            gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" \
+              --notes "Changes: [CHANGELOG.md](https://github.com/$GITHUB_REPOSITORY/blob/$GITHUB_REF_NAME/CHANGELOG.md)"
+          gh release upload "$GITHUB_REF_NAME" out/release/* --clobber
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.ref_name }}
+          path: out/release
+          retention-days: 90

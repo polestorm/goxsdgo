@@ -103,7 +103,7 @@ func TestMultiCharEscapes(t *testing.T) {
 		{`\S`, []string{"a"}, []string{" "}},
 		{`\d+`, []string{"0123", "٣", "३"}, []string{"a", "²"}},
 		{`\D`, []string{"a"}, []string{"5"}},
-		{`\w+`, []string{"abcŻ9", "̀"}, []string{"-", " ", ".", "­"}},
+		{`\w+`, []string{"abcŻ9", "̀"}, []string{"-", " ", ".", "\u00ad"}},
 		{`\W`, []string{"!", " "}, []string{"a"}},
 		// \i i \c według XML 1.0 2e: litery z dodatku B, '_' i ':'; cyfry tylko w \c.
 		{`\i\c*`, []string{"a", "_x", ":x", "a-b.c", "ł1", "à"}, []string{"1a", "-a", ".a"}},
@@ -137,7 +137,7 @@ func TestCategoryEscapes(t *testing.T) {
 		{`\p{Co}`, []string{"\ue000"}, []string{"a"}},
 		// Cn: znaki nieprzypisane (U+0378 jest nieprzypisany w każdej wersji Unicode).
 		{`\p{Cn}`, []string{"͸"}, []string{"a"}},
-		{`\p{C}`, []string{"\t", "\ue000", "͸", "​"}, []string{"a"}},
+		{`\p{C}`, []string{"\t", "\ue000", "͸", "\u200b"}, []string{"a"}},
 	})
 	for _, bad := range []string{`\p{Cs}`, `\p{Lx}`, `\p{}`, `\p{L`, `\pL`, `\p{l}`} {
 		if _, err := Compile(bad); err == nil {

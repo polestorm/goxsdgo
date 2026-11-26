@@ -1,6 +1,7 @@
 package xsd
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -61,6 +62,18 @@ type Config struct {
 	// MaxDocuments and MaxDepth limit the number of schema documents read (default 1000) and the nesting of
 	// include, import and redefine (default 64). Zero means the default.
 	MaxDocuments, MaxDepth int
+	// Resolve, if not nil, supplies the schema documents the library cannot find itself: an include, import or
+	// redefine whose schemaLocation is an absolute URL without an entry in Locations, or a relative address in a
+	// document Resolve supplied (it is resolved against that document's URL). For an import, Namespaces is tried
+	// first. Resolve is called at most once per URL during a compilation, and its documents are read in the same
+	// pass, so their own includes and imports go through the same rules, limits and cycle checks.
+	//
+	// The library itself never uses the network; Resolve decides where documents come from (a directory, a
+	// cache, the network). Returning an error for which errors.Is(err, fs.ErrNotExist) holds means "not found",
+	// as if there were no Resolve; any other error stops Compile and is returned wrapped. A document may be at
+	// most MaxResolvedSize bytes. xsi:schemaLocation hints never go to Resolve, only the imports of the schema
+	// documents they name.
+	Resolve func(SchemaRef) (io.ReadCloser, error)
 
 	// SchemaLocationHints turns on xsi:schemaLocation and xsi:noNamespaceSchemaLocation hints in documents
 	// (4.3.2). The schema documents they name are read only from fsys: through Locations, or as a path relative
@@ -140,6 +153,10 @@ func (c Config) Compile(fsys fs.FS, names ...string) (*Set, error) {
 	}
 	sch, err := schema.Load(fsys, c.schemaConfig(), names...)
 	if err != nil {
+		var list schema.ErrorList
+		if !errors.As(err, &list) && !errors.Is(err, errors.ErrUnsupported) {
+			return nil, fmt.Errorf("xsd: %w", err)
+		}
 		return nil, schemaError(err)
 	}
 	s.schema = sch
@@ -147,8 +164,56 @@ func (c Config) Compile(fsys fs.FS, names ...string) (*Set, error) {
 }
 
 func (c Config) schemaConfig() schema.Config {
-	return schema.Config{Locations: c.Locations, Namespaces: c.Namespaces, MaxDocuments: c.MaxDocuments,
+	sc := schema.Config{Locations: c.Locations, Namespaces: c.Namespaces, MaxDocuments: c.MaxDocuments,
 		MaxDepth: c.MaxDepth, NameRules: c.NameRules.edition()}
+	if f := c.Resolve; f != nil {
+		sc.Resolve = func(r schema.Ref) (io.ReadCloser, error) {
+			return f(SchemaRef{Location: r.Location, Namespace: r.Namespace, Kind: r.Kind, From: r.From})
+		}
+	}
+	return sc
+}
+
+// SchemaRef is a reference to a schema document that Config.Resolve is asked for.
+type SchemaRef struct {
+	// Location is the absolute URL of the document: schemaLocation resolved against the referring document.
+	Location string
+	// Namespace is the namespace attribute of an import; empty for include and redefine.
+	Namespace string
+	// Kind is "include", "import" or "redefine".
+	Kind string
+	// From is the name of the referring document (see SchemaDocument.Name).
+	From string
+}
+
+// MaxResolvedSize is the largest schema document accepted from Config.Resolve, in bytes.
+const MaxResolvedSize = schema.MaxResolvedSize
+
+// SchemaDocument describes one schema document a Set was compiled from.
+type SchemaDocument struct {
+	// Name is the path of the document in fsys, or its URL when Config.Resolve supplied it. Schema errors use the
+	// same name in Error.Document.
+	Name string
+	// Location is the absolute URL the document was found under (through Locations or Resolve); empty for a
+	// document found by its path only.
+	Location string
+	// Resolved reports that Config.Resolve supplied the document.
+	Resolved bool
+	// Size is the length of the document in bytes; SHA256 the hexadecimal SHA-256 of those bytes.
+	Size   int64
+	SHA256 string
+}
+
+// Documents returns the schema documents the Set was compiled from, in the order they were read: the documents
+// given to Compile and everything they include, import or redefine. Documents named only by xsi:schemaLocation
+// hints are not in the list. The list is a copy.
+func (s *Set) Documents() []SchemaDocument {
+	out := make([]SchemaDocument, len(s.schema.Documents))
+	for i, d := range s.schema.Documents {
+		out[i] = SchemaDocument{Name: d.Name, Location: d.Location, Resolved: d.Resolved, Size: d.Size,
+			SHA256: hex.EncodeToString(d.SHA256[:])}
+	}
+	return out
 }
 
 func schemaError(err error) error {

@@ -34,6 +34,10 @@ Compared with libxml2 and three other XML Schema validators in pure Go,
   helps consumers in transition.
 - **Safe by default, linear time**: no network, no external entities, limits on depth, size and entity
   expansion; `pattern` facets and content models with large counters run in linear time; fuzzed.
+- **Schemas from anywhere, recorded**: includes and imports are followed recursively in one pass; documents
+  outside your files come only through a function you supply (`Config.Resolve`), and
+  [`xsd/resolve`](https://pkg.go.dev/github.com/polestorm/goxsdgo/xsd/resolve) gives one with a local folder, a
+  cache and opt-in downloads from allowed hosts. `Set.Documents()` lists every document used, with its SHA-256.
 
 Where it is weaker: knroy/go-xml passes 17 more W3C cases (goxsdgo follows the text of the recommendation where it
 reads it differently from the suite, see [docs/differences.md](docs/differences.md)) and also implements XSD 1.1;
@@ -124,9 +128,12 @@ without Go. The comparison with other validators: [docs/methodology.md](docs/met
 - [`docs/migrating-from-libxml2.md`](docs/migrating-from-libxml2.md): moving from libxml2 to goxsdgo, error fields
   and codes.
 - [`docs/provenance.md`](docs/provenance.md): sources and clean-room rules.
+- [`CHANGELOG.md`](CHANGELOG.md) (changes with an impact class) and [`docs/known-issues.md`](docs/known-issues.md)
+  (known limitations, risk, workaround); release artifacts (test report, traceability, coverage, staticcheck,
+  govulncheck, SBOM) are attached to every [release](https://github.com/polestorm/goxsdgo/releases).
 - In Polish: [`docs/testing.md`](docs/testing.md) (tests, measurements), [`docs/differences.md`](docs/differences.md)
   (differences from the test suite and from libxml2), [`docs/differences-libxml2.md`](docs/differences-libxml2.md)
-  (every case), [`docs/evidence.md`](docs/evidence.md) (evidence package), [`docs/fuzzing.md`](docs/fuzzing.md),
+  (every case), [`docs/design.md`](docs/design.md) and [`docs/risk.md`](docs/risk.md) (validation dossier), [`docs/evidence.md`](docs/evidence.md) (evidence package), [`docs/fuzzing.md`](docs/fuzzing.md),
   [`requirements/`](requirements/) (numbered requirements), [`docs/adr/`](docs/adr/) (decisions),
   [`docs/roadmap.md`](docs/roadmap.md).
 

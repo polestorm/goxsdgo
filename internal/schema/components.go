@@ -306,6 +306,17 @@ type Schema struct {
 	// i anonimowe) w kolejności budowy; etap 4 sprawdza na nich ograniczenia modeli zawartości.
 	ComplexTypes []*ComplexType
 	ElementDecls []*ElementDecl
-	// Documents to ścieżki wczytanych dokumentów w kolejności wczytania.
-	Documents []string
+	// Documents to wczytane dokumenty w kolejności wczytania.
+	Documents []DocumentInfo
+}
+
+// DocumentInfo opisuje jeden wczytany dokument schematu: nazwę (ścieżka w fs.FS albo adres dokumentu
+// z Config.Resolve), adres bezwzględny, pod którym go znaleziono (pusty, gdy go nie ma), źródło, rozmiar
+// i SHA-256 przeczytanych bajtów.
+type DocumentInfo struct {
+	Name     string
+	Location string
+	Resolved bool
+	Size     int64
+	SHA256   [32]byte
 }

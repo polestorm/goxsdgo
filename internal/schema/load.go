@@ -1,7 +1,11 @@
 package schema
 
 import (
+	"bytes"
+	"crypto/sha256"
+	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/url"
 	"path"
@@ -24,6 +28,26 @@ type Config struct {
 	// NameRules wybiera reguły znaków nazw dla typów nazw i klas \i, \c we wzorcach (ADR 0012): domyślnie
 	// XML 1.0 Second Edition.
 	NameRules xmlchars.Edition
+	// Resolve, jeśli nie nil, dostarcza dokument pod adresem bezwzględnym, którego nie ma w Locations ani w fs.FS
+	// (ADR 0013). Błąd spełniający errors.Is(err, fs.ErrNotExist) znaczy „nie ma”, każdy inny przerywa Load.
+	Resolve func(Ref) (io.ReadCloser, error)
+}
+
+// Ref to odwołanie do dokumentu schematu, które Load przekazuje Config.Resolve.
+type Ref struct {
+	Location  string // adres bezwzględny po rozwiązaniu względem dokumentu, który odwołuje się
+	Namespace string // atrybut namespace importu
+	Kind      string // "include", "import", "redefine"
+	From      string // nazwa dokumentu z odwołaniem
+}
+
+// MaxResolvedSize to największy dokument przyjmowany od Config.Resolve, w bajtach.
+const MaxResolvedSize = 64 << 20
+
+// fetched to dokument dostarczony przez Config.Resolve (albo informacja, że go nie ma).
+type fetched struct {
+	data  []byte
+	found bool
 }
 
 // defKind to przestrzeń symboli komponentu globalnego (2.5, 3.15.3).
@@ -73,8 +97,10 @@ type document struct {
 	root *node
 	// tns to docelowa przestrzeń nazw po ewentualnej zamianie kameleona (4.2.1, punkt 3.2); hasTNS mówi, czy
 	// dokument ma atrybut targetNamespace.
-	tns         string
-	hasTNS      bool
+	tns    string
+	hasTNS bool
+	// resolved: dokument dostarczył Config.Resolve; path to wtedy jego adres, nie ścieżka w fs.FS.
+	resolved    bool
 	imports     map[string]bool
 	importsNoNS bool
 	// included to dokumenty włączone przez include (bezpośrednio i pośrednio) — redefine szuka w nich komponentów.
@@ -88,6 +114,10 @@ type loader struct {
 	fsys fs.FS
 	cfg  Config
 	errs ErrorList
+	// fatal: błąd Config.Resolve inny niż „nie ma”; przerywa wczytywanie.
+	fatal error
+	// fetched: adres → dokument z Config.Resolve; każdy adres pytamy najwyżej raz.
+	fetched map[string]*fetched
 	// unsupported: pierwszy błąd konstrukcji spoza zakresu.
 	unsupported *Error
 	docs        []*document
@@ -135,7 +165,7 @@ func Load(fsys fs.FS, cfg Config, names ...string) (*Schema, error) {
 		cfg.MaxDepth = 64
 	}
 	l := &loader{fsys: fsys, cfg: cfg, loaded: map[string]*document{}, defOf: map[*node]*def{},
-		ownTNS: map[string]string{}, dirs: map[string]map[string]bool{}}
+		ownTNS: map[string]string{}, dirs: map[string]map[string]bool{}, fetched: map[string]*fetched{}}
 	for k := range l.index {
 		l.index[k] = map[QName]*def{}
 	}
@@ -158,6 +188,9 @@ func Load(fsys fs.FS, cfg Config, names ...string) (*Schema, error) {
 			continue
 		}
 		l.loadDocument(p, "", roleTop, nil, nil, 0)
+	}
+	if l.fatal != nil {
+		return nil, l.fatal
 	}
 	if l.unsupported != nil {
 		return nil, l.unsupported
@@ -239,15 +272,24 @@ func (l *loader) loadDocument(p, base string, r role, from *document, ref *node,
 		l.errorf(CodeLimit, refPos, "include/import/redefine nested deeper than %d", l.cfg.MaxDepth)
 		return nil
 	}
-	f, err := l.fsys.Open(p)
-	if err != nil {
-		if r == roleTop {
-			l.errorf(CodeNotSchema, refPos, "schema document %s cannot be read: %v", p, err)
+	var src io.Reader
+	resolved := false
+	if fd, ok := l.fetched[p]; ok && fd.found {
+		src, resolved = bytes.NewReader(fd.data), true
+	} else {
+		f, err := l.fsys.Open(p)
+		if err != nil {
+			if r == roleTop {
+				l.errorf(CodeNotSchema, refPos, "schema document %s cannot be read: %v", p, err)
+			}
+			return nil
 		}
-		return nil
+		defer f.Close()
+		src = f
 	}
-	root, perr := parseDocument(f, p)
-	f.Close()
+	h := sha256.New()
+	cnt := &countWriter{}
+	root, perr := parseDocument(io.TeeReader(src, io.MultiWriter(h, cnt)), p)
 	if perr != nil {
 		if e, ok := perr.(*Error); ok {
 			if e.Cause == errUnsupported && l.unsupported == nil {
@@ -285,11 +327,13 @@ func (l *loader) loadDocument(p, base string, r role, from *document, ref *node,
 		return d
 	}
 	d := &document{path: p, base: base, root: root, imports: map[string]bool{}, hasTNS: hasTNS, tns: effective(tns),
-		names: l.cfg.NameRules}
+		names: l.cfg.NameRules, resolved: resolved}
 	setDoc(root, d)
 	l.loaded[key] = d
 	l.docs = append(l.docs, d)
-	l.sch.Documents = append(l.sch.Documents, p)
+	info := DocumentInfo{Name: p, Location: base, Resolved: resolved, Size: cnt.n}
+	copy(info.SHA256[:], h.Sum(nil))
+	l.sch.Documents = append(l.sch.Documents, info)
 
 	l.checkSFS(root, map[string]bool{})
 	switch r {
@@ -333,7 +377,7 @@ func (l *loader) loadDocument(p, base string, r role, from *document, ref *node,
 		switch {
 		case k.is("include"):
 			loc, _ := k.attr("schemaLocation")
-			if q, b, ok := l.locate(d, loc); ok {
+			if q, b, ok := l.locateOrResolve(d, loc, Ref{Kind: "include"}); ok {
 				if inc := l.loadDocument(q, b, roleInclude, d, k, depth+1); inc != nil {
 					d.included = append(d.included, inc)
 					d.included = append(d.included, inc.included...)
@@ -355,13 +399,16 @@ func (l *loader) loadDocument(p, base string, r role, from *document, ref *node,
 					q, b, ok = np, "", true
 				}
 			}
+			if !ok && hasLoc {
+				q, b, ok = l.fetchDocument(d, loc, Ref{Kind: "import", Namespace: ns})
+			}
 			if ok {
 				l.loadDocument(q, b, roleImport, d, k, depth+1)
 			}
 		case k.is("redefine"):
 			loc, _ := k.attr("schemaLocation")
 			var red *document
-			if q, b, ok := l.locate(d, loc); ok {
+			if q, b, ok := l.locateOrResolve(d, loc, Ref{Kind: "redefine"}); ok {
 				red = l.loadDocument(q, b, roleRedefine, d, k, depth+1)
 			}
 			l.applyRedefine(d, k, red)
@@ -436,8 +483,10 @@ func (l *loader) locate(d *document, loc string) (string, string, bool) {
 		}
 	}
 	u, err := url.Parse(loc)
-	if err != nil || u.Scheme != "" || u.Host != "" || strings.HasPrefix(loc, "/") {
-		return "", "", false // adres bezwzględny bez wpisu w Locations: sieci nie używamy
+	if err != nil || u.Scheme != "" || u.Host != "" || strings.HasPrefix(loc, "/") || d.resolved {
+		// Adres bezwzględny bez wpisu w Locations (sieci nie używamy; może go dostarczyć Config.Resolve);
+		// dokument z Config.Resolve nie ma ścieżki w fs.FS, więc jego adresy względne też idą do Resolve.
+		return "", "", false
 	}
 	rel, err := url.PathUnescape(u.Path)
 	if err != nil {
@@ -453,6 +502,76 @@ func (l *loader) locate(d *document, loc string) (string, string, bool) {
 // exists sprawdza, czy plik p istnieje w fs.FS z dokładnie tą wielkością liter na każdym poziomie ścieżki.
 // System plików bez rozróżniania wielkości liter (macOS, Windows) otworzyłby „Schz012_b.xsd” jako
 // „schZ012_b.xsd”; wynik nie może zależeć od systemu.
+// locateOrResolve: locate, a gdy dokumentu nie ma, fetchDocument.
+func (l *loader) locateOrResolve(d *document, loc string, ref Ref) (string, string, bool) {
+	if q, b, ok := l.locate(d, loc); ok {
+		return q, b, true
+	}
+	return l.fetchDocument(d, loc, ref)
+}
+
+// fetchDocument pyta Config.Resolve o dokument pod adresem loc rozwiązanym względem adresu dokumentu d (albo pod
+// samym loc, gdy jest bezwzględny). Dokument dostaje za nazwę i adres bazowy ten adres, więc jego include
+// i import rozwiązują się względem niego. Każdy adres pytamy najwyżej raz.
+func (l *loader) fetchDocument(d *document, loc string, ref Ref) (string, string, bool) {
+	if l.cfg.Resolve == nil || l.fatal != nil {
+		return "", "", false
+	}
+	loc = collapse(loc)
+	if i := strings.IndexByte(loc, '#'); i >= 0 {
+		loc = loc[:i]
+	}
+	u, err := url.Parse(loc)
+	if loc == "" || err != nil {
+		return "", "", false
+	}
+	if !u.IsAbs() {
+		if d.base == "" {
+			return "", "", false
+		}
+		b, err := url.Parse(d.base)
+		if err != nil {
+			return "", "", false
+		}
+		u = b.ResolveReference(u)
+	}
+	abs := u.String()
+	if fd, ok := l.fetched[abs]; ok {
+		return abs, abs, fd.found
+	}
+	if len(l.docs) >= l.cfg.MaxDocuments {
+		return abs, abs, true // loadDocument zgłosi przekroczenie limitu przed otwarciem; nie pytamy na zapas
+	}
+	ref.Location, ref.From = abs, d.path
+	rc, err := l.cfg.Resolve(ref)
+	if err != nil {
+		l.fetched[abs] = &fetched{}
+		if !errors.Is(err, fs.ErrNotExist) {
+			l.fatal = fmt.Errorf("resolving %s (%s in %s): %w", abs, ref.Kind, d.path, err)
+		}
+		return "", "", false
+	}
+	data, err := io.ReadAll(io.LimitReader(rc, MaxResolvedSize+1))
+	rc.Close()
+	if err == nil && len(data) > MaxResolvedSize {
+		err = fmt.Errorf("document larger than %d bytes", MaxResolvedSize)
+	}
+	if err != nil {
+		l.fetched[abs] = &fetched{}
+		l.fatal = fmt.Errorf("resolving %s (%s in %s): %w", abs, ref.Kind, d.path, err)
+		return "", "", false
+	}
+	l.fetched[abs] = &fetched{data: data, found: true}
+	return abs, abs, true
+}
+
+type countWriter struct{ n int64 }
+
+func (c *countWriter) Write(p []byte) (int, error) {
+	c.n += int64(len(p))
+	return len(p), nil
+}
+
 func (l *loader) exists(p string) bool {
 	dir := "."
 	for _, part := range strings.Split(p, "/") {

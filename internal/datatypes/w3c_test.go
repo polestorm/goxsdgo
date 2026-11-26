@@ -310,13 +310,13 @@ func (s *schema) elementType(el *node) (*datatypes.Type, error) {
 // opcjonalnie jeden element lokalny o typie prostym w xs:sequence albo xs:choice oraz atrybuty o typach
 // prostych. Liczność i atrybuty sprawdzamy według cvc-complex-type (część 1) tylko w tym zakresie.
 type container struct {
-	child              string
-	childType          *datatypes.Type
-	minOccurs          int
-	maxOccurs          int // -1: unbounded
-	attrs              map[string]*datatypes.Type
-	required           map[string]bool
-	hasParticle, empty bool
+	child       string
+	childType   *datatypes.Type
+	minOccurs   int
+	maxOccurs   int // -1: unbounded
+	attrs       map[string]*datatypes.Type
+	required    map[string]bool
+	hasParticle bool
 }
 
 func (s *schema) containerType(ct *node) (*container, error) {

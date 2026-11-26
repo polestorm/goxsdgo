@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -1199,14 +1198,4 @@ func (v *validator) loadHints(fr *frame, tok *xmlreader.Token) {
 	if sch != nil {
 		v.sch = sch
 	}
-}
-
-// sortedKeys pomaga w powtarzalnych komunikatach.
-func sortedKeys(m map[string]bool) []string {
-	out := make([]string, 0, len(m))
-	for k := range m {
-		out = append(out, k)
-	}
-	sort.Strings(out)
-	return out
 }
