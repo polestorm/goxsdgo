@@ -13,7 +13,7 @@ Every release lists its changes with an impact class and the requirements they t
 Tags up to v0.3.0 are annotated, not signed; from v0.4.0 on, tags are signed. Known limitations:
 [docs/known-issues.md](docs/known-issues.md).
 
-## Unreleased
+## v0.5.0 (2026-11-27)
 
 - **Class 2.** The XML reader comes from the module [goxmlgo](https://github.com/polestorm/goxmlgo) v0.2.0, the
   reader split out of goxsdgo (ADR 0014). It is the only dependency of goxsdgo, and it has no dependencies and no
