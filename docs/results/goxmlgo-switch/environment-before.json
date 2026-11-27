@@ -1,0 +1,21 @@
+{
+  "mode": "perf",
+  "time": "2026-11-27T00:13:51+01:00",
+  "goxsdgo_commit": "741210b",
+  "goxsdgo_dirty": false,
+  "go_version": "go1.27.0",
+  "os": "darwin",
+  "os_version": "macOS 27.0.1",
+  "arch": "arm64",
+  "cpu": "Apple M4",
+  "num_cpu": 10,
+  "load_average": "3,13 2,38 2,43",
+  "xmllint": "/usr/bin/xmllint: using libxml version 20913",
+  "modules": {
+    "github.com/cB-Sigma/xsd": "v1.0.0",
+    "github.com/jacoelho/xsd": "v0.6.15",
+    "github.com/knroy/go-xml/v2": "v2.3.1",
+    "github.com/polestorm/goxsdgo": "v0.0.0 =\u003e ../..",
+    "golang.org/x/text": "v0.41.0"
+  }
+}

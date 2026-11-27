@@ -44,14 +44,13 @@ jobs:
         with:
           path: |
             testdata/w3c/xsdtests
-            testdata/w3c/xmlconf
             testdata/w3c/schemas
             testdata/schemas/mf
             testdata/instances/mf
           key: testdata-${{ hashFiles('testdata/sources.json') }}
       - name: fetch test data
         run: |
-          for set in w3c-xsdtests w3c-xmlconf w3c-schemas mf-instances mf-schemas; do
+          for set in w3c-xsdtests w3c-schemas mf-instances mf-schemas; do
             go -C tools/fetch run . -root ../.. -set $set
           done
       - name: tag signature
@@ -82,7 +81,8 @@ jobs:
       - name: checks
         run: |
           test -z "$(gofmt -l .)"
-          if grep -q '^require' go.mod; then echo 'the library module must not have dependencies'; exit 1; fi
+          # ADR 0014: jedyna zależność to goxmlgo, które samo nie ma zależności
+          if [ "$(go list -m all | sed 1d | cut -d' ' -f1)" != github.com/polestorm/goxmlgo ]; then echo 'the only dependency of the library module is goxmlgo'; exit 1; fi
           CGO_ENABLED=0 go build ./...
           go vet ./... 2>&1 | tee out/release/vet.txt
       - name: tests and coverage

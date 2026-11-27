@@ -16,7 +16,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/polestorm/goxsdgo/internal/xmlchars"
+	"github.com/polestorm/goxmlgo/xmlchars"
 )
 
 // CodeSyntax to kod błędu wyrażenia, które nie jest poprawnym wyrażeniem regularnym XSD (część 2, 4.3.4.2:

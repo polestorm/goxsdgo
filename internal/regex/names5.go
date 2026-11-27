@@ -1,6 +1,6 @@
 package regex
 
-import "github.com/polestorm/goxsdgo/internal/xmlchars"
+import "github.com/polestorm/goxmlgo/xmlchars"
 
 // xmlNameStart5 i xmlNameChar5 to \i i \c według XML 1.0 Fifth Edition (produkcje [4] i [4a]), z tych samych
 // przedziałów co czytnik dokumentów (internal/xmlchars). Używane tylko z xsd.Config.NameRules (ADR 0012).

@@ -14,10 +14,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/polestorm/goxmlgo/xmlchars"
+	"github.com/polestorm/goxmlgo/xmlreader"
 	"github.com/polestorm/goxsdgo/internal/datatypes"
 	"github.com/polestorm/goxsdgo/internal/schema"
-	"github.com/polestorm/goxsdgo/internal/xmlchars"
-	"github.com/polestorm/goxsdgo/xmlreader"
 )
 
 // Hint to wskazówka lokalizacji schematu z xsi:schemaLocation (para przestrzeń, adres) albo

@@ -33,8 +33,18 @@ type Evidence struct {
 	SourcesSHA  string         `json:"sources_json_sha256"`
 	FetchVerify FetchVerify    `json:"fetch_verify"`
 	ADRs        []ADR          `json:"adrs"`
+	Deps        []Dependency   `json:"dependencies"`
 	Differences []DiffSection  `json:"differences"`
 	Files       []string       `json:"files"`
+}
+
+// Dependency to moduł wymagany przez bibliotekę (go list -m all bez modułu głównego) z sumą z go.sum i adresem
+// jego źródeł i dokumentów w tej wersji (ADR 0014: goxmlgo ma własne wymagania i pakiet dowodów).
+type Dependency struct {
+	Path    string `json:"path"`
+	Version string `json:"version"`
+	Sum     string `json:"go_sum"`
+	Source  string `json:"source"`
 }
 
 // PythonRun to wynik testów tools/fetch w Pythonie.
@@ -195,8 +205,8 @@ func buildCriteria(in Inputs) []Criterion {
 	for _, t := range in.Traces {
 		counts[t.Status]++
 	}
-	k4.Value = fmt.Sprintf("%d wymagań: przeszło %d, na żądanie %d, pominięte %d, bez testu %d, nieprzypisane %d, nie przeszło %d; odwołania do nieznanych wymagań: %d",
-		len(in.Traces), counts["pass"], counts["manual"], counts["skip"], counts["missing"], counts["unresolved"], counts["fail"], len(in.UnknownRefs))
+	k4.Value = fmt.Sprintf("%d wymagań: przeszło %d, na żądanie %d, pominięte %d, bez testu %d, nieprzypisane %d, nie przeszło %d, delegowane do goxmlgo %d; odwołania do nieznanych wymagań: %d",
+		len(in.Traces), counts["pass"], counts["manual"], counts["skip"], counts["missing"], counts["unresolved"], counts["fail"], counts["delegated"], len(in.UnknownRefs))
 	switch {
 	case counts["fail"] > 0 || counts["missing"] > 0 || len(in.UnknownRefs) > 0 || in.result(pkgXSD+".TestRequirementsCovered") == "fail":
 		k4.Status = "not_met"
@@ -334,7 +344,8 @@ func okWord(ok bool) string {
 
 var statusPL = map[string]string{"met": "spełnione", "not_met": "**niespełnione**", "pending": "oczekuje",
 	"pass": "przeszedł", "fail": "**nie przeszedł**", "skip": "pominięty (brak danych)", "missing": "**brak testu**",
-	"unresolved": "**nieprzypisany**", "manual": "na żądanie (benchmark albo zmienna GOXSDGO_*)"}
+	"unresolved": "**nieprzypisany**", "manual": "na żądanie (benchmark albo zmienna GOXSDGO_*)",
+	"delegated": "delegowane do goxmlgo (dowód w jego pakiecie dowodów)"}
 
 // renderReport składa report.md (po polsku).
 func renderReport(e *Evidence) string {
@@ -433,6 +444,13 @@ func renderReport(e *Evidence) string {
 	}
 	p("\n`%s`: %s\n\n```\n%s\n```\n", e.FetchVerify.Command, okWord(e.FetchVerify.OK), strings.Join(e.FetchVerify.Lines, "\n"))
 
+	p("\n## Zależności biblioteki\n\nModuły z `go list -m all` (bez modułu głównego), sumy z `go.sum`. Wymagania delegowane (macierz wyżej) mają dowód\nw pakiecie dowodów zależności w tej wersji.\n\n| Moduł | Wersja | go.sum | Źródła i dokumenty |\n|---|---|---|---|\n")
+	for _, d := range e.Deps {
+		p("| `%s` | %s | `%s` | %s |\n", d.Path, d.Version, d.Sum, d.Source)
+	}
+	if len(e.Deps) == 0 {
+		p("| — | | | |\n")
+	}
 	p("\n## Decyzje (docs/adr)\n\n| Plik | Tytuł | Status |\n|---|---|---|\n")
 	for _, a := range e.ADRs {
 		p("| `%s` | %s | %s |\n", a.File, cell(a.Title), cell(a.Status))

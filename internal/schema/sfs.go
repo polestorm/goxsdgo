@@ -6,8 +6,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/polestorm/goxmlgo/xmlchars"
 	"github.com/polestorm/goxsdgo/internal/datatypes"
-	"github.com/polestorm/goxsdgo/internal/xmlchars"
 )
 
 // Kontrola dokumentu schematu według schematu dla schematów (część 1, dodatek A; część 2, dodatek A). Każdy element

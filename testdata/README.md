@@ -25,9 +25,8 @@ do 260 znaków.
 | Katalog | Zawartość | Źródło | Licencja | W repozytorium |
 |---|---|---|---|---|
 | `w3c/xsdtests/` | zestaw testów W3C XML Schema: 42 270 plików, 78 plików `*.testSet`, 27 408 przypadków schematów i dokumentów | `github.com/w3c/xsdtests`, commit `7bc3365c` (2026-04-01) | W3C Document Notice and License (1999), plik `00COPYRIGHT` | nie, pobierany |
-| `w3c/xmlconf/` | zestaw W3C XML Conformance 20130923: 3 386 plików (czytnik XML, etap 1) | `www.w3.org/XML/Test/xmlts20130923.tar.gz` | W3C; części od Sun, OASIS, IBM, Edinburgh (noty w plikach) | nie, pobierany |
 | `w3c/schemas/` | `xml.xsd` i `xlink.xsd`, które `xsts.xsd` i trzy przypadki zestawu importują spod adresów w3.org | `www.w3.org` | W3C | nie, pobierane |
-| `w3c/*.ratchet` | zapadki: które przypadki W3C (XSD, XML Conformance, typy NIST i Microsoft) już przechodzą (`docs/testing.md`) | własne | Apache 2.0 | tak |
+| `w3c/*.ratchet` | zapadki: które przypadki W3C (XSD, typy NIST i Microsoft; zapadka XML Conformance jest od v0.5.0 w goxmlgo) już przechodzą (`docs/testing.md`) | własne | Apache 2.0 | tak |
 | `schemas/mf/` | schematy MF i KAS: JPK (V7M, V7K w wersjach 1–3, FA, KR, KR_PD, WB, MAG, EWP, PKPIR, VAT), KSeF FA(2) i FA(3), e-Sprawozdania z plikami pomocniczymi (`auxiliary/`): 170 plików | gov.pl, crd.gov.pl; lista i adresy z katalogu `../xml.pro/internal/importing/schemas/auxiliary.json`, uzupełnione o JPK_V7M(1) i V7K(1) z importami | materiały urzędowe (art. 4 ustawy o prawie autorskim) | nie, pobierane |
 | `instances/mf/` | przykłady JPK_VAT (V7M i V7K w wersjach 1–3, InitUpload): 14 plików, dane fikcyjne MF | podatki.gov.pl, strona „Pliki do pobrania” JPK_VAT z deklaracją | materiały urzędowe | nie, pobierane |
 | `instances/expected.json` | oczekiwany werdykt każdego dokumentu korpusu i jego schemat; 8 przykładów MF ma schemat, 6 dokumentów InitUpload nie ma (brak schematu metadanych przesyłki) | własne | Apache 2.0 | tak |

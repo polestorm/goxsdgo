@@ -11,8 +11,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/polestorm/goxmlgo/xmlreader"
 	"github.com/polestorm/goxsdgo/internal/testkit"
-	"github.com/polestorm/goxsdgo/xmlreader"
 )
 
 // BenchmarkCorpus (kryterium K7, ADR 0011) mierzy szybkość walidacji na prywatnym korpusie z katalogu

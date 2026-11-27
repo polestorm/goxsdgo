@@ -17,7 +17,7 @@ generowania typów Go, reguł semantycznych spoza schematu (te są po stronie od
 |---|---|---|
 | `xsd` | kompilacja schematu i walidacja dokumentów | `Compile`, `Config` (`Locations`, `Namespaces`, `Resolve`, limity, `SchemaLocationHints`, `OnValue`, `NameRules`), `Set.Validate`, `Set.ValidateDocument`, `Set.Documents`, `Error`, `SchemaError`, `ErrLimit`, `ErrTooManyErrors`, katalog kodów (`Codes`, `LookupCode`, `LibXML2Code`) |
 | `xsd/resolve` | opcjonalne źródło dokumentów schematu dla `Config.Resolve` | `New(Options)`: `Dir`, `Cache`, `Network`, `AllowHosts`, `LocalPath`, `ErrDownload` |
-| `xmlreader` | strumieniowy czytnik XML 1.0 z przestrzeniami nazw | `New`, `Reader.Next`, `Token`, `Attr` (z `Type`), `Error` z kodem, `Limits` |
+| `xmlreader` | przestarzała warstwa zgodności: aliasy typów czytnika `goxmlgo/xmlreader` z API v0.3.0 (ADR 0014) | `New`, `DefaultLimits`, aliasy `Reader`, `Token`, `Attr`, `Error`, `Limits`, … |
 
 Pakiety `internal/` nie są interfejsem. API przed 1.0 może się zmienić (pytanie 5 w `docs/adr/open-questions.md`);
 każda zmiana ma w CHANGELOG klasę wpływu, zmiana niezgodna wstecz (klasa 3) ma notatkę migracji.
@@ -44,7 +44,8 @@ każda zmiana ma w CHANGELOG klasę wpływu, zmiana niezgodna wstecz (klasa 3) m
 
 | Zależność | Uzasadnienie |
 |---|---|
-| biblioteka standardowa Go (≥ 1.22) | jedyna; `go.mod` bez sekcji `require`, `CGO_ENABLED=0` (sprawdza CI) |
+| biblioteka standardowa Go (≥ 1.22) | `CGO_ENABLED=0` (sprawdza CI) |
+| `github.com/polestorm/goxmlgo` (v0.2.0) | jedyny moduł spoza biblioteki standardowej (ADR 0014): czytnik XML (`xmlreader`) i klasy znaków nazw (`xmlchars`), wydzielone z goxsdgo; sam bez zależności i bez cgo, tagi podpisane, CHANGELOG z klasą wpływu, własny pakiet dowodów; CI sprawdza, że `go list -m all` podaje tylko ten moduł |
 | `net/http`, `crypto/tls` (tylko `xsd/resolve`) | pobieranie dokumentów, gdy wywołujący włączy `Network`; programy bez `xsd/resolve` ich nie linkują przez goxsdgo |
 
 Narzędzia w `tools/` (porównania, fuzzing, pakiet dowodów, pobieranie danych testowych) są osobnymi modułami i nie

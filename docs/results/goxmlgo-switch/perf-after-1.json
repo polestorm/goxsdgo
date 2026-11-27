@@ -1,0 +1,284 @@
+[
+  {
+    "candidate": "goxsdgo",
+    "mb": 20,
+    "runs": 5,
+    "median_seconds": 0.374,
+    "min_seconds": 0.373,
+    "max_seconds": 0.383,
+    "median_max_rss_mb": 24.078125,
+    "verdict": "valid",
+    "each": [
+      {
+        "candidate": "goxsdgo",
+        "mb": 20,
+        "seconds": 0.373,
+        "max_rss_mb": 24.453125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 20,
+        "seconds": 0.374,
+        "max_rss_mb": 23.875,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 20,
+        "seconds": 0.374,
+        "max_rss_mb": 24.109375,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 20,
+        "seconds": 0.38,
+        "max_rss_mb": 23.953125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 20,
+        "seconds": 0.383,
+        "max_rss_mb": 24.078125,
+        "verdict": "valid"
+      }
+    ]
+  },
+  {
+    "candidate": "libxml2",
+    "mb": 20,
+    "runs": 5,
+    "median_seconds": 0.304207375,
+    "min_seconds": 0.296222667,
+    "max_seconds": 0.315509916,
+    "median_max_rss_mb": 4.28125,
+    "verdict": "valid",
+    "each": [
+      {
+        "candidate": "libxml2",
+        "mb": 20,
+        "seconds": 0.296222667,
+        "max_rss_mb": 4.28125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 20,
+        "seconds": 0.296802542,
+        "max_rss_mb": 4.28125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 20,
+        "seconds": 0.315509916,
+        "max_rss_mb": 4.28125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 20,
+        "seconds": 0.307558333,
+        "max_rss_mb": 4.28125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 20,
+        "seconds": 0.304207375,
+        "max_rss_mb": 4.265625,
+        "verdict": "valid"
+      }
+    ]
+  },
+  {
+    "candidate": "goxsdgo",
+    "mb": 60,
+    "runs": 5,
+    "median_seconds": 1.177,
+    "min_seconds": 1.151,
+    "max_seconds": 1.192,
+    "median_max_rss_mb": 24.796875,
+    "verdict": "valid",
+    "each": [
+      {
+        "candidate": "goxsdgo",
+        "mb": 60,
+        "seconds": 1.151,
+        "max_rss_mb": 24.796875,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 60,
+        "seconds": 1.154,
+        "max_rss_mb": 25.03125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 60,
+        "seconds": 1.179,
+        "max_rss_mb": 25.125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 60,
+        "seconds": 1.192,
+        "max_rss_mb": 24.421875,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 60,
+        "seconds": 1.177,
+        "max_rss_mb": 24.65625,
+        "verdict": "valid"
+      }
+    ]
+  },
+  {
+    "candidate": "libxml2",
+    "mb": 60,
+    "runs": 5,
+    "median_seconds": 0.923428709,
+    "min_seconds": 0.908338167,
+    "max_seconds": 0.934662417,
+    "median_max_rss_mb": 4.3125,
+    "verdict": "valid",
+    "each": [
+      {
+        "candidate": "libxml2",
+        "mb": 60,
+        "seconds": 0.911899458,
+        "max_rss_mb": 4.3125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 60,
+        "seconds": 0.908338167,
+        "max_rss_mb": 4.3125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 60,
+        "seconds": 0.923428709,
+        "max_rss_mb": 4.3125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 60,
+        "seconds": 0.925239375,
+        "max_rss_mb": 4.3125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 60,
+        "seconds": 0.934662417,
+        "max_rss_mb": 4.3125,
+        "verdict": "valid"
+      }
+    ]
+  },
+  {
+    "candidate": "goxsdgo",
+    "mb": 200,
+    "runs": 5,
+    "median_seconds": 3.545,
+    "min_seconds": 3.542,
+    "max_seconds": 3.942,
+    "median_max_rss_mb": 25.40625,
+    "verdict": "valid",
+    "each": [
+      {
+        "candidate": "goxsdgo",
+        "mb": 200,
+        "seconds": 3.942,
+        "max_rss_mb": 25.21875,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 200,
+        "seconds": 3.555,
+        "max_rss_mb": 25.1875,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 200,
+        "seconds": 3.544,
+        "max_rss_mb": 25.890625,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 200,
+        "seconds": 3.542,
+        "max_rss_mb": 25.40625,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "goxsdgo",
+        "mb": 200,
+        "seconds": 3.545,
+        "max_rss_mb": 25.765625,
+        "verdict": "valid"
+      }
+    ]
+  },
+  {
+    "candidate": "libxml2",
+    "mb": 200,
+    "runs": 5,
+    "median_seconds": 2.842677666,
+    "min_seconds": 2.825671916,
+    "max_seconds": 3.05573375,
+    "median_max_rss_mb": 4.3125,
+    "verdict": "valid",
+    "each": [
+      {
+        "candidate": "libxml2",
+        "mb": 200,
+        "seconds": 3.05573375,
+        "max_rss_mb": 4.3125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 200,
+        "seconds": 2.863183459,
+        "max_rss_mb": 4.3125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 200,
+        "seconds": 2.825671916,
+        "max_rss_mb": 4.3125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 200,
+        "seconds": 2.842677666,
+        "max_rss_mb": 4.3125,
+        "verdict": "valid"
+      },
+      {
+        "candidate": "libxml2",
+        "mb": 200,
+        "seconds": 2.840823625,
+        "max_rss_mb": 4.3125,
+        "verdict": "valid"
+      }
+    ]
+  }
+]

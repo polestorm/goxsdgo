@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/polestorm/goxsdgo/xmlreader"
+	"github.com/polestorm/goxmlgo/xmlreader"
 )
 
 // node to element dokumentu schematu. Dokumenty schematu są małe, więc trzymamy je w pamięci w całości; walidacja

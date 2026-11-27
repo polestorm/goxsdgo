@@ -1,6 +1,6 @@
 # 0004 Własny czytnik XML
 
-Status: przyjęta · 2026-11-25 · rozstrzyga pytanie 3 z `open-questions.md`
+Status: przyjęta · 2026-11-25 · rozstrzyga pytanie 3 z `open-questions.md`; od 2026-11-27 czytnik jest w module goxmlgo (ADR 0014), decyzje tej ADR obowiązują tam
 
 ## Kontekst
 

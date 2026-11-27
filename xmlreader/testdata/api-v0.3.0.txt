@@ -1,0 +1,146 @@
+package github.com/polestorm/goxsdgo/xmlreader
+
+const (
+	AttrTypeCDATA       = "CDATA"
+	AttrTypeID          = "ID"
+	AttrTypeIDREF       = "IDREF"
+	AttrTypeIDREFS      = "IDREFS"
+	AttrTypeENTITY      = "ENTITY"
+	AttrTypeENTITIES    = "ENTITIES"
+	AttrTypeNMTOKEN     = "NMTOKEN"
+	AttrTypeNMTOKENS    = "NMTOKENS"
+	AttrTypeNotation    = "NOTATION"
+	AttrTypeEnumeration = "ENUMERATION"
+)
+
+const (
+	CodeEncodingInvalid     = "xml-encoding-invalid"
+	CodeEncodingUnsupported = "xml-encoding-unsupported"
+	CodeEncodingMismatch    = "xml-encoding-mismatch"
+	CodeChar                = "xml-char"
+	CodeSyntax              = "xml-syntax"
+	CodeEOF                 = "xml-eof"
+	CodeName                = "xml-name"
+	CodeNoRoot              = "xml-no-root"
+	CodeOutsideRoot         = "xml-content-outside-root"
+	CodeCDATAEnd            = "xml-cdata-end"
+	CodeComment             = "xml-comment"
+	CodeReservedPITarget    = "xml-reserved-pi-target"
+	CodeXMLDecl             = "xml-decl"
+	CodeEntityStructure     = "xml-entity-structure"
+	CodeElementTypeMatch    = "wfc-element-type-match"
+	CodeUniqueAttSpec       = "wfc-unique-att-spec"
+	CodeNoExternalEntityRef = "wfc-no-external-entity-references"
+	CodeNoLtInAttValue      = "wfc-no-lt-in-attribute-values"
+	CodeLegalCharacter      = "wfc-legal-character"
+	CodeEntityDeclared      = "wfc-entity-declared"
+	CodeParsedEntity        = "wfc-parsed-entity"
+	CodeNoRecursion         = "wfc-no-recursion"
+	CodePEsInInternalSubset = "wfc-pes-in-internal-subset"
+	CodePrefixDeclared      = "nsc-prefix-declared"
+	CodeNoPrefixUndeclaring = "nsc-no-prefix-undeclaring"
+	CodeAttributesUnique    = "nsc-attributes-unique"
+	CodeReservedPrefixes    = "nsc-reserved-prefixes"
+	CodeQName               = "ns-qname"
+	CodeLimitDepth          = "limit-depth"
+	CodeLimitNameLength     = "limit-name-length"
+	CodeLimitAttributes     = "limit-attributes"
+	CodeLimitTextSize       = "limit-text-size"
+	CodeLimitEntityExpand   = "limit-entity-expansion"
+	CodeLimitEntityDepth    = "limit-entity-depth"
+	CodeLimitDTDSize        = "limit-dtd-size"
+	CodeExternalEntity      = "unsupported-external-entity"
+	CodeEntityUnresolved    = "unsupported-entity-unresolved"
+	CodeConditionalSection  = "unsupported-conditional-section"
+)
+
+const (
+	KindStartElement Kind = iota + 1
+	KindEndElement
+	KindText
+	KindComment
+	KindProcInst
+	KindDoctype
+)
+
+type Attr struct {
+	Name  Name
+	Value string
+
+	Type string
+
+	Specified    bool
+	Line, Column int
+}
+
+type Binding struct{ Prefix, URI string }
+
+type Error struct {
+	Code string
+
+	Line, Column int
+	Message      string
+}
+
+type Kind uint8
+
+type Limits struct {
+	MaxDepth           int
+	MaxNameLength      int
+	MaxAttributes      int
+	MaxTextSize        int
+	MaxEntityExpansion int
+	MaxEntityDepth     int
+	MaxDTDSize         int
+}
+
+type Name struct {
+	Space, Local, Prefix string
+}
+
+type Notation struct {
+	Name, PublicID, SystemID string
+	HasPublic, HasSystem     bool
+}
+
+type Options struct {
+	Limits Limits
+
+	NoNamespaces bool
+}
+
+type Reader struct {
+	// contains filtered or unexported fields
+}
+
+type Token struct {
+	Kind  Kind
+	Name  Name
+	Attrs []Attr
+
+	Data []byte
+
+	CDATA, Whitespace bool
+
+	SelfClosing bool
+
+	Line, Column int
+
+	EndLine, EndColumn int
+}
+
+func DefaultLimits() Limits
+
+func New(r io.Reader, opts Options) *Reader
+
+func (e *Error) Error() string
+
+func (r *Reader) DeclaredNamespaces() []Binding
+
+func (r *Reader) LookupNamespace(prefix string) (string, bool)
+
+func (r *Reader) Next() (Token, error)
+
+func (r *Reader) Notations() []Notation
+
+func (r *Reader) UnparsedEntity(name string) bool

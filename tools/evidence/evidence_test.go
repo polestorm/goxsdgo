@@ -17,7 +17,7 @@ func fakeRepo(t *testing.T) string {
 	files := map[string]string{
 		"requirements/README.md": "| Prefiks | Plik | Zakres |\n|---|---|---|\n| `AB` | `a.md` | a |\n| `CDE` | `c.md` | c |\n",
 		"requirements/a.md":      "| Id | Wymaganie |\n|---|---|\n| AB-001 | pierwsze |\n| AB-002 | drugie, z \\| w treści |\n| AB-003 | tylko pomocnicza |\n| AB-004 | benchmark |\n| AB-005 | na żądanie |\n",
-		"requirements/c.md":      "| Id | Wymaganie |\n|---|---|\n| CDE-001 | bez testu |\n",
+		"requirements/c.md":      "| Id | Wymaganie |\n|---|---|\n| CDE-001 | bez testu |\n| CDE-002 | Delegowane: goxmlgo v0.2.0, `requirements/xml.md` XML-001. |\n",
 		"go.mod":                 "module example.com/m\n\ngo 1.22\n",
 		"p/p_test.go": `package p
 
@@ -76,7 +76,7 @@ func TestTraceabilityMatrix(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(reqs) != 6 || reqs[1].Text != `drugie, z \| w treści` {
+	if len(reqs) != 7 || reqs[1].Text != `drugie, z \| w treści` {
 		t.Fatalf("requirements: %+v", reqs)
 	}
 	refs, err := collectRefs(root, idRe)
@@ -92,7 +92,7 @@ func TestTraceabilityMatrix(t *testing.T) {
 	}
 	traces, unknown := buildTraces(reqs, refs, []*TestRun{run})
 	want := map[string]string{"AB-001": "pass", "AB-002": "skip", "AB-003": "unresolved", "AB-004": "manual",
-		"AB-005": "manual", "CDE-001": "missing"}
+		"AB-005": "manual", "CDE-001": "missing", "CDE-002": "delegated"}
 	for _, tr := range traces {
 		if tr.Status != want[tr.ID] {
 			t.Errorf("%s: status %s, want %s (evidence %v)", tr.ID, tr.Status, want[tr.ID], tr.Evidence)

@@ -1,0 +1,13 @@
+# go test ./xsd -run '^$' -bench 'BenchmarkValidateJPK$' -benchmem -count 5
+# before: v0.4.1 (741210b), own reader
+BenchmarkValidateJPK-10    	       3	 444010958 ns/op	  47.24 MB/s	25874765 B/op	  945893 allocs/op
+BenchmarkValidateJPK-10    	       3	 417194292 ns/op	  50.27 MB/s	25874213 B/op	  945891 allocs/op
+BenchmarkValidateJPK-10    	       3	 416660153 ns/op	  50.34 MB/s	25861845 B/op	  945890 allocs/op
+BenchmarkValidateJPK-10    	       3	 457494556 ns/op	  45.84 MB/s	25861904 B/op	  945890 allocs/op
+BenchmarkValidateJPK-10    	       3	 473291917 ns/op	  44.31 MB/s	25923861 B/op	  945898 allocs/op
+# after: goxmlgo v0.2.0
+BenchmarkValidateJPK-10    	       3	 367787042 ns/op	  57.02 MB/s	25837344 B/op	  945890 allocs/op
+BenchmarkValidateJPK-10    	       3	 366111542 ns/op	  57.29 MB/s	25825056 B/op	  945889 allocs/op
+BenchmarkValidateJPK-10    	       3	 368861014 ns/op	  56.86 MB/s	25849696 B/op	  945891 allocs/op
+BenchmarkValidateJPK-10    	       3	 369032125 ns/op	  56.83 MB/s	25849786 B/op	  945891 allocs/op
+BenchmarkValidateJPK-10    	       3	 394507028 ns/op	  53.16 MB/s	25886789 B/op	  945894 allocs/op

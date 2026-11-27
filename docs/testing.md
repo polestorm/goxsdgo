@@ -5,7 +5,7 @@
 | Warstwa | Gdzie | Co sprawdza |
 |---|---|---|
 | zestaw W3C | `testdata/w3c/xsdtests/` (ADR 0003), `TestW3CSuite`, czytnik `internal/w3c` | werdykt dla każdego schematu i dokumentu z zestawu XSD 1.0 2e; raport w podziale na dostawców (NIST, Microsoft, Sun, Boeing, IBM, Saxonica, W3C); wyłączenia z powodem; zapadka `testdata/w3c/xsdtests.ratchet`; `TestW3CSuiteNameRules5` raportuje wynik z regułami nazw XML 1.0 5e (bez osobnej zapadki, K1 liczymy w ustawieniu domyślnym) |
-| zgodność XML | `xmlreader`, `TestXMLConformance` | czytnik XML na zestawie W3C XML Conformance (dobra forma, przestrzenie nazw, druga postać kanoniczna tam, gdzie zestaw ją podaje); zapadka `testdata/w3c/xmlconf.ratchet`, `go test ./xmlreader -update` |
+| czytnik XML | moduł goxmlgo (ADR 0014); w goxsdgo `xmlreader/compat_test.go` | od v0.5.0 czytnik, jego zestaw W3C XML Conformance (`TestXMLConformance`, zapadka), `FuzzReader` i porównanie z `encoding/xml` są w goxmlgo (`docs/testing.md` tamże); goxsdgo sprawdza warstwę zgodności `goxsdgo/xmlreader` (API v0.3.0, tożsamość typów, XML-020) i wymagania delegowane (`TestRequirementsCovered`) |
 | typy proste (pośrednio) | `internal/datatypes`, `TestW3CDatatypes` | przypadki NIST i Microsoft (DataTypes, Regex) z zestawu W3C przez adapter w testach, który czyta schematy o prostym kształcie; nie jest to K1, bo bez etapu 3 brak prawdziwego wczytania schematu; zapadki `testdata/w3c/nist-datatypes.ratchet`, `ms-datatypes.ratchet` |
 | wymagania | `requirements/*.md`, `TestRequirementsCovered` | każde wymaganie ma test albo plik korpusu; każde odwołanie `REQ:` wskazuje istniejące wymaganie |
 | korpus schematów | `testdata/schemas/mf/`, `TestSchemaCorpus` | każdy ze 170 schematów MF (JPK, KSeF, e-Sprawozdania) kompiluje się bez błędów; importy rozwiązuje katalog adresów z manifestu, bez sieci; zapadki `testdata/mf-schemas.ratchet`, `testdata/mf-instances.ratchet` |
@@ -18,7 +18,7 @@
 | bezpieczeństwo | `TestSafeByDefault` (od etapu 5) | brak sieci i encji zewnętrznych, limity głębokości i rozmiaru, schemat spoza `fs.FS` odrzucony |
 | pamięć | `TestStreamingMemory` (od etapu 5) | syntetyczny JPK generowany w teście, nie plik: 200 MB w zwykłym przebiegu, 1 GB z `GOXSDGO_STREAM_MB=1024`; szczyt pamięci < 64 MB |
 | powtarzalność | `TestDeterministic` (od etapu 5, także walidacja współbieżna) | wielokrotna walidacja daje te same błędy w tej samej kolejności |
-| odporność | `FuzzCompile`, `FuzzValidate`, `FuzzContentModel` (automat porównywany z niezależnym, prostym dopasowaniem), `FuzzReader`, `FuzzRegexTranslate`, `FuzzLexical`, `FuzzDecimal`; kampania `tools/fuzz` (paczka dla serwera bez Go: `-pack`, dziennik: `-import`), dziennik godzin w `docs/fuzzing.md`; fuzzing według reguły z globalnego `CLAUDE.md` właściciela (Synology, lokalnie tylko w nocy na zasilaniu sieciowym) | dowolny schemat i dokument: bez paniki, czas ograniczony |
+| odporność | `FuzzCompile`, `FuzzValidate`, `FuzzContentModel` (automat porównywany z niezależnym, prostym dopasowaniem), `FuzzRegexTranslate`, `FuzzLexical`, `FuzzDecimal`; kampania `tools/fuzz` (paczka dla serwera bez Go: `-pack`, dziennik: `-import`), dziennik godzin w `docs/fuzzing.md`; fuzzing według reguły z globalnego `CLAUDE.md` właściciela (Synology, lokalnie tylko w nocy na zasilaniu sieciowym) | dowolny schemat i dokument: bez paniki, czas ograniczony |
 | patologiczne | `TestPathological` (`internal/schema`: modele zawartości; `xsd`: wzorce, liczności, zagnieżdżenia, długie atrybuty i teksty, klucze, ID, wyliczenia, listy, symbole wieloznaczne, encje; iloraz czasów 2n/n ≤ 3,2; wejścia ponad limitem kończą się `ErrLimit`) | wzorce z zagnieżdżonymi powtórzeniami, `maxOccurs` w setkach tysięcy, głębokie zagnieżdżenia, tysiące kluczy: czas rośnie liniowo |
 | wydajność | `BenchmarkValidateJPK`, `BenchmarkCorpus`, `tools/compare private` i `timefile` | porównanie z libxml2 przez `tools/compare` (K7); korpus prywatny z `GOXSDGO_PRIVATE_CORPUS`, wyłącznie liczby zbiorcze |
 | bez zmian wyników | `TestDumpErrors` (`GOXSDGO_DUMP_ERRORS`) | zrzut wszystkich błędów zestawu W3C i korpusu przed i po optymalizacji; różnica musi być pusta |
@@ -32,12 +32,12 @@ w CI pomijane z komunikatem, a kryterium K2 mierzymy lokalnie. Zestaw W3C i przy
 
 ## Zapadki
 
-Pliki `*.ratchet` (`testdata/w3c/xsdtests.ratchet`, `xmlconf.ratchet`, `nist-datatypes.ratchet`,
+Pliki `*.ratchet` (`testdata/w3c/xsdtests.ratchet`, `nist-datatypes.ratchet`,
 `ms-datatypes.ratchet`, `testdata/mf-schemas.ratchet`, `testdata/mf-instances.ratchet`) mówią, które przypadki
 w zakresie już przechodzą. Plik zawiera krótszą z dwóch list: przypadki zaliczone (`# mode: passing`) albo
 niezaliczone (`# mode: failing`); nagłówek podaje, ile przypadków jest w zakresie i ile przechodzi
 (`internal/testkit.Ratchet`). Test kończy się błędem, gdy przypadek, który przechodził, przestaje przechodzić. Nowe
-zaliczenia zapisuje `go test ./xsd ./internal/datatypes ./xmlreader -update` (flagę `-update` mają tylko pakiety z zapadkami), a zmiana pliku jest widoczna w przeglądzie. Przypadek
+zaliczenia zapisuje `go test ./xsd ./internal/datatypes -update` (flagę `-update` mają tylko pakiety z zapadkami), a zmiana pliku jest widoczna w przeglądzie. Przypadek
 przestaje przechodzić tylko z wyjaśnieniem w opisie commitu. Przypadek, którego `goxsdgo` jeszcze nie umie
 rozstrzygnąć (`errors.ErrUnsupported`), nie jest nigdy zaliczony, także gdy oczekiwany werdykt to „błędny”.
 
@@ -65,6 +65,7 @@ Wyniki zapisujemy tutaj z datą, wersją i sposobem pomiaru.
 
 | Data | Commit | W3C (zaliczone / w zakresie) | Korpus MF | Zgodność z libxml2 | Uwagi |
 |---|---|---|---|---|---|
+| 2026-11-27 | czytnik z goxmlgo v0.2.0 (ADR 0014) | 39 369 / 39 439 (bez zmian) | 170 / 170, 15 / 15 | bez zmian (zrzut błędów `TestDumpErrors` identyczny bajt po bajcie) | `internal/xmlchars` i kod `xmlreader` usunięte; zapadka `xmlconf.ratchet` i zestaw XML Conformance przeszły do goxmlgo; walidacja 13–17% szybsza (`docs/results/goxmlgo-switch/`) |
 | 2026-11-26 | `tools/compare` bez goxsdval | 39 369 / 39 439 (bez zmian) | 170 / 170, 15 / 15 | 99,69% werdyktów, 99,7% wierszy; 530 rozbieżności (rację ma goxsdgo w 521, libxml2 w 9) | własne wiązanie libxml2 w `tools/compare` (wyniki identyczne jak przez goxsdval); `tools/bench perf` mediana z 5 przebiegów: 200 MB goxsdgo 4,00 s, libxml2 2.15.4 3,90 s, jacoelho/xsd 3,75 s; surowe wyniki w `docs/results/`, metoda w `docs/methodology.md` |
 | 2026-11-26 | po przepisaniu historii | 39 369 / 39 439 (bez zmian) | bez zmian | bez zmian | pakiet `messages` wydzielony z historią do osobnego modułu (ADR 0010); wymagań 129 (bez 7 MSG); identyfikatory od etapu 6b zmienione (`docs/fuzzing.md`) |
 | 2026-11-25 | poprawka `length-minLength-maxLength` 1.2/2.2 | 39 369 / 39 439 (+2: MS IDREFS_length006, NMTOKENS_length006) | bez zmian | — | błąd goxsdgo znaleziony przy porównaniu z knroy/go-xml i klasyfikacji przypadków spornych; zrzut błędów: zmieniły się wyłącznie te 2 przypadki |

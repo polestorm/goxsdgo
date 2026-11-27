@@ -21,7 +21,7 @@ are validators in pure Go, published in 2026.
 
 | | goxsdgo | libxml2[^ref] | knroy[^names] | jacoelho[^names] | cB-Sigma[^names] |
 |---|:---:|:---:|:---:|:---:|:---:|
-| Dependencies[^deps] | 0 🥇 | C, cgo | 1 | 0 🥇 | 0 🥇 |
+| Dependencies[^deps] | 1 | C, cgo | 1 | 0 🥇 | 0 🥇 |
 | Minimum Go | 1.22 🥇 | — | 1.25 | 1.27 | 1.24 |
 | Lines of Go code[^size] | 15,293 | (C) | 203,186 | 55,395 | 8,679 🥇 |
 | Added to a program | 1.7 MB | 1.0 MB lib + …[^dylib] | 6.4 MB | 3.2 MB | 1.6 MB 🥇 |
@@ -91,7 +91,8 @@ are validators in pure Go, published in 2026.
 [^mf]: The 170 schemas of `testdata/sources.json` with their imports, resolved from a local catalogue; the 8
     published MF samples and 7 synthetic documents of `testdata/instances/expected.json`. jacoelho/xsd stops at its
     content-model state limit on the two KSeF invoice schemas, FA(2) and FA(3).
-[^deps]: Modules required by a program that validates a file. libxml2 is a C library reached through cgo.
+[^deps]: Modules required by a program that validates a file. libxml2 is a C library reached through cgo. goxsdgo
+    (from v0.5.0) needs [goxmlgo](https://github.com/polestorm/goxmlgo), its own XML reader, which has no dependencies.
 [^size]: Lines of the non-test Go files of the packages that a "compile a schema, validate a file" program pulls
     in (`tools/bench/sizeprog`), without the program itself. "Added to a program" is the size of that program minus
     the same program without a validator (`CGO_ENABLED=0`, `-ldflags="-s -w"`, macOS arm64); for libxml2 the size

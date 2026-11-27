@@ -29,8 +29,8 @@ import (
 // ../testdata/..., ../../testdata/...) działają tak samo jak w repozytorium.
 
 // dataDirs to katalogi danych czytane przez fuzzery jako wejścia startowe (xsd/fuzzseed_test.go,
-// xmlreader/fuzz_test.go, internal/regex/regex_test.go).
-var dataDirs = []string{"testdata/schemas/mf", "testdata/instances/mf", "testdata/w3c/xmlconf", "testdata/w3c/xsdtests"}
+// internal/regex/regex_test.go). Zestaw XML Conformance czytał FuzzReader, który jest w goxmlgo od v0.5.0.
+var dataDirs = []string{"testdata/schemas/mf", "testdata/instances/mf", "testdata/w3c/xsdtests"}
 
 func pack(root, dir string, fuzzers []fuzzer, targets []string, withData bool) error {
 	if err := os.RemoveAll(dir); err != nil {

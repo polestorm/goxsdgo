@@ -52,14 +52,16 @@ go -C tools/fuzz run . -root ../.. -import /ścieżka/do/journal.tsv   # wynik z
 - Wiersz z oznaczeniem „(zmiany)” to przebieg na kodzie z niezatwierdzonymi zmianami: nie liczy się do K5.
 - Przebieg zakończony błędem zeruje licznik dla kodu, którego dotyczy: błąd naprawiamy, wejście zostaje w
   `testdata/fuzz/<Fuzzer>/` jako test regresji, a godziny liczymy od nowego commitu.
-- Wejścia startowe pochodzą z pobranych danych testowych (schematy i przykłady MF, próbka zestawu W3C i XML
-  Conformance); bez nich fuzzery startują z wejść wpisanych w kod. Danych prywatnych nie używamy.
+- Od v0.5.0 (ADR 0014) kod czytnika jest w module goxmlgo; jego wersja w `go.mod` jest częścią kodu biblioteki, więc
+  podbicie goxmlgo zeruje licznik tak samo jak zmiana kodu goxsdgo.
+- Wejścia startowe pochodzą z pobranych danych testowych (schematy i przykłady MF, próbka zestawu W3C; do v0.4.1
+  także XML Conformance dla `FuzzReader`); bez nich fuzzery startują z wejść wpisanych w kod. Danych prywatnych nie używamy.
 
 ## Fuzzery
 
 | Fuzzer | Pakiet | Niezmienniki |
 |---|---|---|
-| `FuzzReader` | `xmlreader` (do 2026-11-26 `internal/xmlreader`) | brak paniki; czytanie się kończy; pozycje tokenów i błędów w granicach wejścia; błąd zawsze typu `*Error` |
+| `FuzzReader` | do v0.4.1 `xmlreader` (do 2026-11-26 `internal/xmlreader`); od v0.5.0 w goxmlgo (`docs/fuzzing.md` tamże) | brak paniki; czytanie się kończy; pozycje tokenów i błędów w granicach wejścia; błąd zawsze typu `*Error` |
 | `FuzzRegexTranslate` | `internal/regex` | brak paniki; wynik tłumaczenia kompiluje się w RE2 albo daje `regex-too-large`; czas tłumaczenia ograniczony |
 | `FuzzLexical` | `internal/datatypes` | postać kanoniczna należy do przestrzeni leksykalnej, oznacza tę samą wartość i jest stała |
 | `FuzzDecimal` | `internal/datatypes` | `Decimal` zgodny z niezależnym wzorcem na `big.Rat`: przyjęcie literału, porządek, znak, postać kanoniczna, liczba cyfr, jednoznaczna reprezentacja |
@@ -156,3 +158,11 @@ po jednym bajcie, porcjami po 7 bajtów; XML-019). Dotąd fuzzer podawał wejśc
 błędu deklaracji XML czytanej porcjami (KI-13, znaleziony przy wydzielaniu czytnika do goxmlgo). Przebieg sprawdzający
 na Macu (zasilanie sieciowe, `-parallel 2`): 100 s, bez błędu. Poprawka zmienia kod biblioteki, dlatego kampania
 K5 biegnie na `v0.4.1` (wyżej).
+
+## Czytnik w goxmlgo (2026-11-27)
+
+Od v0.5.0 goxsdgo czyta dokumenty czytnikiem z `github.com/polestorm/goxmlgo` (ADR 0014). `FuzzReader` i jego
+wejścia regresji są w goxmlgo i tam liczą się jego godziny; w goxsdgo zostaje 6 fuzzerów (czytnik dalej dostaje
+wejścia pośrednio przez `FuzzValidate` i `FuzzCompile`). Paczka `tools/fuzz -pack` nie zawiera już zestawu XML
+Conformance. Kampania z paczki `985c49f` (v0.4.1, w kolejce na Synology) dotyczy kodu sprzed przełączenia: jej
+godziny liczą się dla v0.4.1, nie dla wydania z goxmlgo.

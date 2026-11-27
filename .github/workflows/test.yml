@@ -29,14 +29,13 @@ jobs:
         with:
           path: |
             testdata/w3c/xsdtests
-            testdata/w3c/xmlconf
             testdata/w3c/schemas
             testdata/schemas/mf
             testdata/instances/mf
           key: testdata-${{ hashFiles('testdata/sources.json') }}
       - name: fetch test data
         run: |
-          for set in w3c-xsdtests w3c-xmlconf w3c-schemas mf-instances; do
+          for set in w3c-xsdtests w3c-schemas mf-instances; do
             go -C tools/fetch run . -root ../.. -set $set
           done
           # schematy MF: gdy serwer MF nie odpowiada (np. epuap.gov.pl z serwerów GitHuba), tools/fetch bierze plik
@@ -45,9 +44,10 @@ jobs:
       - name: gofmt
         if: matrix.os == 'ubuntu-latest'
         run: test -z "$(gofmt -l .)"
-      - name: no dependencies in the library module
+      # ADR 0014: jedyna zależność modułu biblioteki to goxmlgo, które samo nie ma zależności
+      - name: only goxmlgo as a dependency of the library module
         if: matrix.os == 'ubuntu-latest'
-        run: "! grep -q '^require' go.mod"
+        run: test "$(go list -m all | sed 1d | cut -d' ' -f1)" = github.com/polestorm/goxmlgo
       - name: no cgo in the library
         if: matrix.os == 'ubuntu-latest'
         run: CGO_ENABLED=0 go build ./...

@@ -15,18 +15,43 @@ import (
 var paramFields = map[string]bool{"Document": true, "Path": true, "Name": true, "Value": true, "Facet": true, "Expected": true,
 	"Reason": true, "Type": true, "Insert": true}
 
-// TestCatalogMatchesSource: katalog i kod źródłowy podają ten sam zbiór kodów błędów; każdy wpis jest kompletny.
+// readerUnreachable to kody goxmlgo/xmlreader, których walidator nie może zwrócić, z powodem; katalog ich nie podaje.
+var readerUnreachable = map[string]string{
+	"limit-elements": "goxsdgo never sets Limits.MaxElements, so the reader has no element limit",
+	"usage-skip":     "goxsdgo never calls Reader.Skip",
+}
+
+// TestCatalogMatchesSource: katalog podaje dokładnie kody, które walidator może zwrócić: emitowane przez źródła
+// goxsdgo i eksportowane przez goxmlgo/xmlreader (poza readerUnreachable); każdy wpis jest kompletny.
 // REQ: ERR-001
 func TestCatalogMatchesSource(t *testing.T) {
 	src := sourceCodes(t)
+	reader := map[string]bool{}
+	for name, code := range readerCodes(t) {
+		reader[code] = true
+		if _, ok := readerUnreachable[code]; ok {
+			continue
+		}
+		if _, ok := LookupCode(code); !ok {
+			t.Errorf("goxmlgo/xmlreader exports %s = %q, which is missing from the catalog (xsd/codes.go)", name, code)
+		}
+	}
+	for code := range readerUnreachable {
+		if !reader[code] {
+			t.Errorf("readerUnreachable lists %s, which goxmlgo/xmlreader does not export", code)
+		}
+		if _, ok := LookupCode(code); ok {
+			t.Errorf("%s is unreachable through goxsdgo, but the catalog lists it", code)
+		}
+	}
 	seen := map[string]bool{}
 	for i, c := range catalog {
 		if i > 0 && catalog[i-1].Code >= c.Code {
 			t.Errorf("catalog not sorted or duplicate at %s", c.Code)
 		}
 		seen[c.Code] = true
-		if _, ok := src[c.Code]; !ok {
-			t.Errorf("catalog lists %s, which the source never emits", c.Code)
+		if _, ok := src[c.Code]; !ok && !reader[c.Code] {
+			t.Errorf("catalog lists %s, which neither the source nor goxmlgo/xmlreader emits", c.Code)
 		}
 		switch c.Kind {
 		case KindSchema, KindDocument, KindLimit:
@@ -53,7 +78,13 @@ func TestCatalogMatchesSource(t *testing.T) {
 			t.Errorf("code %s (first used at %s) is missing from the catalog (xsd/codes.go)", code, at)
 		}
 	}
-	t.Logf("%d codes in the catalog", len(catalog))
+	readerOnly := 0
+	for _, c := range catalog {
+		if _, ok := src[c.Code]; reader[c.Code] && !ok {
+			readerOnly++
+		}
+	}
+	t.Logf("%d codes in the catalog, %d of them from goxmlgo/xmlreader only", len(catalog), readerOnly)
 }
 
 // checkObservedCodes sprawdza kody zwrócone w testach zgodności: każdy ma wpis w katalogu, rodzaj błędu zgadza się
@@ -178,7 +209,16 @@ func TestCompatTable(t *testing.T) {
 // REQ: ERR-001
 func TestErrorsDoc(t *testing.T) {
 	const path = "../docs/errors.md"
-	want := errorsDoc()
+	reader := map[string]bool{}
+	for _, code := range readerCodes(t) {
+		reader[code] = true
+	}
+	src := sourceCodes(t)
+	own := map[string]bool{}
+	for code := range src {
+		own[code] = true
+	}
+	want := errorsDoc(reader, own)
 	if *update {
 		if err := os.WriteFile(path, []byte(want), 0o644); err != nil {
 			t.Fatal(err)
@@ -191,7 +231,9 @@ func TestErrorsDoc(t *testing.T) {
 	}
 }
 
-func errorsDoc() string {
+// errorsDoc buduje docs/errors.md; reader to kody eksportowane przez goxmlgo/xmlreader, emitted kody emitowane
+// przez źródła goxsdgo (kolumna „Źródło”).
+func errorsDoc(reader, emitted map[string]bool) string {
 	var b strings.Builder
 	b.WriteString(`# Katalog kodów błędów
 
@@ -207,7 +249,9 @@ i może się zmieniać, a do tłumaczenia służy kod i parametry.
   ` + "`Builtin`" + `, ` + "`Insert`" + ` pola ` + "`InsertLine`" + ` i ` + "`InsertColumn`" + ` (ADR 0010).
 - **libxml2**: odpowiednik z tabeli compat (kryterium K8); „observed n/m” — ustalony na tych samych danych przez
   ` + "`tools/compare`" + `, „assigned” — przypisany, z podaną podstawą.
-- **Własny**: kod nadany przez goxsdgo, bo rekomendacja nie nazywa tej reguły.
+- **Własny**: kod nadany przez goxsdgo, bo rekomendacja nie nazywa tej reguły (dla kodów czytnika: przez czytnik).
+- **Źródło**: ` + "`goxsdgo`" + ` — kod emituje walidator; ` + "`goxmlgo`" + ` — kod czytnika XML ` + "`github.com/polestorm/goxmlgo/xmlreader`" + `
+  (ADR 0014), przekazany przez walidator bez zmian; jego opis i reguła są też w ` + "`docs/errors.md`" + ` goxmlgo.
 
 `)
 	kinds := map[string]int{}
@@ -229,7 +273,7 @@ i może się zmieniać, a do tłumaczenia służy kod i parametry.
 		{"Limity i konstrukcje nieobsługiwane", KindLimit},
 	}
 	for _, g := range groups {
-		fmt.Fprintf(&b, "## %s\n\n| Kod | Reguła | Parametry | libxml2 | Opis |\n|---|---|---|---|---|\n", g.title)
+		fmt.Fprintf(&b, "## %s\n\n| Kod | Źródło | Reguła | Parametry | libxml2 | Opis |\n|---|---|---|---|---|---|\n", g.title)
 		codes := Codes()
 		sort.Slice(codes, func(i, j int) bool { return codes[i].Code < codes[j].Code })
 		for _, c := range codes {
@@ -251,7 +295,15 @@ i może się zmieniać, a do tłumaczenia służy kod i parametry.
 			if params == "" {
 				params = "—"
 			}
-			fmt.Fprintf(&b, "| `%s` | %s | %s | %s | %s |\n", c.Code, rule, params, lib, strings.ReplaceAll(c.Summary, "|", "\\|"))
+			var from []string
+			if reader[c.Code] {
+				from = append(from, "goxmlgo")
+			}
+			if emitted[c.Code] {
+				from = append(from, "goxsdgo")
+			}
+			source := strings.Join(from, ", ")
+			fmt.Fprintf(&b, "| `%s` | %s | %s | %s | %s | %s |\n", c.Code, source, rule, params, lib, strings.ReplaceAll(c.Summary, "|", "\\|"))
 		}
 		b.WriteString("\n")
 	}

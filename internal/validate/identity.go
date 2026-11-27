@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/polestorm/goxmlgo/xmlreader"
 	"github.com/polestorm/goxsdgo/internal/datatypes"
 	"github.com/polestorm/goxsdgo/internal/schema"
-	"github.com/polestorm/goxsdgo/xmlreader"
 )
 
 // Ograniczenia tożsamości (3.11.4 Identity-constraint Satisfied, 3.11.5 Identity-constraint Table) strumieniowo.

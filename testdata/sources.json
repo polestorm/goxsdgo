@@ -12,17 +12,6 @@
       "file_count": 42270
     },
     {
-      "name": "w3c-xmlconf",
-      "kind": "archive",
-      "dest": "testdata/w3c/xmlconf",
-      "note": "W3C XML Conformance Test Suite 20130923 (czytnik XML, etap 1).",
-      "url": "https://www.w3.org/XML/Test/xmlts20130923.tar.gz",
-      "strip": 1,
-      "sha256": "9b61db9f5dbffa545f4b8d78422167083a8568c59bd1129f94138f936cf6fc1f",
-      "tree_sha256": "df92eaea937153a50914dc55c1445c8ec28d670c56e8eba279409ad642d1a857",
-      "file_count": 3386
-    },
-    {
       "name": "w3c-schemas",
       "kind": "files",
       "dest": "testdata/w3c/schemas",

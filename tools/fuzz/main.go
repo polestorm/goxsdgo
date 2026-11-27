@@ -32,7 +32,7 @@ import (
 )
 
 type fuzzer struct {
-	pkg  string // ścieżka pakietu względem root, np. ./xmlreader
+	pkg  string // ścieżka pakietu względem root, np. ./xsd
 	name string
 }
 

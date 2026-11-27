@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/polestorm/goxmlgo/xmlchars"
 	"github.com/polestorm/goxsdgo/internal/regex"
-	"github.com/polestorm/goxsdgo/internal/xmlchars"
 )
 
 // NamespaceResolver rozwiązuje prefiks przestrzeni nazw w miejscu, w którym stoi wartość QName albo NOTATION

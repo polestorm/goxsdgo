@@ -1,3 +1,6 @@
+// Przykład z goxsdgo v0.3.0 (xmlreader/example_test.go), przepisany bez zmian: program napisany dla v0.3.0
+// kompiluje się i daje ten sam wynik z warstwą zgodności (XML-020).
+
 package xmlreader_test
 
 import (

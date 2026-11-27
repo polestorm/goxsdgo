@@ -1,7 +1,7 @@
 # goxsdgo — instrukcje dla Claude Code
 
 Projekt: walidator XML według XSD 1.0 w czystym Go. Cele: zgodność z rekomendacjami W3C XML Schema 1.0 (Second
-Edition, części 1 i 2), zero cgo i zero zależności poza biblioteką standardową, walidacja strumieniowa w ograniczonej
+Edition, części 1 i 2), zero cgo, jedyna zależność to własny czytnik XML `goxmlgo` (sam bez zależności), walidacja strumieniowa w ograniczonej
 pamięci, bezpieczny z konstrukcji (bez sieci, bez encji zewnętrznych), błędy ze stałym kodem, wierszem, kolumną
 i ścieżką, powtarzalny wynik, czas liniowy także dla danych złośliwych. Projekt jest agnostyczny wobec odbiorców.
 
@@ -57,7 +57,8 @@ Zasady:
   go-libxml2, helium, walidatory XSD w Go i podobne). Wolno uruchamiać je jako czarną skrzynkę, żeby porównać wynik.
   Po spełnieniu K1 i K2 przegląd kodu konkurencji według ADR 0002: czyta osobny agent, oddaje notatkę prozą bez kodu,
   wpis w `docs/review/`;
-- **zero zależności i zero cgo**: `go.mod` w katalogu głównym nie ma sekcji `require`; `CGO_ENABLED=0 go build ./...`
+- **jedyna zależność to goxmlgo (zero zależności, zero cgo)** (ADR 0014): `go.mod` w katalogu głównym wymaga tylko
+  `github.com/polestorm/goxmlgo`, które samo nie ma zależności (CI: `go list -m all`); `CGO_ENABLED=0 go build ./...`
   musi przechodzić; porównanie z libxml2 żyje w osobnym module `tools/compare` i nie jest importowane przez bibliotekę;
 - wzorcem są rekomendacje i oczekiwane wyniki zestawu W3C, nie zachowanie libxml2: gdy libxml2 różni się od
   rekomendacji, wygrywa rekomendacja, a różnicę wpisujemy do `docs/differences.md` (odbiorca musi wiedzieć, że plik
@@ -68,7 +69,7 @@ Zasady:
   `python tools/fetch/fetch.py` według `testdata/sources.json`; nie trafiają do repozytorium (ADR 0003). Obie wersje
   narzędzia zmieniamy razem;
 - zapadki `testdata/**/*.ratchet` (`docs/testing.md`): po zmianie, która dodaje zaliczenia,
-  `go test ./xsd ./internal/datatypes ./xmlreader -update` (flagę `-update` mają tylko pakiety z zapadkami); walidator odniesienia: `tools/compare` (polecenia w `docs/testing.md`);
+  `go test ./xsd ./internal/datatypes -update` (flagę `-update` mają tylko pakiety z zapadkami); walidator odniesienia: `tools/compare` (polecenia w `docs/testing.md`);
 - **żadnych prawdziwych danych podatników ani klientów w korpusie**: tylko przykłady opublikowane przez MF i dokumenty
   syntetyczne (`testdata/README.md`);
 - nazwy plików, pakietów i identyfikatorów po angielsku; komentarze i dokumentacja po polsku; po angielsku: `README.md`,
@@ -96,9 +97,12 @@ Zasady:
 - dokumenty schematu spoza `fs.FS` tylko przez `Config.Resolve` (ADR 0013); pakiet `xsd` nie importuje `net/http`,
   sieć jest wyłącznie w opcjonalnym `xsd/resolve` i tylko z `Options.Network`; testy sieci tylko na lokalnym
   `httptest`;
-- czytnik XML jest publicznym pakietem `xmlreader` (od 2026-11-26, wcześniej `internal/xmlreader`); jego porównanie
-  z `encoding/xml` (`TestStdlibConformance`, `BenchmarkJPK*`) podlega tej samej regule powtarzalności, wyniki
-  w `docs/results/xmlreader-*`;
+- czytnik XML jest w osobnym module `github.com/polestorm/goxmlgo` (od 2026-11-27, ADR 0014; wcześniej `xmlreader`
+  w tym repozytorium): zmiany czytnika, jego testy, zestaw XML Conformance, `FuzzReader` i porównanie z `encoding/xml`
+  robimy tam, nie tutaj; błąd czytnika widoczny w walidatorze naprawiamy w goxmlgo, nie obchodzimy tutaj.
+  `goxsdgo/xmlreader` to przestarzała warstwa zgodności (aliasy, API v0.3.0): bez nowych funkcji przekazujących.
+  Podbicie wersji goxmlgo: wpis w `CHANGELOG.md`, zrzut `TestDumpErrors` przed i po, K1–K3, pomiar szybkości;
+  wymagania delegowane w `requirements/xml.md` i `datatypes.md` wskazują wersję z `go.mod` (test to sprawdza);
 - w katalogu głównym trzymamy tylko `README.md`, `CHANGELOG.md`, `LICENSE`, `NOTICE`, `go.mod` (i `.gitignore`); ten
   plik leży w `.claude/CLAUDE.md`;
 - **teczka walidacyjna** (dla odbiorców walidujących moduł, np. QMS `module-validation.md`): każda zmiana ma wpis

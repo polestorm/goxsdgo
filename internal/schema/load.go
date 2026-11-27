@@ -11,7 +11,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/polestorm/goxsdgo/internal/xmlchars"
+	"github.com/polestorm/goxmlgo/xmlchars"
 )
 
 // Config ustawia wczytywanie schematu. Wartość zerowa to ustawienia domyślne: bez sieci, dokumenty tylko z fs.FS.

@@ -111,27 +111,23 @@ Results land in `out/` (not committed) until `publish` copies them.
 
 ## XML reader
 
-The comparison of [`xmlreader`](../xmlreader/README.md) with `encoding/xml` (Go standard library, default
-settings, `Strict` on) is run by the tests of the package, on inputs fetched by `tools/fetch` (the W3C XML
-Conformance suite, `w3c-xmlconf` in `testdata/sources.json`) and on a generated document:
+Since v0.5.0 the XML reader is the module [goxmlgo](https://github.com/polestorm/goxmlgo) (ADR 0014). Its
+comparison with `encoding/xml` (W3C XML Conformance suite, speed and memory), the commands and the raw results are
+in goxmlgo: [docs/methodology.md](https://github.com/polestorm/goxmlgo/blob/v0.2.0/docs/methodology.md) and
+[docs/results/](https://github.com/polestorm/goxmlgo/tree/v0.2.0/docs/results). The last run in goxsdgo (reader of
+v0.4.0) is in the history of this repository, `docs/results/xmlreader-*` at tag v0.4.1.
+
+### Switching to goxmlgo: validation before and after
+
+The switch from goxsdgo's own reader (v0.4.1) to goxmlgo v0.2.0 was measured with the same time-and-memory method
+as above, goxsdgo only (`-only goxsdgo`; xmllint ran alongside as a reference for the load of the machine):
 
 ```sh
-go test ./xmlreader -run TestStdlibConformance -v -stdlib-out ../docs/results/xmlreader-conformance.tsv
-go test ./xmlreader -run '^$' -bench 'BenchmarkJPK' -benchmem -count 5
+go -C tools/bench build -o ../../out/bench/bench . && (cd tools/bench && ../../out/bench/bench -root ../.. -only goxsdgo -runs 5 perf 20 60 200)
+GOXSDGO_DUMP_ERRORS=errors.txt go test ./xsd -run TestDumpErrors   # every error of every W3C case and corpus document
 ```
 
-- **Conformance**: the in-scope cases of `TestXMLConformance` (XML 1.0 Fifth Edition, Namespaces 1.0, no external
-  entities; the exclusions and their counts are printed by `go test ./xmlreader -run TestXMLConformance -v`). A
-  well-formed case (`valid`, `invalid`) passes when the reader reads the whole document without an error;
-  for xmlreader also with the suite's canonical form where it has one. A `not-wf` case passes when the reader
-  rejects the document. encoding/xml is read with `Token`, which resolves namespaces.
-- **Speed and memory**: `BenchmarkJPK` (xmlreader), `BenchmarkJPKStdlib` (`Token`) and `BenchmarkJPKStdlibRaw`
-  (`RawToken`, without namespace resolution) read the same deterministic document of 20,000 JPK-like rows
-  (8.8 MB, generated in memory by `jpkLike` in `xmlreader/reader_test.go`), one goroutine; the table gives the
-  median of 5 runs of `MB/s`, and `B/op` and `allocs/op` from the same output.
-- Raw results: [`results/xmlreader-conformance.tsv`](results/xmlreader-conformance.tsv) (each case, both readers)
-  and [`results/xmlreader-bench.txt`](results/xmlreader-bench.txt) (the `go test` output with date, commit, Go
-  version and machine).
+Raw results and the summary: [`results/goxmlgo-switch/`](results/goxmlgo-switch/README.md).
 
 ## Known limits of the numbers
 

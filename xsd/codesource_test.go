@@ -10,9 +10,60 @@ import (
 	"testing"
 )
 
-// codePackages to pakiety, których kody błędów mogą dotrzeć do wywołującego: jako Error.Code albo w treści błędu
-// zwracanego drugim wynikiem (limity, konstrukcje nieobsługiwane).
-var codePackages = []string{"xmlreader", "datatypes", "regex", "schema", "validate"}
+// codePackages to pakiety goxsdgo, których kody błędów mogą dotrzeć do wywołującego: jako Error.Code albo w treści
+// błędu zwracanego drugim wynikiem (limity, konstrukcje nieobsługiwane). Kody czytnika pochodzą z goxmlgo/xmlreader
+// (readerCodes); jego stałe są znane przy rozwiązywaniu odwołań xmlreader.CodeX w tych pakietach.
+var codePackages = []string{"datatypes", "regex", "schema", "validate"}
+
+// readerCodes zwraca kody błędów eksportowane przez goxmlgo/xmlreader w wersji z go.mod (stała Code* → wartość),
+// czytane z kodu źródłowego modułu w pamięci modułów.
+func readerCodes(t *testing.T) map[string]string {
+	t.Helper()
+	dir, _ := goxmlgo(t)
+	matches, err := filepath.Glob(filepath.Join(dir, "xmlreader", "*.go"))
+	if err != nil || len(matches) == 0 {
+		t.Fatalf("goxmlgo/xmlreader sources in %s: %v", dir, err)
+	}
+	out := map[string]string{}
+	fset := token.NewFileSet()
+	for _, m := range matches {
+		if strings.HasSuffix(m, "_test.go") {
+			continue
+		}
+		f, err := parser.ParseFile(fset, m, nil, 0)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for name, v := range codeConsts(f) {
+			out[name] = v
+		}
+	}
+	return out
+}
+
+// codeConsts zwraca stałe Code* pliku z wartością będącą literałem napisu.
+func codeConsts(f *ast.File) map[string]string {
+	out := map[string]string{}
+	for _, d := range f.Decls {
+		g, ok := d.(*ast.GenDecl)
+		if !ok || g.Tok != token.CONST {
+			continue
+		}
+		for _, s := range g.Specs {
+			vs := s.(*ast.ValueSpec)
+			for i, n := range vs.Names {
+				if !strings.HasPrefix(n.Name, "Code") || i >= len(vs.Values) {
+					continue
+				}
+				if lit, ok := vs.Values[i].(*ast.BasicLit); ok && lit.Kind == token.STRING {
+					v, _ := strconv.Unquote(lit.Value)
+					out[n.Name] = v
+				}
+			}
+		}
+	}
+	return out
+}
 
 // sourceCodes czyta kod źródłowy pakietów (bez testów) i zwraca wszystkie kody błędów, które mogą zostać
 // wyemitowane: wartości stałych Code* użytych w kodzie oraz złożenia „Code* + "punkt"”. Stała użyta wyłącznie
@@ -25,12 +76,9 @@ func sourceCodes(t *testing.T) map[string]string {
 		files []*ast.File
 	}
 	var pkgs []pkgFiles
-	consts := map[string]map[string]string{} // pakiet → nazwa stałej → wartość
+	consts := map[string]map[string]string{"xmlreader": readerCodes(t)} // pakiet → nazwa stałej → wartość
 	for _, p := range codePackages {
 		dir := filepath.Join("..", "internal", p)
-		if p == "xmlreader" { // publiczny od 2026-11-26
-			dir = filepath.Join("..", p)
-		}
 		matches, err := filepath.Glob(filepath.Join(dir, "*.go"))
 		if err != nil {
 			t.Fatal(err)
@@ -46,23 +94,8 @@ func sourceCodes(t *testing.T) map[string]string {
 				t.Fatal(err)
 			}
 			pf.files = append(pf.files, f)
-			for _, d := range f.Decls {
-				g, ok := d.(*ast.GenDecl)
-				if !ok || g.Tok != token.CONST {
-					continue
-				}
-				for _, s := range g.Specs {
-					vs := s.(*ast.ValueSpec)
-					for i, n := range vs.Names {
-						if !strings.HasPrefix(n.Name, "Code") || i >= len(vs.Values) {
-							continue
-						}
-						if lit, ok := vs.Values[i].(*ast.BasicLit); ok && lit.Kind == token.STRING {
-							v, _ := strconv.Unquote(lit.Value)
-							consts[p][n.Name] = v
-						}
-					}
-				}
+			for name, v := range codeConsts(f) {
+				consts[p][name] = v
 			}
 		}
 		pkgs = append(pkgs, pf)

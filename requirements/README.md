@@ -2,10 +2,12 @@
 
 Każde wymaganie ma identyfikator `PREFIKS-nnn`. Testy i pliki korpusu odwołują się do nich przez `REQ: PREFIKS-nnn`;
 test `TestRequirementsCovered` sprawdza pokrycie w obie strony.
+Wymaganie delegowane („Delegowane: goxmlgo vX.Y.Z, `requirements/plik.md` ID…”) jest spełnione w module goxmlgo; test
+sprawdza, że wersja zgadza się z `go.mod`, a wskazane wymaganie istnieje w tej wersji goxmlgo.
 
 | Prefiks | Plik | Zakres |
 |---|---|---|
-| `XML` | `xml.md` | czytnik XML: dobra forma, przestrzenie nazw, pozycje, DOCTYPE, limity |
+| `XML` | `xml.md` | czytnik XML: wymagania delegowane do goxmlgo i wymagania goxsdgo wobec czytnika |
 | `DT` | `datatypes.md` | typy wbudowane, aspekty, listy, unie (część 2) |
 | `RE` | `regex.md` | wyrażenia regularne XSD (część 2, dodatek F) |
 | `SCH` | `schema.md` | wczytanie schematu, komponenty, `include`/`import`/`redefine`, ograniczenia poprawności schematu |

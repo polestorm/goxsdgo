@@ -9,6 +9,9 @@ require (
 	github.com/polestorm/goxsdgo v0.0.0
 )
 
-require golang.org/x/text v0.41.0 // indirect
+require (
+	github.com/polestorm/goxmlgo v0.2.0 // indirect
+	golang.org/x/text v0.41.0 // indirect
+)
 
 replace github.com/polestorm/goxsdgo => ../..

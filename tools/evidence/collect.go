@@ -330,11 +330,15 @@ type Trace struct {
 	Evidence []string `json:"evidence"`
 	// Status: pass (wszystkie testy przeszły), manual (dowód uruchamiany na żądanie: benchmark albo test pomijany
 	// bez zmiennej GOXSDGO_*), skip (test pominięty, np. bez pobranych danych), unresolved (tylko funkcje pomocnicze
-	// albo test nieznany w przebiegu), fail, missing (brak dowodu).
+	// albo test nieznany w przebiegu), fail, missing (brak dowodu), delegated (wymaganie delegowane do goxmlgo:
+	// dowód jest w pakiecie dowodów goxmlgo w wersji z odsyłacza, ADR 0014).
 	Status string `json:"status"`
 }
 
-var statusRank = map[string]int{"pass": 0, "manual": 1, "skip": 2, "unresolved": 3, "fail": 4, "missing": 5}
+var statusRank = map[string]int{"pass": 0, "delegated": 0, "manual": 1, "skip": 2, "unresolved": 3, "fail": 4, "missing": 5}
+
+// delegatedPrefix zaczyna treść wymagania delegowanego do goxmlgo (requirements/README.md).
+const delegatedPrefix = "Delegowane: "
 
 // buildTraces łączy wymagania, odwołania i wyniki przebiegów w macierz śledzenia; zwraca też odwołania do
 // nieistniejących wymagań. Odwołanie przy funkcji pomocniczej (np. sprawdzeniu wołanym przez kilka testów) jest
@@ -406,6 +410,9 @@ func buildTraces(reqs []Requirement, refs []Ref, runs []*TestRun) ([]Trace, []Re
 			}
 		}
 		switch {
+		case resolved == 0 && supporting == 0 && strings.HasPrefix(req.Text, delegatedPrefix):
+			t.Status = "delegated"
+			t.Evidence = append(t.Evidence, strings.ReplaceAll(strings.TrimSuffix(strings.TrimPrefix(req.Text, delegatedPrefix), "."), "`", ""))
 		case resolved == 0 && supporting > 0:
 			t.Status = "unresolved"
 		case resolved == 0:

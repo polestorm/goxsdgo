@@ -13,6 +13,26 @@ Every release lists its changes with an impact class and the requirements they t
 Tags up to v0.3.0 are annotated, not signed; from v0.4.0 on, tags are signed. Known limitations:
 [docs/known-issues.md](docs/known-issues.md).
 
+## Unreleased
+
+- **Class 2.** The XML reader comes from the module [goxmlgo](https://github.com/polestorm/goxmlgo) v0.2.0, the
+  reader split out of goxsdgo (ADR 0014). It is the only dependency of goxsdgo, and it has no dependencies and no
+  cgo of its own. Validation behaviour is unchanged: every error of every in-scope W3C case and corpus document is
+  byte for byte the same (`TestDumpErrors`), K1–K3 and all ratchets unchanged. Validation is 13–17% faster
+  ([docs/results/goxmlgo-switch/](docs/results/goxmlgo-switch/README.md)). Requirements XML-001 to XML-018 and
+  DT-019 are delegated to goxmlgo (same IDs there, checked by `TestRequirementsCovered`); the reader's tests,
+  W3C XML Conformance results, `FuzzReader` and the comparison with `encoding/xml` moved there. The error catalogue
+  keeps the reader's codes, marked with their source (`docs/errors.md`); `limit-elements` and `usage-skip` of
+  goxmlgo are not in it, because goxsdgo never sets `MaxElements` or calls `Skip`.
+- **Class 2.** `goxsdgo/xmlreader` is deprecated: it keeps type aliases of `goxmlgo/xmlreader` and the constants and
+  functions of v0.3.0, so programs written for it compile unchanged and its types are the goxmlgo types (an error
+  matches `*xmlreader.Error` from either import path in `errors.As`); goxmlgo's additions (`Skip`, `Reset`,
+  `Limits.MaxElements`, `Token.Namespaces`, `NamespaceScope`, `TokenReader`, `Declaration`) are reached through the
+  aliases. New code should import `github.com/polestorm/goxmlgo/xmlreader`. XML-020.
+- **Class 0.** The W3C XML Conformance suite is no longer fetched (`w3c-xmlconf` removed from
+  `testdata/sources.json`); the evidence package lists the dependencies with their `go.sum` hashes and marks
+  delegated requirements.
+
 ## v0.4.1 (2026-11-26)
 
 - **Class 1.** `xmlreader` (and so `xsd.Set.Validate`, which reads documents with it): input that arrives in small

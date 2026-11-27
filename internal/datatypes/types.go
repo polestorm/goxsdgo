@@ -13,8 +13,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/polestorm/goxmlgo/xmlchars"
 	"github.com/polestorm/goxsdgo/internal/regex"
-	"github.com/polestorm/goxsdgo/internal/xmlchars"
 )
 
 // Variety to odmiana typu prostego (2.5.1).

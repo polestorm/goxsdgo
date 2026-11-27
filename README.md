@@ -1,7 +1,7 @@
 # goxsdgo
 
-Validates XML documents against XML Schema 1.0 (XSD) in pure Go: no cgo, no libxml2, no dependencies outside the
-Go standard library. Written from the W3C recommendations. Documents are validated as a stream, in bounded memory,
+Validates XML documents against XML Schema 1.0 (XSD) in pure Go: no cgo, no libxml2; the only dependency is our own
+XML reader, [goxmlgo](https://github.com/polestorm/goxmlgo), which has none. Written from the W3C recommendations. Documents are validated as a stream, in bounded memory,
 and every error has a stable code named after the rule of the recommendation, with line, column and element path.
 
 ```go
@@ -59,7 +59,7 @@ All of them were run as programs through their public API, on the same cases and
 | | goxsdgo | libxml2 | knroy | jacoelho | cB-Sigma |
 |---|:---:|:---:|:---:|:---:|:---:|
 | W3C XSD 1.0 test suite[^w3c] | 99.82% | 98.03% | 99.87% 🥇 | 99.10% | 99.72% |
-| Dependencies | 0 | C, cgo | 1 | 0 | 0 |
+| Dependencies | 1[^deps] | C, cgo | 1 | 0 | 0 |
 | Added to a program | 1.7 MB | 1.0 MB lib + … | 6.4 MB | 3.2 MB | 1.6 MB 🥇 |
 | Time, 200 MB XML[^perf] | 4.00 s | 3.90 s | —[^tree] | 3.75 s 🥇 | —[^tree] |
 | Memory, 200 MB XML | 25 MB | 5 MB 🥇 | — | 22 MB | — |
@@ -94,14 +94,18 @@ instance tests, the MF corpus, safety probes, 20 MB and 1 GB documents, patholog
     Apple M4 laptop ([docs/methodology.md](docs/methodology.md)).
 [^pop]: Stars on 2026-11-26 (`gh api repos/OWNER/REPO`); libxml2 is developed on GNOME's GitLab, the count is of
     its GitHub mirror `GNOME/libxml2`.
+[^deps]: [goxmlgo](https://github.com/polestorm/goxmlgo), the XML reader, split out of goxsdgo in v0.5.0; it has no
+    dependencies and no cgo. knroy needs `golang.org/x/text`.
 [^tree]: Builds a tree of the whole document (11× and 22× the file size in memory), so not run on 200 MB.
 
 ## XML reader
 
-The streaming XML reader goxsdgo validates with is a public package of its own,
-[`xmlreader`](xmlreader/): XML 1.0 and namespaces checked in full (1725 of 1727 W3C XML Conformance cases against
-1146 for `encoding/xml`), line, column and a fixed code for every error, limits on by default, and about twice the
-speed of `encoding/xml` with almost no allocations. Comparison and examples: [xmlreader/README.md](xmlreader/README.md).
+The streaming XML reader goxsdgo validates with is a module of its own since v0.5.0:
+[goxmlgo](https://github.com/polestorm/goxmlgo) (`goxmlgo/xmlreader`): XML 1.0 and namespaces checked in full, line,
+column and a fixed code for every error, limits on by default, faster than `encoding/xml` with almost no allocations.
+Its requirements, conformance results, fuzzing and the comparison with `encoding/xml` are there. The package
+`goxsdgo/xmlreader` stays as deprecated type aliases, so programs written for it keep compiling
+([xmlreader/README.md](xmlreader/README.md)).
 
 ## Status
 

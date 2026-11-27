@@ -189,6 +189,7 @@ func build(root string, streamMB int, now time.Time) (*Evidence, map[string][]by
 		SourcesSHA:  sourcesSHA,
 		FetchVerify: fv,
 		ADRs:        readADRs(root),
+		Deps:        readDeps(root),
 		Differences: diffSections(string(diffText)),
 	}
 	for name := range raw {
@@ -311,4 +312,29 @@ func tarDir(dir, target string) error {
 func fail(err error) {
 	fmt.Fprintln(os.Stderr, "evidence:", err)
 	os.Exit(1)
+}
+
+// readDeps czyta zależności modułu biblioteki: go list -m all (bez modułu głównego) i sumy h1 z go.sum.
+func readDeps(root string) []Dependency {
+	sums := map[string]string{}
+	b, _ := os.ReadFile(filepath.Join(root, "go.sum"))
+	for _, line := range strings.Split(string(b), "\n") {
+		if f := strings.Fields(line); len(f) == 3 && !strings.HasSuffix(f[1], "/go.mod") {
+			sums[f[0]+" "+f[1]] = f[2]
+		}
+	}
+	var deps []Dependency
+	out := runCmd(root, nil, "go", "list", "-m", "-f", "{{if not .Main}}{{.Path}} {{.Version}}{{end}}", "all")
+	for _, line := range strings.Split(string(out), "\n") {
+		f := strings.Fields(line)
+		if len(f) != 2 {
+			continue
+		}
+		d := Dependency{Path: f[0], Version: f[1], Sum: sums[f[0]+" "+f[1]]}
+		if strings.HasPrefix(d.Path, "github.com/") {
+			d.Source = "https://" + d.Path + "/tree/" + d.Version
+		}
+		deps = append(deps, d)
+	}
+	return deps
 }
