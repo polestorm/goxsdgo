@@ -147,9 +147,8 @@ Paczka z `e715fa1` (kod v0.4.0), ustawiona w kolejce 2026-11-26 21:37, została 
 (23:36): poprawka KI-13 zmieniła kod biblioteki, więc jej godziny nie liczyłyby się dla wydania z poprawką.
 Zamiast niej paczka z tagu `v0.4.1` (`985c49f`, kod biblioteki jak w `140b2de`) w `~/fuzz/goxsdgo/985c49f/`,
 ustawiona 2026-11-26 23:37: 1440 min (24 h, 7 fuzzerów po ok. 205 min), 3 workery, `nice -n 19`, z nowym
-niezmiennikiem `FuzzReader` (niżej). Ziarna wszystkich 7 fuzzerów przechodzą na serwerze. Ruszy po zadaniach
-`gohighlightgo` i `gomermaidgo`. Po zakończeniu: skopiować `~/fuzz/goxsdgo/985c49f/fuzzpack/work/journal.tsv`
-i `go -C tools/fuzz run . -root ../.. -import journal.tsv`, potem zbudować pakiet dowodów.
+niezmiennikiem `FuzzReader` (niżej). Ziarna wszystkich 7 fuzzerów przechodzą na serwerze. Wycofana przed startem
+2026-11-27 (niżej).
 
 ## Nowy niezmiennik FuzzReader (2026-11-26)
 
@@ -164,5 +163,14 @@ K5 biegnie na `v0.4.1` (wyżej).
 Od v0.5.0 goxsdgo czyta dokumenty czytnikiem z `github.com/polestorm/goxmlgo` (ADR 0014). `FuzzReader` i jego
 wejścia regresji są w goxmlgo i tam liczą się jego godziny; w goxsdgo zostaje 6 fuzzerów (czytnik dalej dostaje
 wejścia pośrednio przez `FuzzValidate` i `FuzzCompile`). Paczka `tools/fuzz -pack` nie zawiera już zestawu XML
-Conformance. Kampania z paczki `985c49f` (v0.4.1, w kolejce na Synology) dotyczy kodu sprzed przełączenia: jej
-godziny liczą się dla v0.4.1, nie dla wydania z goxmlgo.
+Conformance.
+
+## Zlecenie na Synology (2026-11-27): kandydat z goxmlgo
+
+Paczka `985c49f` (v0.4.1) została wycofana z kolejki przed startem (2026-11-27 08:49): przełączenie na goxmlgo
+zmienia kod biblioteki (wersja w `go.mod`), więc jej godziny nie liczyłyby się dla wydania z goxmlgo. Zamiast niej
+paczka z `ae99efe` (czytnik z goxmlgo v0.2.0) w `~/fuzz/goxsdgo/ae99efe/`, ustawiona 2026-11-27 08:49: 1440 min
+(24 h, 6 fuzzerów po 240 min), 3 workery, `nice -n 19`. Ruszy po zadaniach `gohighlightgo`, `gomermaidgo`, `goxmlgo`
+i `gozipgo` (kolejność wyznacza blokada). Po zakończeniu: skopiować
+`~/fuzz/goxsdgo/ae99efe/fuzzpack/work/journal.tsv` i `go -C tools/fuzz run . -root ../.. -import journal.tsv`,
+potem zbudować pakiet dowodów.
