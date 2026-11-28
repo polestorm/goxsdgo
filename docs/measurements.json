@@ -1,8 +1,8 @@
 {
   "note": "Pomiary wykonywane poza `go test` (libxml2 przez tools/compare, plik 1 GB, korpus prywatny, testy odbiorcy), z których korzysta pakiet dowodów (tools/evidence, docs/evidence.md). Wartości przepisane z docs/testing.md; po nowym pomiarze zmień je tutaj i zbuduj pakiet ponownie. Korpus prywatny wyłącznie jako liczby zbiorcze.",
   "candidate": {
-    "commit": "ae99efe",
-    "note": "Kandydat do wydania: v0.5.0 (kod biblioteki jak w ae99efe, czytnik z goxmlgo v0.2.0; od 2026-11-27; wcześniej 140b2de = v0.4.1, 4749d94 = v0.4.0, 51b65ae, etap 7). K5 liczy godziny fuzzingu na nim i na commitach, które nie zmieniają kodu biblioteki (docs/fuzzing.md)."
+    "commit": "72166c9",
+    "note": "Kandydat do wydania: v0.6.0 (kod biblioteki jak w 72166c9, czytnik z goxmlgo v0.5.0, Go 1.26; od 2026-11-28; wcześniej ae99efe = v0.5.0, 140b2de = v0.4.1, 4749d94 = v0.4.0, 51b65ae, etap 7). K5 liczy godziny fuzzingu na nim i na commitach, które nie zmieniają kodu biblioteki (docs/fuzzing.md)."
   },
   "k3": {
     "date": "2026-11-25",

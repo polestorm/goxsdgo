@@ -13,7 +13,7 @@ Every release lists its changes with an impact class and the requirements they t
 Tags up to v0.3.0 are annotated, not signed; from v0.4.0 on, tags are signed. Known limitations:
 [docs/known-issues.md](docs/known-issues.md).
 
-## Unreleased
+## v0.6.0 (2026-11-28)
 
 - **Class 3.** goxsdgo needs **Go 1.26** (until v0.5.0: Go 1.22), because the XML reader goxmlgo v0.5.0 needs it
   (ADR 0015). Programs on Go 1.22–1.25 stay on goxsdgo v0.5.0.

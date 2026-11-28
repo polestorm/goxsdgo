@@ -3,7 +3,7 @@
 Correctness measured 2026-11-27, speed 2026-11-28 12:28–12:33 (load average 2.0–3.2 on 10 cores, `load.txt`), on an
 Apple M4 (macOS, on AC power). **Before**: goxsdgo v0.5.0 (`b210e7d`, clean
 tree) with goxmlgo v0.2.0. **After**: the same code with goxmlgo v0.5.0, `go 1.26`, the new limit
-`DocumentLimits.MaxNamespaces` and three new tests (ADR 0015; uncommitted tree on top of `b210e7d`). A third state,
+`DocumentLimits.MaxNamespaces` and three new tests (ADR 0015; commit `72166c9`, measured as the uncommitted tree on top of `b210e7d`). A third state,
 **bump only** (goxmlgo v0.5.0 with no other change), separates the reader's effect from goxsdgo's own changes.
 Method: as for the move to goxmlgo v0.2.0 ([../../methodology.md](../../methodology.md#switching-to-goxmlgo-validation-before-and-after)).
 Library tests ran with Go 1.26.6, the new minimum; `tools/bench` and the performance binaries with Go 1.27.0 (its

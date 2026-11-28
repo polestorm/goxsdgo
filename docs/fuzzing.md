@@ -174,3 +174,14 @@ paczka z `ae99efe` (czytnik z goxmlgo v0.2.0) w `~/fuzz/goxsdgo/ae99efe/`, ustaw
 i `gozipgo` (kolejność wyznacza blokada). Po zakończeniu: skopiować
 `~/fuzz/goxsdgo/ae99efe/fuzzpack/work/journal.tsv` i `go -C tools/fuzz run . -root ../.. -import journal.tsv`,
 potem zbudować pakiet dowodów.
+
+## Zlecenie na Synology (2026-11-28): kandydat v0.6.0
+
+Procesy kolejki czekające na NAS-ie przepadły przy jego restartach (2026-11-27 ok. 13:24 i 2026-11-28 ok. 04:46);
+paczka `ae99efe` nie ruszyła i została wycofana (2026-11-28 12:34, katalog usunięty): v0.6.0 zmienia kod biblioteki
+(goxmlgo v0.5.0, `go 1.26`, `DocumentLimits.MaxNamespaces`, ADR 0015), więc jej godziny nie liczyłyby się dla
+następnego wydania. Zamiast niej paczka z `72166c9` w `~/fuzz/goxsdgo/72166c9/`, ustawiona 2026-11-28 12:34:
+1440 min (24 h, 6 fuzzerów po 240 min), 3 workery, `nice -n 19`, za zadaniem `gozipgo/3bb5a06`. Po zakończeniu:
+skopiować `~/fuzz/goxsdgo/72166c9/fuzzpack/work/journal.tsv` i `go -C tools/fuzz run . -root ../.. -import
+journal.tsv`, potem zbudować pakiet dowodów. Przy kolejnym restarcie NAS-a zadanie trzeba ustawić ponownie
+(`grep goxsdgo ~/fuzz/queue.log`, `ps … | grep queue.sh`).
