@@ -44,8 +44,8 @@ każda zmiana ma w CHANGELOG klasę wpływu, zmiana niezgodna wstecz (klasa 3) m
 
 | Zależność | Uzasadnienie |
 |---|---|
-| biblioteka standardowa Go (≥ 1.22) | `CGO_ENABLED=0` (sprawdza CI) |
-| `github.com/polestorm/goxmlgo` (v0.2.0) | jedyny moduł spoza biblioteki standardowej (ADR 0014): czytnik XML (`xmlreader`) i klasy znaków nazw (`xmlchars`), wydzielone z goxsdgo; sam bez zależności i bez cgo, tagi podpisane, CHANGELOG z klasą wpływu, własny pakiet dowodów; CI sprawdza, że `go list -m all` podaje tylko ten moduł |
+| biblioteka standardowa Go (≥ 1.26, bo tyle wymaga goxmlgo v0.5.0; do goxsdgo v0.5.0: ≥ 1.22) | `CGO_ENABLED=0` (sprawdza CI) |
+| `github.com/polestorm/goxmlgo` (v0.5.0; goxsdgo v0.5.0 miało v0.2.0) | jedyny moduł spoza biblioteki standardowej (ADR 0014): czytnik XML (`xmlreader`) i klasy znaków nazw (`xmlchars`), wydzielone z goxsdgo; sam bez zależności i bez cgo, tagi podpisane, CHANGELOG z klasą wpływu, własny pakiet dowodów; CI sprawdza, że `go list -m all` podaje tylko ten moduł |
 | `net/http`, `crypto/tls` (tylko `xsd/resolve`) | pobieranie dokumentów, gdy wywołujący włączy `Network`; programy bez `xsd/resolve` ich nie linkują przez goxsdgo |
 
 Narzędzia w `tools/` (porównania, fuzzing, pakiet dowodów, pobieranie danych testowych) są osobnymi modułami i nie

@@ -1,6 +1,7 @@
 # 0014 Czytnik XML z modułu goxmlgo; jedyna zależność
 
 Status: przyjęta · 2026-11-27 (decyzja właściciela; etap 6a planu `docs/migration.md` w goxmlgo)
+Zmiana: goxmlgo v0.5.0 i Go 1.26 — ADR 0015.
 
 ## Kontekst
 

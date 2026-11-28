@@ -27,15 +27,16 @@ type DocumentLimits struct {
 	MaxEntityExpansion int // total text produced by expanding internal entities in a document, in bytes
 	MaxEntityDepth     int // nesting of entity references
 	MaxDTDSize         int // length of the DOCTYPE declaration with its internal subset, in bytes
+	MaxNamespaces      int // namespace declarations in scope at one time, those of all open elements together
 }
 
 // DefaultDocumentLimits returns the default document limits: depth 512, name 16 KiB, 4096 attributes,
-// text 16 MiB, entity expansion 4 MiB, entity nesting 32, DOCTYPE 1 MiB.
+// text 16 MiB, entity expansion 4 MiB, entity nesting 32, DOCTYPE 1 MiB, 256 namespace declarations in scope.
 func DefaultDocumentLimits() DocumentLimits {
 	l := xmlreader.DefaultLimits()
 	return DocumentLimits{MaxDepth: l.MaxDepth, MaxNameLength: l.MaxNameLength, MaxAttributes: l.MaxAttributes,
 		MaxTextSize: l.MaxTextSize, MaxEntityExpansion: l.MaxEntityExpansion, MaxEntityDepth: l.MaxEntityDepth,
-		MaxDTDSize: l.MaxDTDSize}
+		MaxDTDSize: l.MaxDTDSize, MaxNamespaces: l.MaxNamespaces}
 }
 
 // ErrLimit reports that validation exceeded a library limit (depth, text size, number of ID and identity-constraint
@@ -92,7 +93,7 @@ type Config struct {
 	OnValue func(TypedValue)
 
 	// Document holds the limits for reading the validated document (depth, names, attributes, text, entities,
-	// DOCTYPE). A zero field means the default from DefaultDocumentLimits, a negative one no limit. Exceeding a
+	// DOCTYPE, namespace declarations in scope). A zero field means the default from DefaultDocumentLimits, a negative one no limit. Exceeding a
 	// limit ends validation with ErrLimit, not with a document error (ADR 0011).
 	Document DocumentLimits
 
@@ -279,7 +280,7 @@ func (s *Set) ValidateDocument(r io.Reader, name string) ([]Error, error) {
 	opts := validate.Options{MaxErrors: s.cfg.MaxErrors, MaxIdentityEntries: s.cfg.MaxIdentityEntries,
 		MaxTextSize: d.MaxTextSize, Reader: xmlreader.Limits{MaxDepth: d.MaxDepth, MaxNameLength: d.MaxNameLength,
 			MaxAttributes: d.MaxAttributes, MaxTextSize: d.MaxTextSize, MaxEntityExpansion: d.MaxEntityExpansion,
-			MaxEntityDepth: d.MaxEntityDepth, MaxDTDSize: d.MaxDTDSize}, Names: s.cfg.NameRules.edition()}
+			MaxEntityDepth: d.MaxEntityDepth, MaxDTDSize: d.MaxDTDSize, MaxNamespaces: d.MaxNamespaces}, Names: s.cfg.NameRules.edition()}
 	if f := s.cfg.OnValue; f != nil {
 		opts.OnValue = func(ev validate.ValueEvent) {
 			f(TypedValue{Path: ev.Path, Name: ev.Name, Attribute: ev.Attribute, Type: ev.Type, Builtin: ev.Builtin,

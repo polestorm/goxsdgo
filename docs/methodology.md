@@ -113,8 +113,8 @@ Results land in `out/` (not committed) until `publish` copies them.
 
 Since v0.5.0 the XML reader is the module [goxmlgo](https://github.com/polestorm/goxmlgo) (ADR 0014). Its
 comparison with `encoding/xml` (W3C XML Conformance suite, speed and memory), the commands and the raw results are
-in goxmlgo: [docs/methodology.md](https://github.com/polestorm/goxmlgo/blob/v0.2.0/docs/methodology.md) and
-[docs/results/](https://github.com/polestorm/goxmlgo/tree/v0.2.0/docs/results). The last run in goxsdgo (reader of
+in goxmlgo: [docs/methodology.md](https://github.com/polestorm/goxmlgo/blob/v0.5.0/docs/methodology.md) and
+[docs/results/](https://github.com/polestorm/goxmlgo/tree/v0.5.0/docs/results). The last run in goxsdgo (reader of
 v0.4.0) is in the history of this repository, `docs/results/xmlreader-*` at tag v0.4.1.
 
 ### Switching to goxmlgo: validation before and after
@@ -127,7 +127,9 @@ go -C tools/bench build -o ../../out/bench/bench . && (cd tools/bench && ../../o
 GOXSDGO_DUMP_ERRORS=errors.txt go test ./xsd -run TestDumpErrors   # every error of every W3C case and corpus document
 ```
 
-Raw results and the summary: [`results/goxmlgo-switch/`](results/goxmlgo-switch/README.md).
+Raw results and the summary: [`results/goxmlgo-switch/`](results/goxmlgo-switch/README.md). The move to goxmlgo
+v0.5.0 was measured the same way, with the runs of `BenchmarkValidateJPK` also in back-to-back pairs:
+[`results/goxmlgo-v0.5.0/`](results/goxmlgo-v0.5.0/README.md).
 
 ## Known limits of the numbers
 

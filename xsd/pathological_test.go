@@ -198,6 +198,9 @@ func TestPathological(t *testing.T) {
 		{"attributes beyond MaxAttributes", xs + `<xs:element name="e"><xs:complexType>
 			<xs:anyAttribute processContents="skip"/></xs:complexType></xs:element></xs:schema>`,
 			manyAttributes(5000), Config{}},
+		{"namespace declarations beyond MaxNamespaces", xs + `<xs:element name="e"><xs:complexType>
+			<xs:anyAttribute processContents="skip"/></xs:complexType></xs:element></xs:schema>`,
+			manyNamespaces(3000), Config{}},
 		{"text beyond MaxTextSize", xs + `<xs:element name="e" type="xs:string"/></xs:schema>`,
 			[]byte("<e>" + strings.Repeat("x", 2<<20) + "</e>"), Config{Document: DocumentLimits{MaxTextSize: 1 << 20}}},
 		// Model zgodny z UPA, ale niejednoznaczny co do liczników: po każdym a liczba możliwych stanów liczników rośnie,
@@ -257,5 +260,16 @@ func manyKeys(n int) []byte {
 		fmt.Fprintf(&b, `<i id="k%d"/>`, i)
 	}
 	b.WriteString("</r>")
+	return b.Bytes()
+}
+
+// manyNamespaces to element z n deklaracjami przestrzeni nazw (ponad domyślny MaxNamespaces, poniżej MaxAttributes).
+func manyNamespaces(n int) []byte {
+	var b bytes.Buffer
+	b.WriteString("<e")
+	for i := 0; i < n; i++ {
+		fmt.Fprintf(&b, ` xmlns:p%d="urn:p%d"`, i, i)
+	}
+	b.WriteString("/>")
 	return b.Bytes()
 }

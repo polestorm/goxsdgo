@@ -307,6 +307,8 @@ var catalog = []CodeInfo{
 		Summary: "Entity expansion exceeds the reader limit (returned with ErrLimit)."},
 	{Code: "limit-name-length", Kind: KindLimit, Spec: "", Section: "", URL: "", Own: true, Params: nil,
 		Summary: "A name exceeds the reader limit (returned with ErrLimit)."},
+	{Code: "limit-namespaces", Kind: KindLimit, Spec: "", Section: "", URL: "", Own: true, Params: nil,
+		Summary: "More namespace declarations are in scope at one time than the reader limit (returned with ErrLimit)."},
 	{Code: "limit-text-size", Kind: KindLimit, Spec: "", Section: "", URL: "", Own: true, Params: nil,
 		Summary: "A text node exceeds the reader limit (returned with ErrLimit)."},
 	{Code: "maxExclusive-valid-restriction", Kind: KindSchema, Spec: "XSD 2", Section: "4.3.8.4", URL: "https://www.w3.org/TR/2004/REC-xmlschema-2-20041028/#maxExclusive-valid-restriction", Own: false, Params: []string{"Document"},

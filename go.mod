@@ -1,5 +1,5 @@
 module github.com/polestorm/goxsdgo
 
-go 1.22
+go 1.26
 
-require github.com/polestorm/goxmlgo v0.2.0
+require github.com/polestorm/goxmlgo v0.5.0

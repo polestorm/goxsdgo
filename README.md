@@ -109,7 +109,7 @@ Its requirements, conformance results, fuzzing and the comparison with `encoding
 
 ## Status
 
-- Feature complete for XSD 1.0; the API may still change before 1.0. Requires Go 1.22 or newer.
+- Feature complete for XSD 1.0; the API may still change before 1.0. Requires Go 1.26 or newer (goxsdgo v0.5.0 and earlier: Go 1.22).
 - Acceptance criteria met, except 24 h of fuzzing (in progress): [docs/evidence.md](docs/evidence.md).
 
 ## Testing

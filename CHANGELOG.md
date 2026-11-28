@@ -13,6 +13,25 @@ Every release lists its changes with an impact class and the requirements they t
 Tags up to v0.3.0 are annotated, not signed; from v0.4.0 on, tags are signed. Known limitations:
 [docs/known-issues.md](docs/known-issues.md).
 
+## Unreleased
+
+- **Class 3.** goxsdgo needs **Go 1.26** (until v0.5.0: Go 1.22), because the XML reader goxmlgo v0.5.0 needs it
+  (ADR 0015). Programs on Go 1.22–1.25 stay on goxsdgo v0.5.0.
+- **Class 2.** The XML reader is goxmlgo v0.5.0 (was v0.2.0). Validation results are unchanged: every error of every
+  in-scope W3C case and corpus document is byte for byte the same (`TestDumpErrors`), K1–K3 and all ratchets
+  unchanged ([docs/results/goxmlgo-v0.5.0/](docs/results/goxmlgo-v0.5.0/README.md)). Of the reader's changes since
+  v0.2.0, two do not reach the validator: a reference to an entity that gives no character no longer produces an
+  empty text token, which the validator never counted (`TestEmptyEntityText`, VAL-007), and a declaration
+  `xmlns:xml` is listed among the declarations of its element, which binds the same namespace as before
+  (`TestXMLPrefixDeclared`, SCH-001, VAL-013).
+- **Class 2.** New limit `DocumentLimits.MaxNamespaces`: at most 256 namespace declarations in scope at one time by
+  default (goxmlgo's `Limits.MaxNamespaces`), beyond that validation ends with `ErrLimit` and the code
+  `limit-namespaces` (new in the catalogue, `docs/errors.md`). A document with more declarations in scope, accepted
+  until v0.5.0, is rejected unless the limit is raised or turned off with a negative value; a schema document over
+  the limit gives `sfs-not-well-formed`. SAFE-001, DET-002. `goxsdgo/xmlreader` gains the constant
+  `CodeLimitNamespaces` for programs written for v0.3.0 (XML-020).
+- **Class 0.** Delegated requirements XML-001 to XML-018 and DT-019 point to goxmlgo v0.5.0.
+
 ## v0.5.0 (2026-11-27)
 
 - **Class 2.** The XML reader comes from the module [goxmlgo](https://github.com/polestorm/goxmlgo) v0.2.0, the

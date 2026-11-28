@@ -12,12 +12,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        go: ["1.22", "stable"]
+        # 1.26: najniższa wersja, której wymaga goxmlgo v0.5.0 (ADR 0015)
+        go: ["1.26", "stable"]
         os: [ubuntu-latest, macos-latest]
-        exclude:
-          # konsolidator Go 1.22 tworzy programy bez LC_UUID, których nowy macOS nie uruchamia
-          - go: "1.22"
-            os: macos-latest
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4

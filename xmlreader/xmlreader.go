@@ -5,7 +5,8 @@
 // Every type here is an alias of the type in goxmlgo/xmlreader, so values pass freely between the two import
 // paths: an error from either one matches *Error of either one in errors.As, and the newer parts of goxmlgo
 // (methods, fields, types such as TokenReader and NamespaceScope) are reached through the aliased types. The
-// constants and functions are the ones this package had in v0.3.0.
+// constants and functions are the ones this package had in v0.3.0, and CodeLimitNamespaces, the code of a limit
+// goxmlgo applies by default since its v0.4.0.
 //
 // Deprecated: use github.com/polestorm/goxmlgo/xmlreader.
 package xmlreader
@@ -105,6 +106,10 @@ const (
 	CodeEntityUnresolved    = xmlreader.CodeEntityUnresolved
 	CodeConditionalSection  = xmlreader.CodeConditionalSection
 )
+
+// CodeLimitNamespaces is the code of the limit Limits.MaxNamespaces, on by default since goxmlgo v0.4.0: a program
+// written for v0.3.0 can receive it without changing its options, so it is listed here too.
+const CodeLimitNamespaces = xmlreader.CodeLimitNamespaces
 
 // DefaultLimits returns the default limits; see goxmlgo/xmlreader.DefaultLimits.
 func DefaultLimits() Limits { return xmlreader.DefaultLimits() }

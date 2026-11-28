@@ -1,0 +1,55 @@
+# before, run 1
+BenchmarkValidateJPK-10    	       3	 424247778 ns/op	  49.44 MB/s	25874618 B/op	  945895 allocs/op
+BenchmarkValidateJPK-10    	       3	 383357500 ns/op	  54.71 MB/s	25837466 B/op	  945891 allocs/op
+BenchmarkValidateJPK-10    	       3	 408642972 ns/op	  51.32 MB/s	25874394 B/op	  945893 allocs/op
+BenchmarkValidateJPK-10    	       3	 423064681 ns/op	  49.57 MB/s	25886714 B/op	  945893 allocs/op
+BenchmarkValidateJPK-10    	       3	 405283930 ns/op	  51.75 MB/s	25812688 B/op	  945888 allocs/op
+# after, run 1
+BenchmarkValidateJPK-10    	       2	 829985375 ns/op	  25.27 MB/s	25918104 B/op	  946028 allocs/op
+BenchmarkValidateJPK-10    	       2	 660536583 ns/op	  31.75 MB/s	25881184 B/op	  946027 allocs/op
+BenchmarkValidateJPK-10    	       2	 535289354 ns/op	  39.18 MB/s	25899576 B/op	  946026 allocs/op
+BenchmarkValidateJPK-10    	       2	 547175833 ns/op	  38.33 MB/s	25918144 B/op	  946028 allocs/op
+BenchmarkValidateJPK-10    	       2	 515975875 ns/op	  40.65 MB/s	26012452 B/op	  946041 allocs/op
+# before, run 2
+BenchmarkValidateJPK-10    	       3	 457952333 ns/op	  45.80 MB/s	25850210 B/op	  945892 allocs/op
+BenchmarkValidateJPK-10    	       3	 369715444 ns/op	  56.73 MB/s	25849690 B/op	  945891 allocs/op
+BenchmarkValidateJPK-10    	       3	 369966639 ns/op	  56.69 MB/s	25874448 B/op	  945893 allocs/op
+BenchmarkValidateJPK-10    	       3	 369043792 ns/op	  56.83 MB/s	25862005 B/op	  945891 allocs/op
+BenchmarkValidateJPK-10    	       3	 370218861 ns/op	  56.65 MB/s	25849786 B/op	  945891 allocs/op
+# after, run 2
+BenchmarkValidateJPK-10    	       1	1431210958 ns/op	  14.65 MB/s	26086416 B/op	  946439 allocs/op
+BenchmarkValidateJPK-10    	       2	1139614688 ns/op	  18.40 MB/s	25919548 B/op	  946030 allocs/op
+BenchmarkValidateJPK-10    	       2	1081519208 ns/op	  19.39 MB/s	25973904 B/op	  946035 allocs/op
+BenchmarkValidateJPK-10    	       2	1093152708 ns/op	  19.19 MB/s	25899592 B/op	  946026 allocs/op
+BenchmarkValidateJPK-10    	       2	1111056854 ns/op	  18.88 MB/s	25955240 B/op	  946032 allocs/op
+# pairs: -test.benchtime 3x -test.count 1, before then after, 15 times
+before 1 BenchmarkValidateJPK-10    	       3	1063137889 ns/op	  19.73 MB/s	25863880 B/op	  945894 allocs/op
+after 1 BenchmarkValidateJPK-10    	       3	1021879042 ns/op	  20.52 MB/s	25837376 B/op	  945890 allocs/op
+before 2 BenchmarkValidateJPK-10    	       3	 961082056 ns/op	  21.82 MB/s	25886864 B/op	  945895 allocs/op
+after 2 BenchmarkValidateJPK-10    	       3	1670474458 ns/op	  12.56 MB/s	25937362 B/op	  945902 allocs/op
+before 3 BenchmarkValidateJPK-10    	       3	1197619820 ns/op	  17.51 MB/s	25874570 B/op	  945895 allocs/op
+after 3 BenchmarkValidateJPK-10    	       3	1036528694 ns/op	  20.23 MB/s	25861058 B/op	  945890 allocs/op
+before 4 BenchmarkValidateJPK-10    	       3	 983262403 ns/op	  21.33 MB/s	25899258 B/op	  945897 allocs/op
+after 4 BenchmarkValidateJPK-10    	       3	 921825722 ns/op	  22.75 MB/s	25838258 B/op	  945891 allocs/op
+before 5 BenchmarkValidateJPK-10    	       3	 972074847 ns/op	  21.58 MB/s	25874426 B/op	  945894 allocs/op
+after 5 BenchmarkValidateJPK-10    	       3	 970661042 ns/op	  21.61 MB/s	25874426 B/op	  945893 allocs/op
+before 6 BenchmarkValidateJPK-10    	       3	 964952695 ns/op	  21.73 MB/s	25837456 B/op	  945891 allocs/op
+after 6 BenchmarkValidateJPK-10    	       3	 926867250 ns/op	  22.63 MB/s	25863090 B/op	  945894 allocs/op
+before 7 BenchmarkValidateJPK-10    	       3	 979009639 ns/op	  21.42 MB/s	25875528 B/op	  945896 allocs/op
+after 7 BenchmarkValidateJPK-10    	       3	1136865875 ns/op	  18.45 MB/s	25826002 B/op	  945891 allocs/op
+before 8 BenchmarkValidateJPK-10    	       3	1129280375 ns/op	  18.57 MB/s	25886832 B/op	  945895 allocs/op
+after 8 BenchmarkValidateJPK-10    	       3	1396549611 ns/op	  15.02 MB/s	25875362 B/op	  945894 allocs/op
+before 9 BenchmarkValidateJPK-10    	       3	1069828292 ns/op	  19.60 MB/s	25900221 B/op	  945898 allocs/op
+after 9 BenchmarkValidateJPK-10    	       3	 985620083 ns/op	  21.28 MB/s	25874565 B/op	  945894 allocs/op
+before 10 BenchmarkValidateJPK-10    	       3	2102654056 ns/op	   9.97 MB/s	25886944 B/op	  945896 allocs/op
+after 10 BenchmarkValidateJPK-10    	       3	2390773306 ns/op	   8.77 MB/s	25937405 B/op	  945903 allocs/op
+before 11 BenchmarkValidateJPK-10    	       3	1706983403 ns/op	  12.29 MB/s	25900189 B/op	  945898 allocs/op
+after 11 BenchmarkValidateJPK-10    	       3	1080455792 ns/op	  19.41 MB/s	25838269 B/op	  945890 allocs/op
+before 12 BenchmarkValidateJPK-10    	       3	1056372389 ns/op	  19.85 MB/s	25874480 B/op	  945894 allocs/op
+after 12 BenchmarkValidateJPK-10    	       3	1069002792 ns/op	  19.62 MB/s	25863896 B/op	  945894 allocs/op
+before 13 BenchmarkValidateJPK-10    	       3	 835383931 ns/op	  25.11 MB/s	25824066 B/op	  945888 allocs/op
+after 13 BenchmarkValidateJPK-10    	       3	1062799736 ns/op	  19.73 MB/s	25862048 B/op	  945892 allocs/op
+before 14 BenchmarkValidateJPK-10    	       3	1073853250 ns/op	  19.53 MB/s	25837562 B/op	  945892 allocs/op
+after 14 BenchmarkValidateJPK-10    	       3	1057685444 ns/op	  19.83 MB/s	25901930 B/op	  945899 allocs/op
+before 15 BenchmarkValidateJPK-10    	       3	1050378528 ns/op	  19.97 MB/s	25874458 B/op	  945894 allocs/op
+after 15 BenchmarkValidateJPK-10    	       3	1059653972 ns/op	  19.79 MB/s	25888674 B/op	  945898 allocs/op

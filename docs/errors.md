@@ -16,7 +16,7 @@ i może się zmieniać, a do tłumaczenia służy kod i parametry.
 - **Źródło**: `goxsdgo` — kod emituje walidator; `goxmlgo` — kod czytnika XML `github.com/polestorm/goxmlgo/xmlreader`
   (ADR 0014), przekazany przez walidator bez zmian; jego opis i reguła są też w `docs/errors.md` goxmlgo.
 
-Kodów: 234 (schema 143, document 80, limit 11); własnych 41; z odpowiednikiem libxml2 223.
+Kodów: 235 (schema 143, document 80, limit 12); własnych 42; z odpowiednikiem libxml2 223.
 
 ## Błędy dokumentu
 
@@ -261,6 +261,7 @@ Kodów: 234 (schema 143, document 80, limit 11); własnych 41; z odpowiednikiem 
 | `limit-entity-depth` | goxmlgo | —, własny | — | — | Entity references are nested deeper than the reader limit (returned with ErrLimit). |
 | `limit-entity-expansion` | goxmlgo | —, własny | — | — | Entity expansion exceeds the reader limit (returned with ErrLimit). |
 | `limit-name-length` | goxmlgo | —, własny | — | — | A name exceeds the reader limit (returned with ErrLimit). |
+| `limit-namespaces` | goxmlgo | —, własny | — | — | More namespace declarations are in scope at one time than the reader limit (returned with ErrLimit). |
 | `limit-text-size` | goxmlgo | —, własny | — | — | A text node exceeds the reader limit (returned with ErrLimit). |
 | `schema-limit` | goxsdgo | —, własny | — | — | Loading exceeded the limit on schema documents or nesting (returned with ErrLimit). |
 | `unsupported-conditional-section` | goxmlgo | [XML 1.0 3.4](https://www.w3.org/TR/2008/REC-xml-20081126/#sec-condition-sect), własny | — | — | A conditional section in a parameter entity (errors.ErrUnsupported). |
